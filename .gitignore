@@ -46,3 +46,9 @@ app.*.map.json
 
 # Backend secrets
 communitywatch-backend/.env
+
+# Node dependencies are installed by the hosting provider
+**/node_modules/
+
+# Runtime database is created by the backend
+communitywatch-backend/*.db
