@@ -4,34 +4,35 @@ import 'dart:ui';
 import 'package:http/http.dart' as http;
 import 'features/auth/screens/location_permission_screen.dart';
 import 'core/widgets/three_d_grid_background.dart';
+import 'core/services/database_service.dart';
+import 'core/services/auth_service.dart';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform;
 
 class OtpVerificationScreen extends StatefulWidget {
   final String email;
-  const OtpVerificationScreen({super.key, required this.email});
+  final String? username;
+  final VoidCallback? onSuccess; // Generic callback for reuse
+
+  const OtpVerificationScreen({
+    super.key,
+    required this.email,
+    this.username,
+    this.onSuccess,
+  });
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
 
-class _OtpVerificationScreenState extends State<OtpVerificationScreen> with SingleTickerProviderStateMixin {
+class _OtpVerificationScreenState extends State<OtpVerificationScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _otpController = TextEditingController();
-  
-  // Intelligence: Auto-detect correct backend address based on platform
+
   String get _baseUrl {
-    // If you are using a real phone (not emulator), replace 'localhost' 
-    // with your computer's IP address (e.g., 'http://192.168.1.5:3000/api')
-    if (kIsWeb) return 'http://localhost:3000/api';
-    try {
-      if (Platform.isAndroid) {
-        // 10.0.2.2 is the special IP to reach your computer from an Android EMULATOR
-        return 'http://10.0.2.2:3000/api';
-      }
-    } catch (_) {}
-    return 'http://localhost:3000/api';
+    return 'https://communitywatch2.onrender.com/api';
   }
+
   bool _isLoading = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -43,13 +44,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> with Sing
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
-    _fadeAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeIn);
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    );
     _animationController.forward();
-    
-    // ENSURE OTP IS TRIGGERED ON LOAD
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _resendOtp();
-    });
   }
 
   @override
@@ -70,27 +69,35 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> with Sing
     setState(() => _isLoading = true);
 
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/verify-otp'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': widget.email, 'code': code}),
-      ).timeout(const Duration(seconds: 10));
+      // 10/10 SECURITY: Backend-side token establishment
+      final success = await AuthService.instance.verifyOtpAndEstablishLink(
+        widget.email,
+        code,
+      );
 
-      final data = jsonDecode(response.body);
+      if (success) {
+        if (widget.onSuccess != null) {
+          widget.onSuccess!();
+          return;
+        }
 
-      if (response.statusCode == 200) {
+        // AUTO-ACTIVATION FLOW
+        await DatabaseService.instance.verifyUser(widget.email);
+
         if (mounted) {
           _showMessage('VERIFICATION_SUCCESS: NODE_ACTIVATED');
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const LocationPermissionScreen()),
+            MaterialPageRoute(
+              builder: (context) => const LocationPermissionScreen(),
+            ),
           );
         }
       } else {
-        _showMessage('ERROR ${response.statusCode}: ${data['message'] ?? 'INVALID_SECURITY_TOKEN'}');
+        _showMessage('ERROR: INVALID_SECURITY_TOKEN');
       }
     } catch (e) {
-      _showMessage('COMM_ERROR: SERVER_UNREACHABLE ($e)');
+      _showMessage('COMM_ERROR: SERVER_UNREACHABLE');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -99,21 +106,29 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> with Sing
   Future<void> _resendOtp() async {
     setState(() => _isLoading = true);
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/send-otp'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': widget.email}),
-      ).timeout(const Duration(seconds: 10));
-      
-      final data = jsonDecode(response.body);
-      
+      final response = await http
+          .post(
+            Uri.parse('${AuthService.instance.getBaseUrl()}/send-otp'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': widget.email}),
+          )
+          .timeout(const Duration(seconds: 20));
+
       if (response.statusCode == 200) {
         _showMessage('NEW_TOKEN_TRANSMITTED to ${widget.email}');
       } else {
-        _showMessage('SERVER_REJECTED [${response.statusCode}]: ${data['message'] ?? 'UNKNOWN_ERR'}');
+        String errorMsg = 'SERVER_REJECTED [${response.statusCode}]';
+        try {
+          final errorData = jsonDecode(response.body);
+          errorMsg = errorData['message'] ?? errorMsg;
+        } catch (_) {
+          // If body is not JSON, it might be an HTML error page
+          errorMsg = "COMM_ERROR: SERVER_RECOVERY_FAILED";
+        }
+        _showMessage(errorMsg);
       }
     } catch (e) {
-      _showMessage('RESEND_FAILED: CHECK_CONNECTION ($e)');
+      _showMessage('RESEND_FAILED: CHECK_CONNECTION');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -122,8 +137,16 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> with Sing
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold)),
-        backgroundColor: message.contains('SUCCESS') ? const Color(0xFF34C759) : Colors.redAccent,
+        content: Text(
+          message,
+          style: const TextStyle(
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: message.contains('SUCCESS')
+            ? const Color(0xFF34C759)
+            : Colors.redAccent,
       ),
     );
   }
@@ -143,42 +166,57 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> with Sing
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white38, size: 20),
-                    ),
                     const SizedBox(height: 40),
                     const Text(
                       'VERIFY_IDENTITY',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 3.0),
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: 3.0,
+                      ),
                     ),
                     Text(
                       'TOKEN_SENT_TO: ${widget.email.toUpperCase()}',
-                      style: const TextStyle(fontSize: 10, color: Color(0xFF0A5CFF), fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Color(0xFF0A5CFF),
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                      ),
                     ),
                     const SizedBox(height: 60),
-                    
+
                     const Text(
                       'ENTER_6_DIGIT_TOKEN',
-                      style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                      style: TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     _buildGlassField(
                       controller: _otpController,
                       hint: '000000',
                       icon: Icons.vpn_key_rounded,
                     ),
-                    
+
                     const SizedBox(height: 48),
-                    
+
                     Container(
                       width: double.infinity,
                       height: 60,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
-                          BoxShadow(color: const Color(0xFF0A5CFF).withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10)),
+                          BoxShadow(
+                            color: const Color(0xFF0A5CFF).withOpacity(0.3),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
                         ],
                       ),
                       child: ElevatedButton(
@@ -186,34 +224,44 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> with Sing
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0A5CFF),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           elevation: 0,
+                          shadowColor: const Color(0xFF0A5CFF).withOpacity(0.3),
                         ),
-                        child: _isLoading 
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('VERIFY_PROTOCOL', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2.0)),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                'VERIFY_PROTOCOL',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 2.0,
+                                ),
+                              ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 32),
                     Center(
                       child: TextButton(
                         onPressed: _isLoading ? null : _resendOtp,
-                        child: const Text('RESEND_SECURITY_TOKEN', style: TextStyle(color: Color(0xFFFB923C), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: Opacity(
-                        opacity: 0.1,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => const LocationPermissionScreen()),
-                            );
-                          },
-                          child: const Text('BYPASS_FOR_TESTING_ONLY', style: TextStyle(color: Colors.white, fontSize: 8)),
+                        child: const Text(
+                          'RESEND_SECURITY_TOKEN',
+                          style: TextStyle(
+                            color: Color(0xFFFB923C),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
+                          ),
                         ),
                       ),
                     ),
@@ -247,14 +295,26 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> with Sing
             keyboardType: TextInputType.number,
             maxLength: 6,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 12.0),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 12.0,
+            ),
             decoration: InputDecoration(
               hintText: hint,
               counterText: "",
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.05), fontSize: 32, letterSpacing: 12.0),
+              hintStyle: TextStyle(
+                color: Colors.white.withOpacity(0.05),
+                fontSize: 32,
+                letterSpacing: 12.0,
+              ),
               prefixIcon: Icon(icon, color: const Color(0xFF0A5CFF), size: 24),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ),
             ),
           ),
         ),

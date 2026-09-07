@@ -5,12 +5,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' show Platform;
-import 'location_permission_screen.dart';
+import 'face_biometric_screen.dart';
 import '../../../otp_screen.dart';
 import '../../../core/services/database_service.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/services/map_intelligence_service.dart';
 import '../../../core/widgets/three_d_grid_background.dart';
+import 'package:latlong2/latlong.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -19,121 +20,191 @@ class SignupScreen extends StatefulWidget {
   State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderStateMixin {
-  final _nameController = TextEditingController();
+class _SignupScreenState extends State<SignupScreen>
+    with TickerProviderStateMixin {
+  final _fNameController = TextEditingController();
+  final _mNameController = TextEditingController();
+  final _lNameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isPasswordVisible = false;
-  bool _agreedToTerms = false;
-  bool _isLocating = false;
-  
-  late AnimationController _animationController;
+
+  String? _selectedRegion;
+  String? _selectedBlood;
+
+  final List<String> _regions = [
+    'Greater Accra',
+    'Ashanti',
+    'Central',
+    'Eastern',
+    'Western',
+    'Northern',
+    'Upper East',
+    'Upper West',
+    'Volta',
+    'Bono',
+    'Bono East',
+    'Ahafo',
+    'Savannah',
+    'North East',
+    'Oti',
+    'Western North',
+  ];
+
+  late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  bool _isLocating = false;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
-    _fadeAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeIn);
-    _animationController.forward();
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeIn,
+    );
+    _fadeController.forward();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
-    _nameController.dispose();
+    _fadeController.dispose();
+    _fNameController.dispose();
+    _mNameController.dispose();
+    _lNameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleSignup() async {
-    if (_nameController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('REQUISITE_DATA_MISSING'), backgroundColor: Colors.redAccent));
-      return;
-    }
-
-    if (!_agreedToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('COMPLIANCE_REQUIRED: AGREE_TO_TERMS'), backgroundColor: Colors.redAccent));
+  Future<void> _handleEnrollment() async {
+    if (_fNameController.text.isEmpty ||
+        _lNameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
+      _showSnack('REQUISITE_DATA_MISSING', Colors.redAccent);
       return;
     }
 
     setState(() => _isLocating = true);
 
     try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-
-      // PRO FEATURE: Find user location during signup - High Precision
       Position? position;
       try {
-        if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
-          position = await Geolocator.getCurrentPosition(
-            locationSettings: const LocationSettings(
-              accuracy: LocationAccuracy.bestForNavigation,
-            ),
-          ).timeout(const Duration(seconds: 10));
-        }
-      } catch (e) {
-        debugPrint("Location discovery skipped: $e");
-      }
+        position = await Geolocator.getCurrentPosition().timeout(
+          const Duration(seconds: 10),
+        );
+      } catch (_) {}
 
-      final user = {
-        'username': _nameController.text,
-        'email': _emailController.text,
+      final userData = {
+        'username': '${_fNameController.text} ${_lNameController.text}',
+        'first_name': _fNameController.text,
+        'middle_name': _mNameController.text,
+        'last_name': _lNameController.text,
+        'email': _emailController.text.trim(),
+        'password': _passwordController.text,
+        'phone': _phoneController.text,
+        'region': _selectedRegion,
+        'blood_group': _selectedBlood,
         'reputation_score': 100,
         'is_verified': 0,
-        'joined_date': 'Oct 2023',
-        'is_frozen': 0,
+        'joined_date': DateTime.now().toIso8601String().substring(0, 10),
         'lat': position?.latitude ?? 5.6037,
         'lng': position?.longitude ?? -0.1870,
       };
 
-      await DatabaseService.instance.createUser(user);
-      
-      // TRIGGER BACKEND TO SEND OTP EMAIL
-      try {
-        String baseUrl = kIsWeb ? 'http://localhost:3000/api' : (Platform.isAndroid ? 'http://10.0.2.2:3000/api' : 'http://localhost:3000/api');
-        await http.post(
-          Uri.parse('$baseUrl/send-otp'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'email': user['email']}),
-        );
-      } catch (e) {
-        debugPrint("Background OTP Trigger Error: $e");
-      }
-      
-      await DatabaseService.instance.createAdminLog({
-        'admin_id': 'SYS',
-        'action': 'New Registration',
-        'timestamp': DateTime.now().toIso8601String().substring(11, 16),
-        'details': 'User ${user['username']} joined from GPS: ${user['lat']}, ${user['lng']}'
-      });
-
-      AuthService.instance.loginUser(user['username'] as String, user['email'] as String);
-
       if (mounted) {
-        Navigator.pushReplacement(
-          context, 
-          MaterialPageRoute(builder: (context) => OtpVerificationScreen(email: user['email'] as String))
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FaceBiometricScreen(
+              userData: userData,
+              onComplete: (finalData, captures) =>
+                  _finalizeSignup(finalData, captures),
+            ),
+          ),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('REGISTRATION_ERROR: $e'), backgroundColor: Colors.redAccent));
     } finally {
       if (mounted) setState(() => _isLocating = false);
     }
+  }
+
+  Future<void> _finalizeSignup(
+    Map<String, dynamic> user,
+    Map<String, String?> captures,
+  ) async {
+    // 10/10 SECURITY: Server-side password hashing and Biometric Signal Upload
+    final result = await AuthService.instance.secureRegister({
+      'username': user['username'],
+      'email': user['email'],
+      'password': user['password'],
+      'firstName': user['first_name'],
+      'lastName': user['last_name'],
+      'phone': user['phone'],
+      'region': user['region'],
+    }, captures);
+
+    if (result['success']) {
+      // Create local copy for offline support
+      await DatabaseService.instance.createUser(user);
+
+      // Trigger OTP
+      _triggerOtp(user['email']);
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OtpVerificationScreen(
+              email: user['email'] as String,
+              username: user['username'] as String,
+            ),
+          ),
+        );
+      }
+    } else {
+      _showSnack(result['message'], Colors.redAccent);
+    }
+  }
+
+  void _triggerOtp(String email) async {
+    try {
+      String baseUrl = 'https://communitywatch2.onrender.com/api';
+      final response = await http.post(
+        Uri.parse('$baseUrl/send-otp'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      if (response.statusCode != 200) {
+        final data = jsonDecode(response.body);
+        _showSnack(data['message'] ?? 'OTP_TRANSMISSION_FAILED', Colors.orange);
+      }
+    } catch (_) {}
+  }
+
+  void _showSnack(String msg, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: const TextStyle(fontFamily: 'monospace')),
+        backgroundColor: color,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF020617),
+      appBar: AppBar(
+        title: const Text('CITIZEN_ENROLLMENT'),
+        backgroundColor: const Color(0xFF0F172A),
+      ),
       body: Stack(
         children: [
           const ThreeDGridBackground(),
@@ -145,99 +216,84 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white38, size: 20),
-                    ),
-                    const SizedBox(height: 20),
                     const Text(
-                      'CREATE_NODE',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 3.0),
-                    ),
-                    const Text(
-                      'INITIALIZING_CITIZEN_ONBOARDING',
-                      style: TextStyle(fontSize: 10, color: Color(0xFF0A5CFF), fontWeight: FontWeight.bold, letterSpacing: 2.0),
-                    ),
-                    const SizedBox(height: 48),
-                    
-                    _buildGlassField(
-                      controller: _nameController,
-                      hint: 'NODE_IDENTIFIER (FULL NAME)',
-                      icon: Icons.person_outline_rounded,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildGlassField(
-                      controller: _emailController,
-                      hint: 'COMM_PROTOCOL (EMAIL)',
-                      icon: Icons.alternate_email_rounded,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildGlassField(
-                      controller: _passwordController,
-                      hint: 'ENCRYPTION_KEY (PASSWORD)',
-                      icon: Icons.lock_outline_rounded,
-                      isPassword: true,
-                      obscureText: !_isPasswordVisible,
-                      toggleVisibility: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    GestureDetector(
-                      onTap: () => setState(() => _agreedToTerms = !_agreedToTerms),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: _agreedToTerms ? const Color(0xFF0A5CFF) : Colors.transparent,
-                              border: Border.all(color: _agreedToTerms ? const Color(0xFF0A5CFF) : Colors.white24, width: 1.5),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: _agreedToTerms ? const Icon(Icons.check, size: 14, color: Colors.white) : null,
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Text(
-                              'I ACCEPT ALL SECURITY PROTOCOLS AND DATA TERMS',
-                              style: TextStyle(color: Colors.white38, fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 1.0),
-                            ),
-                          ),
-                        ],
+                      'IDENTITY_INITIATION',
+                      style: TextStyle(
+                        color: Color(0xFF0A5CFF),
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                        fontSize: 10,
                       ),
                     ),
-                    
-                    const SizedBox(height: 48),
-                    
-                    Container(
-                      width: double.infinity,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(color: const Color(0xFF0A5CFF).withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10)),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: _isLocating ? null : _handleSignup,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0A5CFF),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          elevation: 0,
-                        ),
-                        child: _isLocating 
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('INITIALIZE_ENROLLMENT', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2.0)),
-                      ),
-                    ),
-                    
                     const SizedBox(height: 32),
-                    Center(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('BACK_TO_TERMINAL_LOGIN', style: TextStyle(color: Colors.white24, fontSize: 10, letterSpacing: 1.5, fontWeight: FontWeight.bold)),
+
+                    _buildField(
+                      _fNameController,
+                      'FIRST_NAME',
+                      Icons.person_rounded,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildField(
+                      _mNameController,
+                      'MIDDLE_NAME (OPTIONAL)',
+                      Icons.person_outline_rounded,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildField(
+                      _lNameController,
+                      'LAST_NAME',
+                      Icons.person_rounded,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildField(
+                      _emailController,
+                      'SECURE_EMAIL',
+                      Icons.alternate_email_rounded,
+                      type: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildField(
+                      _phoneController,
+                      'SIGNAL_LINE',
+                      Icons.phone_android_rounded,
+                      type: TextInputType.phone,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildField(
+                      _passwordController,
+                      'ENCRYPTION_KEY',
+                      Icons.lock_outline_rounded,
+                      obscure: true,
+                    ),
+
+                    const SizedBox(height: 32),
+                    _buildDropdown(
+                      'REGION_ASSIGNMENT',
+                      _selectedRegion,
+                      _regions,
+                      (v) => setState(() => _selectedRegion = v),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDropdown(
+                      'BLOOD_TYPE',
+                      _selectedBlood,
+                      ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+                      (v) => setState(() => _selectedBlood = v),
+                    ),
+
+                    const SizedBox(height: 48),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 64,
+                      child: ElevatedButton(
+                        onPressed: _isLocating ? null : _handleEnrollment,
+                        child: _isLocating
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              )
+                            : const Text('BEGIN_BIOMETRIC_SYNC'),
                       ),
                     ),
                   ],
@@ -250,40 +306,76 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildGlassField({
-    required TextEditingController controller,
-    required String hint,
-    required IconData icon,
-    bool isPassword = false,
-    bool obscureText = false,
-    VoidCallback? toggleVisibility,
+  Widget _buildField(
+    TextEditingController controller,
+    String label,
+    IconData icon, {
+    bool obscure = false,
+    TextInputType? type,
   }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.03),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
-          ),
-          child: TextField(
-            controller: controller,
-            obscureText: obscureText,
-            style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.1), fontSize: 10, letterSpacing: 1.5),
-              prefixIcon: Icon(icon, color: const Color(0xFF0A5CFF), size: 20),
-              suffixIcon: isPassword ? IconButton(
-                icon: Icon(obscureText ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: Colors.white12, size: 20),
-                onPressed: toggleVisibility,
-              ) : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscure,
+        keyboardType: type,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+        decoration: InputDecoration(
+          hintText: label,
+          prefixIcon: Icon(icon, size: 18),
+          contentPadding: const EdgeInsets.symmetric(vertical: 18),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdown(
+    String label,
+    String? value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          hint: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white24,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
             ),
           ),
+          dropdownColor: const Color(0xFF0F172A),
+          isExpanded: true,
+          icon: const Icon(
+            Icons.arrow_drop_down_rounded,
+            color: Color(0xFF0A5CFF),
+          ),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+          items: items
+              .map((i) => DropdownMenuItem(value: i, child: Text(i)))
+              .toList(),
+          onChanged: onChanged,
         ),
       ),
     );
