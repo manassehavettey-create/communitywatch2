@@ -63,8 +63,8 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (result['success']) {
-        // Trigger OTP (Backend will handle rate limiting)
-        _triggerOtp(_emailController.text.trim());
+        final otpSent = await _triggerOtp(_emailController.text.trim());
+        if (!otpSent) return;
 
         if (mounted) {
           Navigator.pushReplacement(
@@ -89,9 +89,9 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  void _triggerOtp(String email) async {
+  Future<bool> _triggerOtp(String email) async {
     try {
-      String baseUrl = 'https://communitywatch2.onrender.com/api';
+      const baseUrl = 'https://communitywatch2.onrender.com/api';
       final response = await http.post(
         Uri.parse('$baseUrl/send-otp'),
         headers: {'Content-Type': 'application/json'},
@@ -101,8 +101,13 @@ class _LoginScreenState extends State<LoginScreen>
       if (response.statusCode != 200) {
         final data = jsonDecode(response.body);
         _showSnack(data['message'] ?? 'OTP_TRANSMISSION_FAILED', Colors.orange);
+        return false;
       }
-    } catch (_) {}
+      return true;
+    } catch (error) {
+      _showSnack('OTP_CONNECTION_ERROR: $error', Colors.orange);
+      return false;
+    }
   }
 
   void _showSnack(String msg, Color color) {

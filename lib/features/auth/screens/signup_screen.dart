@@ -153,8 +153,8 @@ class _SignupScreenState extends State<SignupScreen>
       // Create local copy for offline support
       await DatabaseService.instance.createUser(user);
 
-      // Trigger OTP
-      _triggerOtp(user['email']);
+      final otpSent = await _triggerOtp(user['email']);
+      if (!otpSent) return;
 
       if (mounted) {
         Navigator.pushReplacement(
@@ -172,9 +172,9 @@ class _SignupScreenState extends State<SignupScreen>
     }
   }
 
-  void _triggerOtp(String email) async {
+  Future<bool> _triggerOtp(String email) async {
     try {
-      String baseUrl = 'https://communitywatch2.onrender.com/api';
+      const baseUrl = 'https://communitywatch2.onrender.com/api';
       final response = await http.post(
         Uri.parse('$baseUrl/send-otp'),
         headers: {'Content-Type': 'application/json'},
@@ -184,8 +184,13 @@ class _SignupScreenState extends State<SignupScreen>
       if (response.statusCode != 200) {
         final data = jsonDecode(response.body);
         _showSnack(data['message'] ?? 'OTP_TRANSMISSION_FAILED', Colors.orange);
+        return false;
       }
-    } catch (_) {}
+      return true;
+    } catch (error) {
+      _showSnack('OTP_CONNECTION_ERROR: $error', Colors.orange);
+      return false;
+    }
   }
 
   void _showSnack(String msg, Color color) {
