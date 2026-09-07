@@ -99,13 +99,24 @@ app.post('/api/login', async (req, res) => {
   }
 
   db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, user) => {
-    if (err || !user) return res.status(401).json({ status: 'ERROR', message: 'UNIT_NOT_FOUND' });
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ status: 'ERROR', message: 'DENIED' });
+    try {
+      if (err) {
+        console.error('Login database error:', err.message);
+        return res.status(500).json({ status: 'ERROR', message: 'LOGIN_DATABASE_ERROR' });
+      }
+      if (!user) return res.status(401).json({ status: 'ERROR', message: 'UNIT_NOT_FOUND' });
+      if (!user.password) return res.status(401).json({ status: 'ERROR', message: 'PASSWORD_NOT_SET' });
 
-    const token = jwt.sign({ email: user.email, is_admin: user.is_admin }, JWT_SECRET, { expiresIn: '24h' });
-    recordEvent(email, 'USER_LOGIN_ATTEMPT', 'Credentials verified, awaiting OTP.');
-    res.status(200).json({ status: 'SUCCESS', token: token, user: user });
+      const match = await bcrypt.compare(password ?? '', user.password);
+      if (!match) return res.status(401).json({ status: 'ERROR', message: 'DENIED' });
+
+      const token = jwt.sign({ email: user.email, is_admin: user.is_admin }, JWT_SECRET, { expiresIn: '24h' });
+      recordEvent(email, 'USER_LOGIN_ATTEMPT', 'Credentials verified, awaiting OTP.');
+      res.status(200).json({ status: 'SUCCESS', token: token, user: user });
+    } catch (loginError) {
+      console.error('Login processing error:', loginError);
+      if (!res.headersSent) res.status(500).json({ status: 'ERROR', message: 'LOGIN_PROCESSING_ERROR' });
+    }
   });
 });
 
