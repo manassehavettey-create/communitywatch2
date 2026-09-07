@@ -25,6 +25,8 @@ app.use('/uploads', express.static(uploadsDir));
 
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'TACTICAL_CW_V10_SECRET';
+const MASTER_ADMIN_ID = process.env.MASTER_ADMIN_ID || 'ADMIN';
+const MASTER_ADMIN_KEY = process.env.MASTER_ADMIN_KEY || 'Admin@123';
 const SALT_ROUNDS = 12;
 
 // --- MULTER CONFIG ---
@@ -85,7 +87,7 @@ app.post('/api/register', upload.single('face_center'), async (req, res) => {
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
-  if (email === process.env.MASTER_ADMIN_ID && password === process.env.MASTER_ADMIN_KEY) {
+  if (email === MASTER_ADMIN_ID && password === MASTER_ADMIN_KEY) {
     const token = jwt.sign({ email, is_admin: 1 }, JWT_SECRET, { expiresIn: '24h' });
     recordEvent(email, 'ADMIN_LOGIN', 'Master terminal access established.');
     return res.status(200).json({

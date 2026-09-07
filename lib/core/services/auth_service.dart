@@ -72,7 +72,10 @@ class AuthService {
           );
         return {'success': true};
       }
-      return {'success': false, 'message': 'DENIED'};
+      return {
+        'success': false,
+        'message': data['message']?.toString() ?? 'LOGIN_FAILED',
+      };
     } catch (e) {
       debugPrint("❌ [NETWORK_ERROR]: $e");
       return {'success': false, 'message': 'LINK_OFFLINE: $e'};
