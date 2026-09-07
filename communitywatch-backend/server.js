@@ -120,7 +120,7 @@ app.post('/api/send-otp', async (req, res) => {
   db.run(`REPLACE INTO otps (identifier, code, expires_at) VALUES (?, ?, ?)`, [email, code, expiresAt], async (err) => {
     if (err) {
       console.error("❌ DB Error storing OTP:", err.message);
-      return res.status(500).json({ status: 'ERROR', message: 'DB_FAILURE' });
+      return res.status(500).json({ status: 'ERROR', message: `DB_FAILURE: ${err.message}` });
     }
 
     try {
