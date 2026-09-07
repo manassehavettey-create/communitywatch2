@@ -112,7 +112,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({'email': widget.email}),
           )
-          .timeout(const Duration(seconds: 20));
+          .timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
         _showMessage('NEW_TOKEN_TRANSMITTED to ${widget.email}');
@@ -125,10 +125,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
           // If body is not JSON, it might be an HTML error page
           errorMsg = "COMM_ERROR: SERVER_RECOVERY_FAILED";
         }
-        _showMessage(errorMsg);
+        _showMessage('OTP_DELIVERY_FAILED: $errorMsg');
       }
     } catch (e) {
-      _showMessage('RESEND_FAILED: CHECK_CONNECTION');
+      _showMessage('RESEND_FAILED: SERVER_WAKE_OR_CONNECTION_TIMEOUT');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
