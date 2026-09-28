@@ -1,5 +1,6 @@
 package app.scripture.bible_app
 
-import io.flutter.embedding.android.FlutterActivity
+import com.ryanheise.audioservice.AudioServiceActivity
 
-class MainActivity : FlutterActivity()
+// Shares its Flutter engine with audio_service for background playback.
+class MainActivity : AudioServiceActivity()

@@ -74,10 +74,14 @@ class PlansRepository {
 
   /// Starts [planId], or resumes it if it was already started.
   Future<String> start(String planId) async {
+    // Normally one row per plan, but starting the same plan offline on two
+    // devices syncs two; use the most recently updated.
     final existing =
-        await (_db.select(_db.planProgress)
-              ..where((p) => p.planId.equals(planId) & p.deletedAt.isNull()))
-            .getSingleOrNull();
+        (await (_db.select(_db.planProgress)
+                  ..where((p) => p.planId.equals(planId) & p.deletedAt.isNull())
+                  ..orderBy([(p) => OrderingTerm.desc(p.updatedAt)]))
+                .get())
+            .firstOrNull;
     if (existing != null) {
       if (existing.status == PlanStatus.paused.name) await resume(existing.id);
       return existing.id;

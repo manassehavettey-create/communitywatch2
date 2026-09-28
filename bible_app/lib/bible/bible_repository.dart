@@ -63,8 +63,14 @@ class BibleRepository {
         TranslationInfo.fromJson(t, AssetLocation(t['asset'] as String)),
     ];
     final bundledIds = {for (final t in available) t.id};
-    for (final installed in await _store.installed()) {
-      if (!bundledIds.contains(installed.id)) available.add(installed);
+    try {
+      for (final installed in await _store.installed()) {
+        if (!bundledIds.contains(installed.id)) available.add(installed);
+      }
+    } on Object catch (e) {
+      // Bundled translations must always open, even if the folder of
+      // installed ones can't be read.
+      debugPrint('Installed translations unavailable: $e');
     }
     final unavailable = [
       for (final t

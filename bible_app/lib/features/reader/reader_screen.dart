@@ -189,8 +189,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen>
     final state = _keys[_anchor]?.currentState;
     final offset = state?.offsetOfVerse(v);
     if (offset == null || !_scroll.hasClients) {
-      // Layout not ready yet; try again next frame.
-      WidgetsBinding.instance.addPostFrameCallback((_) => _performJump());
+      // Layout not ready yet; try again after the next frame (and make
+      // sure there is one).
+      WidgetsBinding.instance
+        ..addPostFrameCallback((_) => _performJump())
+        ..scheduleFrame();
       return;
     }
     _pendingJump = null;
