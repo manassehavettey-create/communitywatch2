@@ -7,9 +7,9 @@ Checks, per translation:
   * KJV per-book verse totals equal the reference table in canon.py (31,102)
   * KJV per-chapter verse counts equal an independent second dataset
     (scrollmapper/bible_databases KJV) chapter by chapter
-  * WEB per-chapter verse counts equal KJV except for the documented
-    versification differences below, and no verse is empty except the
-    verses WEB deliberately omits
+  * every other translation's per-chapter verse counts equal KJV except for
+    the documented versification differences below, and no verse is empty
+    except the verses that translation deliberately omits
   * text hygiene: no stray markup, doubled spaces or edge whitespace, and
     balanced [supplied word] brackets
   * paragraph and heading anchors point at verses that exist
@@ -35,6 +35,16 @@ WEB_VERSE_COUNT_DIFFS = {("ROM", 14): 26, ("ROM", 16): 25}
 # Verse numbers WEB keeps but leaves without text (omitted on text-critical
 # grounds; Romans 16:25-27 is printed at 14:24-26).
 WEB_EMPTY_VERSES = {("LUK", 17, 36), ("ACT", 8, 37), ("ACT", 15, 34), ("ACT", 24, 7), ("ROM", 16, 25)}
+# ASV and BSB (critical-text translations) leave these verse numbers empty.
+CRITICAL_TEXT_EMPTY_VERSES = {
+    ("MAT", 17, 21), ("MAT", 18, 11), ("MAT", 23, 14), ("MRK", 7, 16), ("MRK", 9, 44),
+    ("MRK", 9, 46), ("MRK", 11, 26), ("MRK", 15, 28), ("LUK", 17, 36), ("LUK", 23, 17),
+    ("JHN", 5, 4), ("ACT", 8, 37), ("ACT", 15, 34), ("ACT", 24, 7), ("ACT", 28, 29),
+    ("ROM", 16, 24),
+}
+ALLOWED_EMPTY = {"kjv": set(), "web": WEB_EMPTY_VERSES, "asv": CRITICAL_TEXT_EMPTY_VERSES,
+                 "bsb": CRITICAL_TEXT_EMPTY_VERSES}
+VERSE_COUNT_DIFFS = {"kjv": {}, "web": WEB_VERSE_COUNT_DIFFS, "asv": {}, "bsb": {}}
 
 SPOT_CHECKS = {
     "kjv": {
@@ -53,9 +63,26 @@ SPOT_CHECKS = {
         ("JHN", 11, 35): "Jesus wept.",
         ("REV", 22, 21): "The grace of the Lord Jesus Christ be with all the saints. Amen.",
     },
+    "asv": {
+        ("GEN", 1, 1): "In the beginning God created the heavens and the earth.",
+        ("PSA", 23, 1): "A Psalm of David. Jehovah is my shepherd; I shall not want.",
+        ("JHN", 3, 16): "For God so loved the world, that he gave his only begotten Son, that "
+                        "whosoever believeth on him should not perish, but have eternal life.",
+        ("JHN", 11, 35): "Jesus wept.",
+        ("REV", 22, 21): "The grace of the Lord Jesus be with the saints. Amen.",
+    },
+    "bsb": {
+        ("GEN", 1, 1): "In the beginning God created the heavens and the earth.",
+        ("PSA", 23, 1): "A Psalm of David. The LORD is my shepherd; I shall not want.",
+        ("JHN", 3, 16): "For God so loved the world that He gave His one and only Son, that "
+                        "everyone who believes in Him shall not perish but have eternal life.",
+        ("JHN", 11, 35): "Jesus wept.",
+        ("REV", 22, 21): "The grace of the Lord Jesus be with all the saints. Amen.",
+    },
 }
 
-REQUIRED_FIELDS = ("schema", "id", "abbreviation", "name", "language", "license", "source", "books")
+REQUIRED_FIELDS = ("schema", "id", "abbreviation", "name", "language", "license", "supplied_words",
+                   "source", "books")
 STRAY_MARKUP = re.compile(r"[#<>{}\\*|_]|\s{2,}")
 
 
@@ -124,7 +151,10 @@ def verify_text(doc: dict, r: Report, allowed_empty: set) -> None:
                 lines = text.split("\n")
                 r.check(all(line and line == line.strip() for line in lines), f"{ref} has a blank/untrimmed line")
                 r.check(not STRAY_MARKUP.search(text), f"{ref} has stray markup: {text[:60]!r}")
-                r.check(text.count("[") == text.count("]"), f"{ref} has unbalanced brackets")
+                if doc["supplied_words"]:
+                    # Brackets mark supplied words, so they must pair up within
+                    # a verse. (ASV uses a lone "[" typographically, e.g. "[Selah".)
+                    r.check(text.count("[") == text.count("]"), f"{ref} has unbalanced brackets")
 
 
 def verify_kjv(doc: dict, r: Report) -> None:
@@ -143,11 +173,12 @@ def verify_kjv(doc: dict, r: Report) -> None:
     r.check(lord > 6000, f"kjv: only {lord} occurrences of LORD; small caps were probably flattened")
 
 
-def verify_web(doc: dict, kjv: dict, r: Report) -> None:
-    web_counts, kjv_counts = chapter_counts(doc), chapter_counts(kjv)
-    for key, n in web_counts.items():
-        expected = WEB_VERSE_COUNT_DIFFS.get(key, kjv_counts.get(key))
-        r.check(n == expected, f"web: {key} has {n} verses, expected {expected}")
+def verify_versification(doc: dict, kjv: dict, r: Report) -> None:
+    counts, kjv_counts = chapter_counts(doc), chapter_counts(kjv)
+    diffs = VERSE_COUNT_DIFFS[doc["id"]]
+    for key, n in counts.items():
+        expected = diffs.get(key, kjv_counts.get(key))
+        r.check(n == expected, f"{doc['id']}: {key} has {n} verses, expected {expected}")
 
 
 def verify_spot_checks(doc: dict, r: Report) -> None:
@@ -159,24 +190,24 @@ def verify_spot_checks(doc: dict, r: Report) -> None:
 def main() -> int:
     r = Report()
     docs = {}
-    for tid in ("kjv", "web"):
+    manifest = json.loads((ASSETS / "translations.json").read_text(encoding="utf-8"))
+    listed = sorted(t["id"] for t in manifest["available"])
+    r.check(listed == sorted(SPOT_CHECKS), f"manifest lists {listed}, verifier knows {sorted(SPOT_CHECKS)}")
+    for tid in SPOT_CHECKS:
         path = ASSETS / f"{tid}.json"
         if not path.exists():
             r.check(False, f"{path} is missing; run build_bible_data.py")
             continue
         docs[tid] = json.loads(path.read_text(encoding="utf-8"))
 
-    if "kjv" in docs:
-        verify_structure(docs["kjv"], r)
-        verify_text(docs["kjv"], r, allowed_empty=set())
-        verify_kjv(docs["kjv"], r)
-        verify_spot_checks(docs["kjv"], r)
-    if "web" in docs:
-        verify_structure(docs["web"], r)
-        verify_text(docs["web"], r, allowed_empty=WEB_EMPTY_VERSES)
-        verify_spot_checks(docs["web"], r)
-        if "kjv" in docs:
-            verify_web(docs["web"], docs["kjv"], r)
+    for tid, doc in docs.items():
+        verify_structure(doc, r)
+        verify_text(doc, r, allowed_empty=ALLOWED_EMPTY[tid])
+        verify_spot_checks(doc, r)
+        if tid == "kjv":
+            verify_kjv(doc, r)
+        elif "kjv" in docs:
+            verify_versification(doc, docs["kjv"], r)
 
     for tid, doc in docs.items():
         counts = chapter_counts(doc)

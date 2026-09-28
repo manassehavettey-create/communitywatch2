@@ -19,9 +19,16 @@ same inputs always give byte-identical files.
 |-----|---------------------|---------------|-------------------------------------------------|
 | kjv | King James Version (1769) | Public domain\* | npm `kjv@1.0.0` (released under the Unlicense) |
 | web | World English Bible | Public domain | npm `world-english-bible@1.0.1` (eBible.org WEB) |
+| asv | American Standard Version (1901) | Public domain | scrollmapper/bible_databases `ASV.json` |
+| bsb | Berean Standard Bible | Public domain (dedicated 30 April 2023) | scrollmapper/bible_databases `BSB.json` |
 
 \* In the United Kingdom the KJV is under perpetual Crown rights for printed
 editions. Everywhere else it is public domain.
+
+scrollmapper has no tagged releases, so its files are pinned by content hash.
+If upstream changes, the build stops rather than silently shipping different
+text. ASV and BSB are plain verse text: no paragraph marks, and Psalm titles
+are part of verse 1, as in that source.
 
 "World English Bible" is a trademark of eBible.org. It may be used as the name
 only for the unaltered text. The build only normalises whitespace.
@@ -53,6 +60,7 @@ The verifier still uses it to cross-check verse counts.
   "schema": 1,
   "id": "kjv", "abbreviation": "KJV", "name": "King James Version",
   "edition": "...", "language": "en", "license": "Public Domain", "license_note": "...",
+  "supplied_words": true,
   "source": { "kind": "npm", "package": "kjv@1.0.0", "url": "...", "sha256": "...", "notes": "..." },
   "books": [
     {
@@ -76,14 +84,18 @@ The verifier still uses it to cross-check verse counts.
 
 Text conventions:
 
-- **KJV** `[word]` marks words the translators supplied (printed in italics in
-  KJV editions). The app renders them in italics and strips the brackets for
-  search, copy and share.
+- **Supplied words (KJV only):** when a translation's `supplied_words` is
+  true, `[word]` marks words the translators supplied, printed in italics in
+  KJV editions. The app renders them in italics and strips the brackets for
+  search, copy and share. In other translations brackets are literal text:
+  the ASV prints `[Selah` and brackets John 7:53–8:11.
 - **WEB** `\n` separates poetry lines within a verse.
 - An empty string is a verse number the translation deliberately leaves
-  without text. WEB does this at Luke 17:36, Acts 8:37, 15:34, 24:7 and
-  Romans 16:25. It prints Romans 16:25–27 at 14:24–26, following the
-  Majority Text.
+  without text:
+  - WEB: Luke 17:36, Acts 8:37, 15:34, 24:7 and Romans 16:25. WEB prints
+    Romans 16:25–27 at 14:24–26, following the Majority Text.
+  - ASV and BSB: 16 verses, including Matthew 17:21, Mark 9:44 and John 5:4.
+    The full list is in `verify_bible_data.py`.
 
 `assets/bible/translations.json` is the manifest the translation selector
 reads. It lists each bundled translation with its asset path, sha256 and
@@ -99,13 +111,15 @@ verse count, and the `not_available` list.
   `canon.py`.
 - KJV per-chapter verse counts match an independent second KJV dataset for
   all 1,189 chapters.
-- WEB chapter lengths equal KJV's except the documented Romans 14/16
-  difference, and no verse is empty except the five listed above.
+- Every other translation's chapter lengths equal KJV's, except WEB's
+  documented Romans 14/16 difference. No verse is empty except the ones
+  listed above.
 - No stray markup, doubled spaces or edge whitespace, and `[ ]` brackets are
   balanced.
 - Paragraph and heading anchors point at verses that exist.
 - Exact-text spot checks pass for Genesis 1:1, Psalm 23:1, John 3:16,
-  John 11:35 and Revelation 22:21.
+  John 11:35 and Revelation 22:21 in every translation.
+- The manifest lists exactly the translations the verifier knows about.
 - The KJV has more than 6,000 occurrences of "LORD", which guards against
   flattened small caps.
 

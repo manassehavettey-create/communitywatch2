@@ -57,9 +57,41 @@ MIRRORS = {
         "sha256": "492d4692c06f0a64125d197a132a6f17a6448ac90ee1fd86ae50f2f6e8db8245",
         "package": "world-english-bible@1.0.1",
     },
+    # scrollmapper/bible_databases has no releases, so the raw file is pinned by
+    # content hash instead; a changed upstream file fails the build loudly.
+    "asv": {
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/ASV.json",
+        "sha256": "602445e22c280a682ac4c489117ead179271f5ee50a78ee4531b249c71e7ce99",
+        "package": "scrollmapper/bible_databases ASV.json",
+    },
+    "bsb": {
+        "url": "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/BSB.json",
+        "sha256": "cec3c644088a8ef4a50cf1e2de035f79d8825f394625d116bb7ee7e1d57739c9",
+        "package": "scrollmapper/bible_databases BSB.json",
+    },
 }
 
 TRANSLATIONS = {
+    "asv": {
+        "id": "asv",
+        "abbreviation": "ASV",
+        "name": "American Standard Version",
+        "edition": "1901",
+        "language": "en",
+        "license": "Public Domain",
+        "license_note": "Public domain.",
+        "supplied_words": False,
+    },
+    "bsb": {
+        "id": "bsb",
+        "abbreviation": "BSB",
+        "name": "Berean Standard Bible",
+        "edition": "BSB text",
+        "language": "en",
+        "license": "Public Domain",
+        "license_note": "Dedicated to the public domain by the Berean Bible translators on 30 April 2023.",
+        "supplied_words": False,
+    },
     "kjv": {
         "id": "kjv",
         "abbreviation": "KJV",
@@ -71,6 +103,7 @@ TRANSLATIONS = {
             "Public domain worldwide except the United Kingdom, where the "
             "Crown's perpetual rights apply to printed editions."
         ),
+        "supplied_words": True,
     },
     "web": {
         "id": "web",
@@ -83,6 +116,7 @@ TRANSLATIONS = {
             "Public domain. \"World English Bible\" is a trademark of eBible.org; "
             "the name may be used only for the unaltered text."
         ),
+        "supplied_words": False,
     },
 }
 
@@ -363,6 +397,34 @@ def build_web_mirror() -> tuple[list[dict], dict]:
 
 
 # --------------------------------------------------------------------------
+# Mirror source: ASV and BSB (scrollmapper/bible_databases JSON)
+# --------------------------------------------------------------------------
+
+
+def build_scrollmapper(tid: str) -> tuple[list[dict], dict]:
+    mirror = MIRRORS[tid]
+    raw = fetch(mirror["url"])
+    sha = hashlib.sha256(raw).hexdigest()
+    if sha != mirror["sha256"]:
+        raise ValueError(f"{mirror['url']} has sha256 {sha}, expected {mirror['sha256']}.")
+    builders: dict[str, BookBuilder] = {}
+    for book in json.loads(raw)["books"]:
+        b = canon.BY_ID[canon.book_id_for(book["name"])]
+        builder = builders.setdefault(b.id, BookBuilder(b))
+        for chapter in book["chapters"]:
+            for verse in chapter["verses"]:
+                builder.add_text(chapter["chapter"], verse["verse"], verse["text"])
+    source = {
+        "kind": "github-raw",
+        "package": mirror["package"],
+        "url": mirror["url"],
+        "sha256": sha,
+        "notes": "Plain verse text; Psalm titles are part of verse 1.",
+    }
+    return _ordered(builders), source
+
+
+# --------------------------------------------------------------------------
 # bible-api.com source
 # --------------------------------------------------------------------------
 
@@ -410,7 +472,8 @@ def write_manifest() -> Path:
         if not path.exists():
             continue
         doc = json.loads(path.read_text(encoding="utf-8"))
-        meta = {k: doc[k] for k in ("id", "abbreviation", "name", "edition", "language", "license", "license_note")}
+        meta = {k: doc[k] for k in ("id", "abbreviation", "name", "edition", "language", "license",
+                                     "license_note", "supplied_words")}
         meta["asset"] = f"assets/bible/{tid}.json"
         meta["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
         meta["verses"] = sum(len(c["verses"]) for b in doc["books"] for c in b["chapters"])
@@ -433,8 +496,10 @@ def main() -> int:
             books, source = build_from_bible_api(tid)
         elif tid == "kjv":
             books, source = build_kjv_mirror()
-        else:
+        elif tid == "web":
             books, source = build_web_mirror()
+        else:
+            books, source = build_scrollmapper(tid)
         path = write_translation(tid, books, source)
         verses = sum(len(c["verses"]) for b in books for c in b["chapters"])
         print(f"  wrote {path.relative_to(HERE.parent.parent)}: {len(books)} books, {verses} verses, "

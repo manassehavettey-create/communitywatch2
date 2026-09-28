@@ -3,6 +3,32 @@
   "default": "kjv",
   "available": [
     {
+      "id": "asv",
+      "abbreviation": "ASV",
+      "name": "American Standard Version",
+      "edition": "1901",
+      "language": "en",
+      "license": "Public Domain",
+      "license_note": "Public domain.",
+      "supplied_words": false,
+      "asset": "assets/bible/asv.json",
+      "sha256": "11dde560b50596a941ece7fa52bd62f6a147f74abf38df728e182ffd90a0a3e0",
+      "verses": 31102
+    },
+    {
+      "id": "bsb",
+      "abbreviation": "BSB",
+      "name": "Berean Standard Bible",
+      "edition": "BSB text",
+      "language": "en",
+      "license": "Public Domain",
+      "license_note": "Dedicated to the public domain by the Berean Bible translators on 30 April 2023.",
+      "supplied_words": false,
+      "asset": "assets/bible/bsb.json",
+      "sha256": "ccee11ad592b75b902448921e82490f764bf94537cf574b10c0eb3b1c64c8093",
+      "verses": 31102
+    },
+    {
       "id": "kjv",
       "abbreviation": "KJV",
       "name": "King James Version",
@@ -10,8 +36,9 @@
       "language": "en",
       "license": "Public Domain",
       "license_note": "Public domain worldwide except the United Kingdom, where the Crown's perpetual rights apply to printed editions.",
+      "supplied_words": true,
       "asset": "assets/bible/kjv.json",
-      "sha256": "3f926f11b668eac6940fc769b9ca1abb718035e3b09281067aa5b2dc96250ba1",
+      "sha256": "d0638cb382ef2dced04f956a2db2a90f004f6193193bb069be021f304267d71a",
       "verses": 31102
     },
     {
@@ -22,8 +49,9 @@
       "language": "en",
       "license": "Public Domain",
       "license_note": "Public domain. \"World English Bible\" is a trademark of eBible.org; the name may be used only for the unaltered text.",
+      "supplied_words": false,
       "asset": "assets/bible/web.json",
-      "sha256": "9e642fbb3a218e62946ffc2404335d6a55028da1eabfce1834bd00fbc74d748a",
+      "sha256": "83c08bbb1fb0cecbf7e19f72b3a3f74c42d5cde9b5d1006f11e70f9302e3f0b8",
       "verses": 31103
     }
   ],
