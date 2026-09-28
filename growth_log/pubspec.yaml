@@ -104,3 +104,26 @@ flutter:
           weight: 800
         - asset: assets/fonts/Archivo-Black.ttf
           weight: 900
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/images/brand/app_icon.png
+  remove_alpha_ios: true
+  adaptive_icon_background: "#0E101C"
+  adaptive_icon_foreground: assets/images/brand/app_icon_foreground.png
+  min_sdk_android: 24
+
+flutter_native_splash:
+  color: "#F5F5F2"
+  color_dark: "#0B0C10"
+  image: assets/images/brand/splash_logo.png
+  android_12:
+    color: "#F5F5F2"
+    color_dark: "#0B0C10"
+    image: assets/images/brand/app_icon_foreground.png
+    icon_background_color: "#0E101C"
+    icon_background_color_dark: "#0E101C"
+  ios: true
+  android: true
+  web: false

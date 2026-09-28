@@ -51,17 +51,21 @@ class SkillRepository {
 
   // ---------------------------------------------------------------- skills
 
-  Stream<List<SkillRow>> watchSkills({bool archived = false}) {
-    final q = _db.select(_db.skills)
-      ..where(
-        (s) => archived ? s.archivedAt.isNotNull() : s.archivedAt.isNull(),
-      )
-      ..orderBy([
-        (s) => OrderingTerm.asc(s.sortOrder),
-        (s) => OrderingTerm.asc(s.id),
-      ]);
-    return q.watch();
-  }
+  SimpleSelectStatement<$SkillsTable, SkillRow> _skillsQuery(bool archived) =>
+      _db.select(_db.skills)
+        ..where(
+          (s) => archived ? s.archivedAt.isNotNull() : s.archivedAt.isNull(),
+        )
+        ..orderBy([
+          (s) => OrderingTerm.asc(s.sortOrder),
+          (s) => OrderingTerm.asc(s.id),
+        ]);
+
+  Stream<List<SkillRow>> watchSkills({bool archived = false}) =>
+      _skillsQuery(archived).watch();
+
+  Future<List<SkillRow>> listSkills({bool archived = false}) =>
+      _skillsQuery(archived).get();
 
   Future<List<SkillRow>> allSkills() => (_db.select(_db.skills)
         ..orderBy([(s) => OrderingTerm.asc(s.sortOrder)]))

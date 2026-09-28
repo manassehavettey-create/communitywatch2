@@ -197,3 +197,32 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+def derive_brand():
+    """Builds the launcher icon, adaptive-icon foreground and splash mark
+    from the Apprentice badge (a sprouting plant) until dedicated brand art
+    exists. Re-run after replacing the badge to refresh them."""
+    plant = Image.open(OUT / 'badges' / 'badge_apprentice.png').convert('RGBA')
+    bbox = plant.getbbox()
+    plant = plant.crop(bbox)
+
+    def place(size, fraction, background=None):
+        canvas = Image.new('RGBA', (size, size), background or (0, 0, 0, 0))
+        p = plant.copy()
+        p.thumbnail((int(size * fraction), int(size * fraction)), Image.LANCZOS)
+        canvas.alpha_composite(p, ((size - p.width) // 2, (size - p.height) // 2))
+        return canvas
+
+    brand = OUT / 'brand'
+    place(1024, 0.72, (14, 16, 28, 255)).convert('RGB').save(brand / 'app_icon.png')
+    place(1024, 0.56).save(brand / 'app_icon_foreground.png')
+    place(1024, 0.84).save(brand / 'splash_logo.png')
+    print('brand: app_icon, app_icon_foreground, splash_logo')
+
+
+if __name__ == '__main__' and not any(
+    (SRC / f'{n}.jpg').exists() or (SRC / f'{n}.png').exists()
+    for n in ('app_icon', 'splash_logo')
+):
+    derive_brand()
