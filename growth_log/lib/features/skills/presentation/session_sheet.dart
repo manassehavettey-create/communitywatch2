@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/application/app_actions.dart';
 import '../../../core/db/database.dart';
 import '../../../core/providers.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/phosphor_icons.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/utils/day_key.dart';
 import '../../../core/utils/format.dart';

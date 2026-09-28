@@ -120,6 +120,7 @@ class ProgressBar extends StatelessWidget {
           duration: Motion.slow,
           curve: Curves.easeOutCubic,
           builder: (context, v, _) => Stack(
+            fit: StackFit.expand,
             children: [
               Positioned.fill(
                 child: ColoredBox(
@@ -127,6 +128,7 @@ class ProgressBar extends StatelessWidget {
                 ),
               ),
               FractionallySizedBox(
+                alignment: Alignment.centerLeft,
                 widthFactor: v,
                 heightFactor: 1,
                 child: DecoratedBox(

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/providers.dart';
 import '../../../core/router.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/phosphor_icons.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/utils/day_key.dart';
 import '../../../core/utils/format.dart';
@@ -65,6 +65,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 value: dashboard,
                 onRetry: () => ref.invalidate(dashboardProvider),
                 data: (d) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     FadeSlideIn(child: _WeekHero(dashboard: d, skills: skills.value ?? const [])),
                     Padding(

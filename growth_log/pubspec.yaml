@@ -47,10 +47,7 @@ dependencies:
   file_picker: ^13.1.0
   share_plus: ^13.3.0
   intl: ^0.20.3
-  phosphor_flutter: ^2.1.0
   confetti: ^0.8.0
-  uuid: ^4.6.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -95,6 +92,15 @@ flutter:
           weight: 700
         - asset: assets/fonts/Urbanist-ExtraBold.ttf
           weight: 800
+    - family: PhosphorRegular
+      fonts:
+        - asset: assets/fonts/phosphor/Phosphor-Regular.ttf
+    - family: PhosphorBold
+      fonts:
+        - asset: assets/fonts/phosphor/Phosphor-Bold.ttf
+    - family: PhosphorFill
+      fonts:
+        - asset: assets/fonts/phosphor/Phosphor-Fill.ttf
     - family: Archivo
       fonts:
         - asset: assets/fonts/Archivo-LightItalic.ttf

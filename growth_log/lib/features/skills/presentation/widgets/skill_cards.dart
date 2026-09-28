@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/application/app_actions.dart';
 import '../../../../core/router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/phosphor_icons.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/format.dart';
 import '../../../../core/widgets/app_image.dart';
@@ -71,8 +71,13 @@ class SkillTile extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Flexible(child: TagChip(level.current.name, dense: true)),
-                    const Spacer(),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TagChip(level.current.name, dense: true),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
                     CircleIconButton(
                       icon: PhosphorIconsFill.play,
                       tooltip: 'Start ${s.name} timer',

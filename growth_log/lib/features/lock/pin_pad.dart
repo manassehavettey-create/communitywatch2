@@ -3,10 +3,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../core/services/lock_service.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/phosphor_icons.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/pressable.dart';
 

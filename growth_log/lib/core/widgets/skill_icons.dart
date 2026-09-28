@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../db/database.dart';
+import '../theme/phosphor_icons.dart';
 import '../theme/tokens.dart';
 
 /// Icons a skill can use. Keys are stored in the database, so never rename

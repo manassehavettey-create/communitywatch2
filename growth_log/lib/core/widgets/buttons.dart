@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../theme/app_theme.dart';
+import '../theme/phosphor_icons.dart';
 import '../theme/tokens.dart';
 import 'pressable.dart';
 

@@ -5,12 +5,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/application/app_actions.dart';
 import '../../../core/providers.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/phosphor_icons.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/utils/format.dart';
 import '../../../core/widgets/buttons.dart';
@@ -418,12 +418,12 @@ class _Section extends StatelessWidget {
           padding: const EdgeInsets.only(top: Space.xl, bottom: Space.sm),
           child: Semantics(header: true, child: Text(title, style: context.text.titleMedium)),
         ),
-        Container(
+        Material(
+          color: gl.card,
           clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: gl.card,
+          shape: RoundedRectangleBorder(
             borderRadius: Radii.cardR,
-            border: Border.all(color: gl.hairline),
+            side: BorderSide(color: gl.hairline),
           ),
           child: Column(
             children: [

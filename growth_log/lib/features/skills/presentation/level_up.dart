@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/tokens.dart';
+import '../../../core/utils/format.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/feedback.dart';
@@ -138,8 +139,8 @@ class _LevelUpScreenState extends ConsumerState<LevelUpScreen>
                     child: SizedBox(
                       width: size.width * 0.55,
                       child: Text(
-                        "You're now ${_article(level.name)} ${level.name.toUpperCase()} in ${a.skillName}. "
-                        '${a.hours} hours of showing up.',
+                        'You reached ${level.name.toUpperCase()} in ${a.skillName}. '
+                        '${Fmt.number(a.hours)} hours of showing up.',
                         style: AppText.subtitle.copyWith(
                           color: Palette.white,
                           fontWeight: FontWeight.w700,
@@ -199,9 +200,6 @@ class _LevelUpScreenState extends ConsumerState<LevelUpScreen>
       ),
     );
   }
-
-  static String _article(String word) =>
-      'AEIOU'.contains(word[0].toUpperCase()) ? 'an' : 'a';
 }
 
 /// Badge + level name, used on cards and detail screens.

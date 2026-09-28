@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/application/app_actions.dart';
 import '../../../core/providers.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/phosphor_icons.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/utils/format.dart';
 import '../../../core/widgets/buttons.dart';
@@ -141,7 +141,10 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
 
     if (_loading) return const Scaffold(body: LoadingState());
     if (_loadError != null) {
-      return Scaffold(appBar: AppBar(), body: ErrorState(error: _loadError!));
+      return Scaffold(
+        appBar: AppBar(),
+        body: ErrorState(error: _loadError!),
+      );
     }
 
     return Scaffold(
@@ -149,23 +152,13 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                Space.gutter,
-                MediaQuery.paddingOf(context).top + Space.sm,
-                Space.gutter,
-                0,
-              ),
+              padding: EdgeInsets.fromLTRB(Space.gutter, MediaQuery.paddingOf(context).top + Space.sm, Space.gutter, 0),
               child: Row(
                 children: [
                   if (!widget.setupMode)
-                    CircleIconButton(
-                      icon: PhosphorIconsBold.x,
-                      tooltip: 'Close',
-                      onPressed: () => context.pop(),
-                    ),
+                    CircleIconButton(icon: PhosphorIconsBold.x, tooltip: 'Close', onPressed: () => context.pop()),
                   const Spacer(),
-                  if (widget.setupMode)
-                    TextButton(onPressed: _skipSetup, child: const Text('Skip for now')),
+                  if (widget.setupMode) TextButton(onPressed: _skipSetup, child: const Text('Skip for now')),
                 ],
               ),
             ),
@@ -191,10 +184,7 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                   maxLength: SkillLimits.nameMax,
                   textCapitalization: TextCapitalization.sentences,
                   autofocus: !_editing,
-                  decoration: InputDecoration(
-                    hintText: 'Guitar, Spanish, Drawing…',
-                    errorText: _nameError,
-                  ),
+                  decoration: InputDecoration(hintText: 'Guitar, Spanish, Drawing…', errorText: _nameError),
                 ),
                 const _Label('Why it matters (optional)'),
                 TextField(
@@ -259,11 +249,7 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                               shape: BoxShape.circle,
                               border: Border.all(color: e.key == _icon ? color : gl.hairline),
                             ),
-                            child: Icon(
-                              e.value,
-                              size: 22,
-                              color: e.key == _icon ? Palette.ink : gl.text,
-                            ),
+                            child: Icon(e.value, size: 22, color: e.key == _icon ? Palette.ink : gl.text),
                           ),
                         ),
                       ),
@@ -303,48 +289,43 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                   ],
                 ),
                 const SizedBox(height: Space.xs),
-                Text(
-                  '10,000 hours is the classic path to mastery — any goal works.',
-                  style: context.text.bodySmall,
-                ),
+                Text('10,000 hours is the classic path to mastery — any goal works.', style: context.text.bodySmall),
                 const _Label('Daily reminder'),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(20, 6, 12, 6),
-                  decoration: BoxDecoration(
-                    color: gl.surface,
+                Material(
+                  color: gl.surface,
+                  clipBehavior: Clip.antiAlias,
+                  shape: RoundedRectangleBorder(
                     borderRadius: Radii.cardSmallR,
-                    border: Border.all(color: gl.hairline),
+                    side: BorderSide(color: gl.hairline),
                   ),
-                  child: Column(
-                    children: [
-                      SwitchListTile.adaptive(
-                        contentPadding: EdgeInsets.zero,
-                        value: _reminder,
-                        title: const Text('Remind me to practise'),
-                        onChanged: (v) => setState(() => _reminder = v),
-                      ),
-                      AnimatedSize(
-                        duration: Motion.medium,
-                        child: _reminder
-                            ? ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                title: const Text('Time'),
-                                trailing: Text(
-                                  Fmt.timeOfDay(_reminderMinutes),
-                                  style: AppText.subtitle,
-                                ),
-                                onTap: _pickTime,
-                              )
-                            : const SizedBox(width: double.infinity),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 6, 12, 6),
+                    child: Column(
+                      children: [
+                        SwitchListTile.adaptive(
+                          contentPadding: EdgeInsets.zero,
+                          value: _reminder,
+                          title: const Text('Remind me to practise'),
+                          onChanged: (v) => setState(() => _reminder = v),
+                        ),
+                        AnimatedSize(
+                          duration: Motion.medium,
+                          child: _reminder
+                              ? ListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  title: const Text('Time'),
+                                  trailing: Text(Fmt.timeOfDay(_reminderMinutes), style: AppText.subtitle),
+                                  onTap: _pickTime,
+                                )
+                              : const SizedBox(width: double.infinity),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: Space.xl),
                 PillButton(
-                  label: widget.setupMode
-                      ? "Let's start"
-                      : (_editing ? 'Save changes' : 'Create skill'),
+                  label: widget.setupMode ? "Let's start" : (_editing ? 'Save changes' : 'Create skill'),
                   trailingArrow: true,
                   expand: true,
                   loading: _saving,
@@ -443,10 +424,7 @@ class _Choice extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Text(
                 label,
-                style: AppText.body.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: selected ? gl.onInverse : gl.text,
-                ),
+                style: AppText.body.copyWith(fontWeight: FontWeight.w700, color: selected ? gl.onInverse : gl.text),
               ),
             ),
           ),
