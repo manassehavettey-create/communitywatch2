@@ -63,8 +63,14 @@ void main() {
     });
 
     test('titles read naturally', () {
-      expect(Levels.milestoneTitle(1, 'Piano'), 'Hit 1 hour of Piano practice!');
-      expect(Levels.milestoneTitle(50, 'Piano'), 'Hit 50 hours of Piano practice!');
+      expect(
+        Levels.milestoneTitle(1, 'Piano'),
+        'Hit 1 hour of Piano practice!',
+      );
+      expect(
+        Levels.milestoneTitle(50, 'Piano'),
+        'Hit 50 hours of Piano practice!',
+      );
       expect(
         Levels.milestoneTitle(100, 'Piano'),
         'Reached Skilled in Piano — 100 hours of practice!',

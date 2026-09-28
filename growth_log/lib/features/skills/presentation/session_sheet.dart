@@ -27,7 +27,8 @@ Future<void> showSessionSheet(
 }) {
   return showAppSheet<void>(
     context,
-    builder: (_) => SessionSheet(skillId: skillId ?? existing?.skillId, existing: existing),
+    builder: (_) =>
+        SessionSheet(skillId: skillId ?? existing?.skillId, existing: existing),
   );
 }
 
@@ -115,7 +116,12 @@ class _SessionSheetState extends ConsumerState<SessionSheet> {
     navigator.pop();
     if (root != null && root.mounted) {
       if (result.isEmpty) {
-        showSnack(root, _editing ? 'Session updated' : 'Logged ${Fmt.duration(_minutes * 60)}');
+        showSnack(
+          root,
+          _editing
+              ? 'Session updated'
+              : 'Logged ${Fmt.duration(_minutes * 60)}',
+        );
       }
       await celebrate(root, result);
     }
@@ -126,7 +132,8 @@ class _SessionSheetState extends ConsumerState<SessionSheet> {
     final ok = await confirm(
       context,
       title: 'Delete this session?',
-      message: '${Fmt.duration(row.durationSec)} on ${Fmt.shortDate(row.dayKey)} will be removed.',
+      message:
+          '${Fmt.duration(row.durationSec)} on ${Fmt.shortDate(row.dayKey)} will be removed.',
       confirmLabel: 'Delete',
       destructive: true,
     );
@@ -152,7 +159,8 @@ class _SessionSheetState extends ConsumerState<SessionSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final skills = ref.watch(skillsOverviewProvider).value ?? const <SkillStats>[];
+    final skills =
+        ref.watch(skillsOverviewProvider).value ?? const <SkillStats>[];
     final today = ref.watch(todayProvider);
     final gl = context.gl;
 
@@ -183,8 +191,14 @@ class _SessionSheetState extends ConsumerState<SessionSheet> {
       secondary: _editing
           ? TextButton.icon(
               onPressed: _delete,
-              icon: const Icon(PhosphorIconsRegular.trash, color: Palette.danger),
-              label: const Text('Delete session', style: TextStyle(color: Palette.danger)),
+              icon: const Icon(
+                PhosphorIconsRegular.trash,
+                color: Palette.danger,
+              ),
+              label: const Text(
+                'Delete session',
+                style: TextStyle(color: Palette.danger),
+              ),
             )
           : null,
       child: Column(
@@ -208,7 +222,9 @@ class _SessionSheetState extends ConsumerState<SessionSheet> {
                     decoration: BoxDecoration(
                       color: sel ? Color(s.colorValue) : gl.surface,
                       borderRadius: Radii.pillR,
-                      border: Border.all(color: sel ? Color(s.colorValue) : gl.hairline),
+                      border: Border.all(
+                        color: sel ? Color(s.colorValue) : gl.hairline,
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -242,7 +258,9 @@ class _SessionSheetState extends ConsumerState<SessionSheet> {
                     _Stepper(
                       icon: PhosphorIconsBold.minus,
                       label: 'Less time',
-                      onTap: _minutes > 1 ? () => _add(_minutes > 15 ? -15 : -1) : null,
+                      onTap: _minutes > 1
+                          ? () => _add(_minutes > 15 ? -15 : -1)
+                          : null,
                     ),
                     Expanded(
                       child: Semantics(
@@ -252,14 +270,40 @@ class _SessionSheetState extends ConsumerState<SessionSheet> {
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text.rich(
-                              TextSpan(children: [
-                                if (hours > 0) ...[
-                                  TextSpan(text: '$hours', style: AppText.display.copyWith(color: Palette.ink, fontSize: 52)),
-                                  TextSpan(text: 'h ', style: AppText.displayItalic.copyWith(color: Palette.ink, fontSize: 30)),
+                              TextSpan(
+                                children: [
+                                  if (hours > 0) ...[
+                                    TextSpan(
+                                      text: '$hours',
+                                      style: AppText.display.copyWith(
+                                        color: Palette.ink,
+                                        fontSize: 52,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'h ',
+                                      style: AppText.displayItalic.copyWith(
+                                        color: Palette.ink,
+                                        fontSize: 30,
+                                      ),
+                                    ),
+                                  ],
+                                  TextSpan(
+                                    text: '$mins',
+                                    style: AppText.display.copyWith(
+                                      color: Palette.ink,
+                                      fontSize: 52,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: 'm',
+                                    style: AppText.displayItalic.copyWith(
+                                      color: Palette.ink,
+                                      fontSize: 30,
+                                    ),
+                                  ),
                                 ],
-                                TextSpan(text: '$mins', style: AppText.display.copyWith(color: Palette.ink, fontSize: 52)),
-                                TextSpan(text: 'm', style: AppText.displayItalic.copyWith(color: Palette.ink, fontSize: 30)),
-                              ]),
+                              ),
                             ),
                           ),
                         ),
@@ -284,9 +328,14 @@ class _SessionSheetState extends ConsumerState<SessionSheet> {
                         semanticLabel: Fmt.duration(m * 60),
                         child: AnimatedContainer(
                           duration: Motion.fast,
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: _minutes == m ? Palette.ink : Palette.white.withValues(alpha: 0.6),
+                            color: _minutes == m
+                                ? Palette.ink
+                                : Palette.white.withValues(alpha: 0.6),
                             borderRadius: Radii.pillR,
                           ),
                           child: Text(
@@ -318,10 +367,20 @@ class _SessionSheetState extends ConsumerState<SessionSheet> {
               ),
               child: Row(
                 children: [
-                  Icon(PhosphorIconsRegular.calendarBlank, color: gl.text, size: 20),
+                  Icon(
+                    PhosphorIconsRegular.calendarBlank,
+                    color: gl.text,
+                    size: 20,
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: Text(Fmt.dayLabel(_day, today), style: AppText.body)),
-                  Icon(PhosphorIconsRegular.caretRight, color: gl.muted, size: 18),
+                  Expanded(
+                    child: Text(Fmt.dayLabel(_day, today), style: AppText.body),
+                  ),
+                  Icon(
+                    PhosphorIconsRegular.caretRight,
+                    color: gl.muted,
+                    size: 18,
+                  ),
                 ],
               ),
             ),
@@ -345,7 +404,11 @@ class _SessionSheetState extends ConsumerState<SessionSheet> {
 }
 
 class _Stepper extends StatelessWidget {
-  const _Stepper({required this.icon, required this.label, required this.onTap});
+  const _Stepper({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   final IconData icon;
   final String label;

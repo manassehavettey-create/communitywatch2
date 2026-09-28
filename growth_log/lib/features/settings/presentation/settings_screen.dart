@@ -127,7 +127,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final ok = await confirm(
         context,
         title: 'Replace all data?',
-        message: 'This backup has ${Fmt.plural(summary.skills, 'skill')}, '
+        message:
+            'This backup has ${Fmt.plural(summary.skills, 'skill')}, '
             '${Fmt.plural(summary.sessions, 'session')} and '
             '${Fmt.plural(summary.entries, 'entry', 'entries')}.\n\n'
             'Everything currently in the app will be replaced. Consider exporting first.',
@@ -152,7 +153,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final first = await confirm(
       context,
       title: 'Reset all data?',
-      message: 'Every skill, session and journal entry will be permanently deleted. '
+      message:
+          'Every skill, session and journal entry will be permanently deleted. '
           'This cannot be undone.',
       confirmLabel: 'Continue',
       destructive: true,
@@ -171,10 +173,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onChanged: (_) => setLocal(() {}),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
             FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: Palette.danger, foregroundColor: Palette.white),
-              onPressed: controller.text.trim() == 'RESET' ? () => Navigator.pop(ctx, true) : null,
+              style: FilledButton.styleFrom(
+                backgroundColor: Palette.danger,
+                foregroundColor: Palette.white,
+              ),
+              onPressed: controller.text.trim() == 'RESET'
+                  ? () => Navigator.pop(ctx, true)
+                  : null,
               child: const Text('Delete everything'),
             ),
           ],
@@ -194,7 +204,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _seed() async {
     setState(() => _busy = true);
     await guarded(context, () async {
-      await DemoSeeder(ref.read(databaseProvider), ref.read(clockProvider)).seed();
+      await DemoSeeder(
+        ref.read(databaseProvider),
+        ref.read(clockProvider),
+      ).seed();
       await ref.read(appActionsProvider).syncAllReminders();
     });
     if (mounted) {
@@ -208,7 +221,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final s = ref.watch(settingsProvider);
     final notifier = ref.read(settingsProvider.notifier);
     final actions = ref.read(appActionsProvider);
-    final skills = ref.watch(skillsOverviewProvider).value ?? const <SkillStats>[];
+    final skills =
+        ref.watch(skillsOverviewProvider).value ?? const <SkillStats>[];
     final gl = context.gl;
 
     return Scaffold(
@@ -227,17 +241,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   CircleIconButton(
                     icon: PhosphorIconsBold.arrowLeft,
                     tooltip: 'Back',
-                    onPressed: () => context.canPop() ? context.pop() : context.go(Routes.home),
+                    onPressed: () => context.canPop()
+                        ? context.pop()
+                        : context.go(Routes.home),
                   ),
                 ],
               ),
               const SizedBox(height: Space.lg),
-              const DisplayTitle(bold: 'Settings', italic: '& privacy', size: 38),
+              const DisplayTitle(
+                bold: 'Settings',
+                italic: '& privacy',
+                size: 38,
+              ),
               _Section(
                 title: 'Appearance',
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(Space.md, Space.md, Space.md, Space.xs),
+                    padding: const EdgeInsets.fromLTRB(
+                      Space.md,
+                      Space.md,
+                      Space.md,
+                      Space.xs,
+                    ),
                     child: SegmentedPills<ThemeMode>(
                       values: ThemeMode.values,
                       selected: s.themeMode,
@@ -258,7 +283,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _SwitchRow(
                     icon: PhosphorIconsRegular.calendarBlank,
                     title: 'Week starts on Monday',
-                    subtitle: s.weekStartsMonday ? null : 'Weeks start on Sunday',
+                    subtitle: s.weekStartsMonday
+                        ? null
+                        : 'Weeks start on Sunday',
                     value: s.weekStartsMonday,
                     onChanged: notifier.setWeekStartsMonday,
                   ),
@@ -274,12 +301,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ? '${Fmt.timeOfDay(s.logReminderMinutes)} · a new gentle prompt each day'
                         : 'A gentle nudge to note something good',
                     value: s.logReminderEnabled,
-                    onChanged: (v) => guarded(context, () => actions.setLogReminder(enabled: v)),
+                    onChanged: (v) => guarded(
+                      context,
+                      () => actions.setLogReminder(enabled: v),
+                    ),
                     onTapTrailing: s.logReminderEnabled
                         ? () async {
                             final m = await _pickTime(s.logReminderMinutes);
                             if (m != null && context.mounted) {
-                              await guarded(context, () => actions.setLogReminder(enabled: true, minutes: m));
+                              await guarded(
+                                context,
+                                () => actions.setLogReminder(
+                                  enabled: true,
+                                  minutes: m,
+                                ),
+                              );
                             }
                           }
                         : null,
@@ -298,11 +334,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                       onTapTrailing: st.skill.reminderEnabled
                           ? () async {
-                              final m = await _pickTime(st.skill.reminderMinutes);
+                              final m = await _pickTime(
+                                st.skill.reminderMinutes,
+                              );
                               if (m != null && context.mounted) {
                                 await guarded(
                                   context,
-                                  () => actions.setSkillReminder(st.skill.id, enabled: true, minutes: m),
+                                  () => actions.setSkillReminder(
+                                    st.skill.id,
+                                    enabled: true,
+                                    minutes: m,
+                                  ),
                                 );
                               }
                             }
@@ -383,7 +425,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Center(
                 child: Text(
                   'Fonts: Urbanist & Archivo (OFL) · Icons: Phosphor',
-                  style: context.text.bodySmall?.copyWith(color: gl.muted.withValues(alpha: 0.7)),
+                  style: context.text.bodySmall?.copyWith(
+                    color: gl.muted.withValues(alpha: 0.7),
+                  ),
                 ),
               ),
             ],
@@ -416,7 +460,10 @@ class _Section extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: Space.xl, bottom: Space.sm),
-          child: Semantics(header: true, child: Text(title, style: context.text.titleMedium)),
+          child: Semantics(
+            header: true,
+            child: Text(title, style: context.text.titleMedium),
+          ),
         ),
         Material(
           color: gl.card,
@@ -455,7 +502,10 @@ class _IconBubble extends StatelessWidget {
     return Container(
       width: 36,
       height: 36,
-      decoration: BoxDecoration(color: color ?? context.gl.canvas, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: color ?? context.gl.canvas,
+        shape: BoxShape.circle,
+      ),
       child: Icon(icon, size: 18, color: context.gl.text),
     );
   }
@@ -485,10 +535,18 @@ class _SwitchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: Space.md, vertical: 2),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: Space.md,
+        vertical: 2,
+      ),
       leading: leading ?? (icon == null ? null : _IconBubble(icon!)),
-      title: Text(title, style: AppText.body.copyWith(fontWeight: FontWeight.w700)),
-      subtitle: subtitle == null ? null : Text(subtitle!, style: context.text.bodySmall),
+      title: Text(
+        title,
+        style: AppText.body.copyWith(fontWeight: FontWeight.w700),
+      ),
+      subtitle: subtitle == null
+          ? null
+          : Text(subtitle!, style: context.text.bodySmall),
       onTap: onTapTrailing ?? () => onChanged(!value),
       trailing: Switch.adaptive(value: value, onChanged: onChanged),
     );
@@ -515,11 +573,26 @@ class _ActionRow extends StatelessWidget {
     final color = destructive ? Palette.danger : context.gl.text;
     return ListTile(
       enabled: onTap != null,
-      contentPadding: const EdgeInsets.symmetric(horizontal: Space.md, vertical: 2),
-      leading: _IconBubble(icon, color: destructive ? Palette.danger.withValues(alpha: 0.12) : null),
-      title: Text(title, style: AppText.body.copyWith(fontWeight: FontWeight.w700, color: color)),
-      subtitle: subtitle == null ? null : Text(subtitle!, style: context.text.bodySmall),
-      trailing: Icon(PhosphorIconsRegular.caretRight, size: 18, color: context.gl.muted),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: Space.md,
+        vertical: 2,
+      ),
+      leading: _IconBubble(
+        icon,
+        color: destructive ? Palette.danger.withValues(alpha: 0.12) : null,
+      ),
+      title: Text(
+        title,
+        style: AppText.body.copyWith(fontWeight: FontWeight.w700, color: color),
+      ),
+      subtitle: subtitle == null
+          ? null
+          : Text(subtitle!, style: context.text.bodySmall),
+      trailing: Icon(
+        PhosphorIconsRegular.caretRight,
+        size: 18,
+        color: context.gl.muted,
+      ),
       onTap: onTap,
     );
   }

@@ -134,13 +134,13 @@ class EntryFilter {
 
   @override
   int get hashCode => Object.hash(
-        type,
-        Object.hashAllUnordered(tags),
-        skillId,
-        from,
-        to,
-        query,
-      );
+    type,
+    Object.hashAllUnordered(tags),
+    skillId,
+    from,
+    to,
+    query,
+  );
 }
 
 @immutable
@@ -156,10 +156,8 @@ class EntryRepository {
   final AppDatabase _db;
   final Clock _clock;
 
-  Stream<T> watch<T>(Future<T> Function() load) => _db.watchTables(
-        [_db.entries, _db.entryTags, _db.tags, _db.skills],
-        load,
-      );
+  Stream<T> watch<T>(Future<T> Function() load) =>
+      _db.watchTables([_db.entries, _db.entryTags, _db.tags, _db.skills], load);
 
   Stream<List<EntryView>> watchEntries(EntryFilter filter) =>
       watch(() => query(filter));
@@ -172,18 +170,25 @@ class EntryRepository {
         (t) => OrderingTerm.desc(t.createdAt),
         (t) => OrderingTerm.desc(t.id),
       ]);
-    if (filter.type != null) q.where((t) => t.type.equals(filter.type!.dbValue));
-    if (filter.skillId != null) q.where((t) => t.skillId.equals(filter.skillId!));
+    if (filter.type != null) {
+      q.where((t) => t.type.equals(filter.type!.dbValue));
+    }
+    if (filter.skillId != null) {
+      q.where((t) => t.skillId.equals(filter.skillId!));
+    }
     if (filter.from != null) {
       q.where((t) => t.dayKey.isBiggerOrEqualValue(filter.from!));
     }
-    if (filter.to != null) q.where((t) => t.dayKey.isSmallerOrEqualValue(filter.to!));
+    if (filter.to != null) {
+      q.where((t) => t.dayKey.isSmallerOrEqualValue(filter.to!));
+    }
     if (filter.tags.isNotEmpty) {
-      final sub = _db.selectOnly(_db.entryTags).join([
-        innerJoin(_db.tags, _db.tags.id.equalsExp(_db.entryTags.tagId)),
-      ])
-        ..addColumns([_db.entryTags.entryId])
-        ..where(_db.tags.name.isIn(filter.tags));
+      final sub =
+          _db.selectOnly(_db.entryTags).join([
+              innerJoin(_db.tags, _db.tags.id.equalsExp(_db.entryTags.tagId)),
+            ])
+            ..addColumns([_db.entryTags.entryId])
+            ..where(_db.tags.name.isIn(filter.tags));
       q.where((t) => t.id.isInQuery(sub));
     }
     final rows = await q.get();
@@ -203,12 +208,13 @@ class EntryRepository {
   Future<List<EntryView>> _hydrate(List<EntryRow> rows) async {
     if (rows.isEmpty) return const [];
     final ids = rows.map((r) => r.id).toList();
-    final tagRows = await (_db.select(_db.entryTags).join([
-      innerJoin(_db.tags, _db.tags.id.equalsExp(_db.entryTags.tagId)),
-    ])
-          ..where(_db.entryTags.entryId.isIn(ids))
-          ..orderBy([OrderingTerm.asc(_db.tags.name)]))
-        .get();
+    final tagRows =
+        await (_db.select(_db.entryTags).join([
+                innerJoin(_db.tags, _db.tags.id.equalsExp(_db.entryTags.tagId)),
+              ])
+              ..where(_db.entryTags.entryId.isIn(ids))
+              ..orderBy([OrderingTerm.asc(_db.tags.name)]))
+            .get();
     final tagsByEntry = <int, List<String>>{};
     for (final r in tagRows) {
       tagsByEntry
@@ -219,9 +225,9 @@ class EntryRepository {
     final skills = skillIds.isEmpty
         ? <int, SkillRow>{}
         : {
-            for (final s in await (_db.select(_db.skills)
-                  ..where((s) => s.id.isIn(skillIds)))
-                .get())
+            for (final s in await (_db.select(
+              _db.skills,
+            )..where((s) => s.id.isIn(skillIds))).get())
               s.id: s,
           };
     return [
@@ -235,15 +241,18 @@ class EntryRepository {
   }
 
   Future<EntryView?> getEntry(int id) async {
-    final row = await (_db.select(_db.entries)..where((e) => e.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.entries,
+    )..where((e) => e.id.equals(id))).getSingleOrNull();
     if (row == null) return null;
     return (await _hydrate([row])).first;
   }
 
   void _validate(EntryDraft d) {
     final body = d.body.trim();
-    if (body.isEmpty) throw const ValidationException('Write a few words first.');
+    if (body.isEmpty) {
+      throw const ValidationException('Write a few words first.');
+    }
     if (body.length > EntryLimits.bodyMax) {
       throw const ValidationException('That entry is too long.');
     }
@@ -264,11 +273,17 @@ class EntryRepository {
     return out;
   }
 
-  Future<int> addEntry(EntryDraft d, {bool isAuto = false, String? milestoneRef}) {
+  Future<int> addEntry(
+    EntryDraft d, {
+    bool isAuto = false,
+    String? milestoneRef,
+  }) {
     _validate(d);
     final tags = _cleanTags(d.tags);
     return _db.transaction(() async {
-      final id = await _db.into(_db.entries).insert(
+      final id = await _db
+          .into(_db.entries)
+          .insert(
             EntriesCompanion.insert(
               type: d.type.dbValue,
               body: d.body.trim(),
@@ -291,43 +306,52 @@ class EntryRepository {
     return _db.transaction(() async {
       final n = await (_db.update(_db.entries)..where((e) => e.id.equals(id)))
           .write(
-        EntriesCompanion(
-          type: Value(d.type.dbValue),
-          body: Value(d.body.trim()),
-          mood: Value(d.mood),
-          skillId: Value(d.skillId),
-          dayKey: Value(d.dayKey),
-          // Once a person edits an auto win it's theirs: never auto-remove.
-          isAuto: const Value(false),
-        ),
-      );
+            EntriesCompanion(
+              type: Value(d.type.dbValue),
+              body: Value(d.body.trim()),
+              mood: Value(d.mood),
+              skillId: Value(d.skillId),
+              dayKey: Value(d.dayKey),
+              // Once a person edits an auto win it's theirs: never auto-remove.
+              isAuto: const Value(false),
+            ),
+          );
       if (n == 0) throw const ValidationException('Entry not found.');
-      await (_db.delete(_db.entryTags)..where((t) => t.entryId.equals(id))).go();
+      await (_db.delete(
+        _db.entryTags,
+      )..where((t) => t.entryId.equals(id))).go();
       await _setTags(id, tags);
       await _pruneTags();
     });
   }
 
   Future<void> deleteEntry(int id) => _db.transaction(() async {
-        await (_db.delete(_db.entries)..where((e) => e.id.equals(id))).go();
-        await _pruneTags();
-      });
+    await (_db.delete(_db.entries)..where((e) => e.id.equals(id))).go();
+    await _pruneTags();
+  });
 
   /// Re-inserts a deleted entry with its tags (for "Undo").
   Future<void> restoreEntry(EntryView view) => _db.transaction(() async {
-        await _db.into(_db.entries).insert(view.entry, mode: InsertMode.insertOrReplace);
-        await _setTags(view.entry.id, view.tags);
-      });
+    await _db
+        .into(_db.entries)
+        .insert(view.entry, mode: InsertMode.insertOrReplace);
+    await _setTags(view.entry.id, view.tags);
+  });
 
   Future<void> _setTags(int entryId, List<String> tags) async {
     for (final name in tags) {
-      await _db.into(_db.tags).insert(
+      await _db
+          .into(_db.tags)
+          .insert(
             TagsCompanion.insert(name: name),
             mode: InsertMode.insertOrIgnore,
           );
-      final tag = await (_db.select(_db.tags)..where((t) => t.name.equals(name)))
-          .getSingle();
-      await _db.into(_db.entryTags).insert(
+      final tag = await (_db.select(
+        _db.tags,
+      )..where((t) => t.name.equals(name))).getSingle();
+      await _db
+          .into(_db.entryTags)
+          .insert(
             EntryTagsCompanion.insert(entryId: entryId, tagId: tag.id),
             mode: InsertMode.insertOrIgnore,
           );
@@ -335,19 +359,26 @@ class EntryRepository {
   }
 
   Future<void> _pruneTags() => _db.customStatement(
-        'DELETE FROM tags WHERE id NOT IN (SELECT tag_id FROM entry_tags)',
-      );
+    'DELETE FROM tags WHERE id NOT IN (SELECT tag_id FROM entry_tags)',
+  );
 
   /// Tags ordered by use, optionally within a day range.
   Future<List<TagCount>> tagCounts({DayKey? from, DayKey? to}) async {
     final count = _db.entryTags.entryId.count();
-    final q = _db.selectOnly(_db.entryTags).join([
-      innerJoin(_db.tags, _db.tags.id.equalsExp(_db.entryTags.tagId)),
-      innerJoin(_db.entries, _db.entries.id.equalsExp(_db.entryTags.entryId)),
-    ])
-      ..addColumns([_db.tags.name, count])
-      ..groupBy([_db.tags.name])
-      ..orderBy([OrderingTerm.desc(count), OrderingTerm.asc(_db.tags.name)]);
+    final q =
+        _db.selectOnly(_db.entryTags).join([
+            innerJoin(_db.tags, _db.tags.id.equalsExp(_db.entryTags.tagId)),
+            innerJoin(
+              _db.entries,
+              _db.entries.id.equalsExp(_db.entryTags.entryId),
+            ),
+          ])
+          ..addColumns([_db.tags.name, count])
+          ..groupBy([_db.tags.name])
+          ..orderBy([
+            OrderingTerm.desc(count),
+            OrderingTerm.asc(_db.tags.name),
+          ]);
     if (from != null) q.where(_db.entries.dayKey.isBiggerOrEqualValue(from));
     if (to != null) q.where(_db.entries.dayKey.isSmallerOrEqualValue(to));
     return [
@@ -358,8 +389,10 @@ class EntryRepository {
 
   Future<Set<DayKey>> entryDays() async {
     final e = _db.entries;
-    final rows =
-        await (_db.selectOnly(e, distinct: true)..addColumns([e.dayKey])).get();
+    final rows = await (_db.selectOnly(
+      e,
+      distinct: true,
+    )..addColumns([e.dayKey])).get();
     return {for (final r in rows) r.read(e.dayKey)!};
   }
 
@@ -369,11 +402,12 @@ class EntryRepository {
   Future<Map<EntryType, int>> countsBetween(DayKey from, DayKey to) async {
     final e = _db.entries;
     final count = e.id.count();
-    final rows = await (_db.selectOnly(e)
-          ..addColumns([e.type, count])
-          ..where(e.dayKey.isBetweenValues(from, to))
-          ..groupBy([e.type]))
-        .get();
+    final rows =
+        await (_db.selectOnly(e)
+              ..addColumns([e.type, count])
+              ..where(e.dayKey.isBetweenValues(from, to))
+              ..groupBy([e.type]))
+            .get();
     final out = {EntryType.gratitude: 0, EntryType.win: 0};
     for (final r in rows) {
       out[EntryType.parse(r.read(e.type)!)] = r.read(count) ?? 0;

@@ -25,8 +25,8 @@ Future<void> main() async {
   };
   if (kReleaseMode) {
     ErrorWidget.builder = (details) => const Material(
-          child: Center(child: Text('Something went wrong on this screen.')),
-        );
+      child: Center(child: Text('Something went wrong on this screen.')),
+    );
   }
 
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -73,7 +73,11 @@ class _FatalErrorApp extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Growth Log could not open your data.', style: AppText.title, textAlign: TextAlign.center),
+                const Text(
+                  'Growth Log could not open your data.',
+                  style: AppText.title,
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   'Try restarting the app. If this keeps happening, free up storage space.\n\n$error',

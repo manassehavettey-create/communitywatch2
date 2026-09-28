@@ -57,8 +57,14 @@ class AppActions {
     _ref.read(hapticsProvider).heavy();
   }
 
-  Future<void> setSkillReminder(int id, {required bool enabled, int? minutes}) async {
-    if (enabled) await _ref.read(notificationServiceProvider).requestPermission();
+  Future<void> setSkillReminder(
+    int id, {
+    required bool enabled,
+    int? minutes,
+  }) async {
+    if (enabled) {
+      await _ref.read(notificationServiceProvider).requestPermission();
+    }
     await _skills.setReminder(id, enabled: enabled, minutes: minutes);
     await _syncSkillReminder(id);
   }
@@ -131,7 +137,9 @@ class AppActions {
     final row = await _ref.read(timerRepositoryProvider).start(skillId);
     final skill = await _skills.getSkill(skillId);
     _ref.read(hapticsProvider).medium();
-    await _ref.read(notificationServiceProvider).showTimer(
+    await _ref
+        .read(notificationServiceProvider)
+        .showTimer(
           skillName: skill?.name ?? 'your skill',
           startedAt: row.startedAt,
         );
@@ -160,7 +168,9 @@ class AppActions {
     final timer = await _ref.read(timerRepositoryProvider).active();
     if (timer == null) return;
     final skill = await _skills.getSkill(timer.skillId);
-    await _ref.read(notificationServiceProvider).showTimer(
+    await _ref
+        .read(notificationServiceProvider)
+        .showTimer(
           skillName: skill?.name ?? 'your skill',
           startedAt: timer.startedAt,
         );
@@ -194,7 +204,9 @@ class AppActions {
   // ------------------------------------------------------------ reminders
 
   Future<void> setLogReminder({required bool enabled, int? minutes}) async {
-    if (enabled) await _ref.read(notificationServiceProvider).requestPermission();
+    if (enabled) {
+      await _ref.read(notificationServiceProvider).requestPermission();
+    }
     await _ref
         .read(settingsProvider.notifier)
         .setLogReminder(enabled: enabled, minutes: minutes);
@@ -205,7 +217,9 @@ class AppActions {
     final settings = _ref.read(settingsProvider);
     final today = _ref.read(clockProvider).today();
     final loggedToday = (await _entries.entryDays()).contains(today);
-    await _ref.read(notificationServiceProvider).scheduleLogReminders(
+    await _ref
+        .read(notificationServiceProvider)
+        .scheduleLogReminders(
           enabled: settings.logReminderEnabled,
           minutes: settings.logReminderMinutes,
           loggedToday: loggedToday,

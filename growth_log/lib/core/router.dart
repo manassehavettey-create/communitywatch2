@@ -33,7 +33,10 @@ abstract final class Routes {
   static String editSkill(int id) => '/skills/$id/edit';
   static String timer([int? skillId]) =>
       skillId == null ? '/timer' : '/timer?skill=$skillId';
-  static String newEntry({EntryType type = EntryType.gratitude, int? skillId}) =>
+  static String newEntry({
+    EntryType type = EntryType.gratitude,
+    int? skillId,
+  }) =>
       '/entry/new?type=${type.dbValue}${skillId == null ? '' : '&skill=$skillId'}';
   static String entry(int id) => '/entry/$id';
   static String recap([DayKey? month]) =>
@@ -72,27 +75,35 @@ final routerProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(shell: shell),
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(path: Routes.home, builder: (_, _) => const HomeScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: Routes.skills, builder: (_, _) => const SkillsScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: Routes.log, builder: (_, _) => const LogScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: Routes.insights,
-              builder: (_, _) => const InsightsScreen(),
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: Routes.home, builder: (_, _) => const HomeScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.skills,
+                builder: (_, _) => const SkillsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: Routes.log, builder: (_, _) => const LogScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.insights,
+                builder: (_, _) => const InsightsScreen(),
+              ),
+            ],
+          ),
         ],
       ),
-      GoRoute(
-        path: Routes.settings,
-        builder: (_, _) => const SettingsScreen(),
-      ),
+      GoRoute(path: Routes.settings, builder: (_, _) => const SettingsScreen()),
       GoRoute(
         path: Routes.newSkill,
         builder: (_, _) => const SkillEditorScreen(),
@@ -115,7 +126,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => MaterialPage(
           fullscreenDialog: true,
           child: TimerScreen(
-            initialSkillId: int.tryParse(state.uri.queryParameters['skill'] ?? ''),
+            initialSkillId: int.tryParse(
+              state.uri.queryParameters['skill'] ?? '',
+            ),
           ),
         ),
       ),
@@ -124,8 +137,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => MaterialPage(
           fullscreenDialog: true,
           child: EntryEditorScreen(
-            initialType: EntryType.parse(state.uri.queryParameters['type'] ?? ''),
-            initialSkillId: int.tryParse(state.uri.queryParameters['skill'] ?? ''),
+            initialType: EntryType.parse(
+              state.uri.queryParameters['type'] ?? '',
+            ),
+            initialSkillId: int.tryParse(
+              state.uri.queryParameters['skill'] ?? '',
+            ),
           ),
         ),
       ),

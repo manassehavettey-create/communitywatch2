@@ -1,5 +1,19 @@
 # Growth Log — Image Asset Brief (Google Flow)
 
+## Status
+16 of 20 images are in the app (processed by `tool/process_assets.py`; originals in `assets_src/generated/`).
+Stand-ins for the 4 that weren't generated:
+
+| Missing | Stand-in |
+|---|---|
+| `app_icon`, `app_icon_foreground`, `splash_logo` | Built from `badge_apprentice` (the sprouting plant) on ink — see `derive_brand()` in the script |
+| `onboarding_track` | Onboarding uses `onboarding_grow` → `onboarding_gratitude` → `levelup_hero` |
+
+To swap in dedicated art later: save it as `assets_src/generated/<name>.png|jpg`, run
+`python3 tool/process_assets.py`, then `dart run flutter_launcher_icons` and
+`dart run flutter_native_splash:create` for the brand images.
+
+
 All images go under `growth_log/assets/images/<folder>/<filename>`.
 The app is already wired to these exact paths; once a file is dropped in, it shows up — no code change needed.
 

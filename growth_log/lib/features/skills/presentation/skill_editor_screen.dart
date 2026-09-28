@@ -56,14 +56,22 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final s = await ref.read(skillRepositoryProvider).getSkill(widget.skillId!);
-      if (s == null) throw const ValidationException('This skill no longer exists.');
+      final s = await ref
+          .read(skillRepositoryProvider)
+          .getSkill(widget.skillId!);
+      if (s == null) {
+        throw const ValidationException('This skill no longer exists.');
+      }
       _name.text = s.name;
       _desc.text = s.description ?? '';
-      _icon = SkillIcons.all.containsKey(s.iconKey) ? s.iconKey : SkillIcons.fallback;
+      _icon = SkillIcons.all.containsKey(s.iconKey)
+          ? s.iconKey
+          : SkillIcons.fallback;
       _color = s.colorValue;
       _target = s.targetHours;
-      if (!_targets.contains(_target)) _customTarget.text = _target.round().toString();
+      if (!_targets.contains(_target)) {
+        _customTarget.text = _target.round().toString();
+      }
       _reminder = s.reminderEnabled;
       _reminderMinutes = s.reminderMinutes;
     } catch (e) {
@@ -83,7 +91,10 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
   Future<void> _pickTime() async {
     final t = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay(hour: _reminderMinutes ~/ 60, minute: _reminderMinutes % 60),
+      initialTime: TimeOfDay(
+        hour: _reminderMinutes ~/ 60,
+        minute: _reminderMinutes % 60,
+      ),
     );
     if (t != null) setState(() => _reminderMinutes = t.hour * 60 + t.minute);
   }
@@ -112,7 +123,11 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
       if (_editing) await actions.updateSkill(id, draft);
       // Asks for notification permission when turning a reminder on.
       if (_reminder) {
-        await actions.setSkillReminder(id, enabled: true, minutes: _reminderMinutes);
+        await actions.setSkillReminder(
+          id,
+          enabled: true,
+          minutes: _reminderMinutes,
+        );
       }
       if (widget.setupMode) {
         await ref.read(settingsProvider.notifier).completeOnboarding();
@@ -152,22 +167,42 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(Space.gutter, MediaQuery.paddingOf(context).top + Space.sm, Space.gutter, 0),
+              padding: EdgeInsets.fromLTRB(
+                Space.gutter,
+                MediaQuery.paddingOf(context).top + Space.sm,
+                Space.gutter,
+                0,
+              ),
               child: Row(
                 children: [
                   if (!widget.setupMode)
-                    CircleIconButton(icon: PhosphorIconsBold.x, tooltip: 'Close', onPressed: () => context.pop()),
+                    CircleIconButton(
+                      icon: PhosphorIconsBold.x,
+                      tooltip: 'Close',
+                      onPressed: () => context.pop(),
+                    ),
                   const Spacer(),
-                  if (widget.setupMode) TextButton(onPressed: _skipSetup, child: const Text('Skip for now')),
+                  if (widget.setupMode)
+                    TextButton(
+                      onPressed: _skipSetup,
+                      child: const Text('Skip for now'),
+                    ),
                 ],
               ),
             ),
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(Space.gutter, Space.md, Space.gutter, 0),
+              padding: const EdgeInsets.fromLTRB(
+                Space.gutter,
+                Space.md,
+                Space.gutter,
+                0,
+              ),
               child: DisplayTitle(
-                bold: widget.setupMode ? 'Your first' : (_editing ? 'Edit' : 'New'),
+                bold: widget.setupMode
+                    ? 'Your first'
+                    : (_editing ? 'Edit' : 'New'),
                 italic: 'skill',
                 size: 40,
               ),
@@ -184,7 +219,10 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                   maxLength: SkillLimits.nameMax,
                   textCapitalization: TextCapitalization.sentences,
                   autofocus: !_editing,
-                  decoration: InputDecoration(hintText: 'Guitar, Spanish, Drawing…', errorText: _nameError),
+                  decoration: InputDecoration(
+                    hintText: 'Guitar, Spanish, Drawing…',
+                    errorText: _nameError,
+                  ),
                 ),
                 const _Label('Why it matters (optional)'),
                 TextField(
@@ -193,7 +231,9 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                   minLines: 1,
                   maxLines: 3,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(hintText: 'Play songs around the campfire'),
+                  decoration: const InputDecoration(
+                    hintText: 'Play songs around the campfire',
+                  ),
                 ),
                 const _Label('Colour'),
                 Wrap(
@@ -215,12 +255,18 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                               color: c,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: c.toARGB32() == _color ? gl.text : Colors.transparent,
+                                color: c.toARGB32() == _color
+                                    ? gl.text
+                                    : Colors.transparent,
                                 width: 3,
                               ),
                             ),
                             child: c.toARGB32() == _color
-                                ? const Icon(PhosphorIconsBold.check, size: 18, color: Palette.ink)
+                                ? const Icon(
+                                    PhosphorIconsBold.check,
+                                    size: 18,
+                                    color: Palette.ink,
+                                  )
                                 : null,
                           ),
                         ),
@@ -247,9 +293,15 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                             decoration: BoxDecoration(
                               color: e.key == _icon ? color : gl.surface,
                               shape: BoxShape.circle,
-                              border: Border.all(color: e.key == _icon ? color : gl.hairline),
+                              border: Border.all(
+                                color: e.key == _icon ? color : gl.hairline,
+                              ),
                             ),
-                            child: Icon(e.value, size: 22, color: e.key == _icon ? Palette.ink : gl.text),
+                            child: Icon(
+                              e.value,
+                              size: 22,
+                              color: e.key == _icon ? Palette.ink : gl.text,
+                            ),
                           ),
                         ),
                       ),
@@ -289,7 +341,10 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                   ],
                 ),
                 const SizedBox(height: Space.xs),
-                Text('10,000 hours is the classic path to mastery — any goal works.', style: context.text.bodySmall),
+                Text(
+                  '10,000 hours is the classic path to mastery — any goal works.',
+                  style: context.text.bodySmall,
+                ),
                 const _Label('Daily reminder'),
                 Material(
                   color: gl.surface,
@@ -314,7 +369,10 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                               ? ListTile(
                                   contentPadding: EdgeInsets.zero,
                                   title: const Text('Time'),
-                                  trailing: Text(Fmt.timeOfDay(_reminderMinutes), style: AppText.subtitle),
+                                  trailing: Text(
+                                    Fmt.timeOfDay(_reminderMinutes),
+                                    style: AppText.subtitle,
+                                  ),
                                   onTap: _pickTime,
                                 )
                               : const SizedBox(width: double.infinity),
@@ -325,13 +383,17 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                 ),
                 const SizedBox(height: Space.xl),
                 PillButton(
-                  label: widget.setupMode ? "Let's start" : (_editing ? 'Save changes' : 'Create skill'),
+                  label: widget.setupMode
+                      ? "Let's start"
+                      : (_editing ? 'Save changes' : 'Create skill'),
                   trailingArrow: true,
                   expand: true,
                   loading: _saving,
                   onPressed: _save,
                 ),
-                SizedBox(height: MediaQuery.paddingOf(context).bottom + Space.xl),
+                SizedBox(
+                  height: MediaQuery.paddingOf(context).bottom + Space.xl,
+                ),
               ],
             ),
           ),
@@ -343,7 +405,12 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
   Widget _preview(Color color) {
     final name = _name.text.trim().isEmpty ? 'Your skill' : _name.text.trim();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(Space.gutter, Space.lg, Space.gutter, Space.xs),
+      padding: const EdgeInsets.fromLTRB(
+        Space.gutter,
+        Space.lg,
+        Space.gutter,
+        Space.xs,
+      ),
       child: AnimatedContainer(
         duration: Motion.medium,
         padding: const EdgeInsets.all(Space.lg),
@@ -353,7 +420,10 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
             Container(
               width: 56,
               height: 56,
-              decoration: const BoxDecoration(color: Palette.ink, shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                color: Palette.ink,
+                shape: BoxShape.circle,
+              ),
               child: Icon(SkillIcons.of(_icon), color: color, size: 28),
             ),
             const SizedBox(width: Space.md),
@@ -369,7 +439,9 @@ class _SkillEditorScreenState extends ConsumerState<SkillEditorScreen> {
                   ),
                   Text(
                     'Novice · 0 of ${Fmt.number((double.tryParse(_customTarget.text.replaceAll(',', '')) ?? _target).round())} h',
-                    style: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.7)),
+                    style: AppText.caption.copyWith(
+                      color: Palette.ink.withValues(alpha: 0.7),
+                    ),
                   ),
                 ],
               ),
@@ -395,7 +467,11 @@ class _Label extends StatelessWidget {
 }
 
 class _Choice extends StatelessWidget {
-  const _Choice({required this.label, required this.selected, required this.onTap});
+  const _Choice({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -424,7 +500,10 @@ class _Choice extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Text(
                 label,
-                style: AppText.body.copyWith(fontWeight: FontWeight.w700, color: selected ? gl.onInverse : gl.text),
+                style: AppText.body.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: selected ? gl.onInverse : gl.text,
+                ),
               ),
             ),
           ),

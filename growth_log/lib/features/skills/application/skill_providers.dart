@@ -86,32 +86,32 @@ class SkillDetail {
       sessions.isEmpty ? 0 : stats.totalSec ~/ sessions.length;
 }
 
-final skillDetailProvider =
-    StreamProvider.autoDispose.family<SkillDetail?, int>((ref, id) {
-  final repo = ref.watch(skillRepositoryProvider);
-  final milestoneRepo = ref.watch(milestoneRepositoryProvider);
-  final today = ref.watch(todayProvider);
-  final (weekStart, weekEnd) = ref.watch(currentWeekProvider);
-  return repo.watch(() async {
-    final skill = await repo.getSkill(id);
-    if (skill == null) return null;
-    final daily = await repo.dailySeconds(skillId: id);
-    final total = daily.values.fold<int>(0, (a, b) => a + b);
-    final week = daily.entries
-        .where((e) => e.key >= weekStart && e.key <= weekEnd)
-        .fold<int>(0, (a, e) => a + e.value);
-    final sessions = await repo.watchSessions(skillId: id).first;
-    final milestones = await milestoneRepo.watchForSkill(id).first;
-    return SkillDetail(
-      stats: SkillStats(
-        skill: skill,
-        totalSec: total,
-        weekSec: week,
-        streak: Streaks.compute(daily.keys, today),
-      ),
-      sessions: sessions,
-      milestones: milestones,
-      daily: daily,
-    );
-  });
-});
+final skillDetailProvider = StreamProvider.autoDispose
+    .family<SkillDetail?, int>((ref, id) {
+      final repo = ref.watch(skillRepositoryProvider);
+      final milestoneRepo = ref.watch(milestoneRepositoryProvider);
+      final today = ref.watch(todayProvider);
+      final (weekStart, weekEnd) = ref.watch(currentWeekProvider);
+      return repo.watch(() async {
+        final skill = await repo.getSkill(id);
+        if (skill == null) return null;
+        final daily = await repo.dailySeconds(skillId: id);
+        final total = daily.values.fold<int>(0, (a, b) => a + b);
+        final week = daily.entries
+            .where((e) => e.key >= weekStart && e.key <= weekEnd)
+            .fold<int>(0, (a, e) => a + e.value);
+        final sessions = await repo.watchSessions(skillId: id).first;
+        final milestones = await milestoneRepo.watchForSkill(id).first;
+        return SkillDetail(
+          stats: SkillStats(
+            skill: skill,
+            totalSec: total,
+            weekSec: week,
+            streak: Streaks.compute(daily.keys, today),
+          ),
+          sessions: sessions,
+          milestones: milestones,
+          daily: daily,
+        );
+      });
+    });

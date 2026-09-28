@@ -15,7 +15,7 @@ abstract class SecretStore {
 
 class SecureSecretStore implements SecretStore {
   SecureSecretStore([FlutterSecureStorage? storage])
-      : _s = storage ?? const FlutterSecureStorage();
+    : _s = storage ?? const FlutterSecureStorage();
   final FlutterSecureStorage _s;
 
   @override
@@ -41,8 +41,8 @@ class MemorySecretStore implements SecretStore {
 /// stretched SHA-256 hash in the platform keychain/keystore.
 class LockService {
   LockService({SecretStore? store, LocalAuthentication? auth})
-      : _store = store ?? SecureSecretStore(),
-        _localAuth = auth;
+    : _store = store ?? SecureSecretStore(),
+      _localAuth = auth;
 
   static const pinLength = 4;
   static const maxAttempts = 5;

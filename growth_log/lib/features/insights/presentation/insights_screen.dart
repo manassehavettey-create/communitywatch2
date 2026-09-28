@@ -36,7 +36,9 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(child: TabHeader(bold: 'Insights', italic: 'at a glance')),
+          const SliverToBoxAdapter(
+            child: TabHeader(bold: 'Insights', italic: 'at a glance'),
+          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
@@ -61,7 +63,9 @@ class _InsightsScreenState extends ConsumerState<InsightsScreen> {
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: Space.dockClearance + Space.lg)),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: Space.dockClearance + Space.lg),
+          ),
         ],
       ),
     );
@@ -91,7 +95,12 @@ class _Content extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(Space.gutter, Space.lg, Space.gutter, 0),
+          padding: const EdgeInsets.fromLTRB(
+            Space.gutter,
+            Space.lg,
+            Space.gutter,
+            0,
+          ),
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -100,33 +109,54 @@ class _Content extends StatelessWidget {
                   child: FadeSlideIn(
                     child: GLCard(
                       color: Palette.lime,
-                      semanticLabel: 'Practised ${Fmt.duration(d.seconds)} this $periodWord, $change versus last $periodWord',
+                      semanticLabel:
+                          'Practised ${Fmt.duration(d.seconds)} this $periodWord, $change versus last $periodWord',
                       child: ExcludeSemantics(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                const Icon(PhosphorIconsBold.trendUp, size: 16, color: Palette.ink),
+                                const Icon(
+                                  PhosphorIconsBold.trendUp,
+                                  size: 16,
+                                  color: Palette.ink,
+                                ),
                                 const SizedBox(width: 4),
-                                Text('Practice', style: AppText.caption.copyWith(color: Palette.ink, fontWeight: FontWeight.w700)),
+                                Text(
+                                  'Practice',
+                                  style: AppText.caption.copyWith(
+                                    color: Palette.ink,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: Space.sm),
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               alignment: Alignment.centerLeft,
-                              child: Text(change, style: AppText.display.copyWith(color: Palette.ink, fontSize: 36)),
+                              child: Text(
+                                change,
+                                style: AppText.display.copyWith(
+                                  color: Palette.ink,
+                                  fontSize: 36,
+                                ),
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'vs last $periodWord',
-                              style: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.7)),
+                              style: AppText.caption.copyWith(
+                                color: Palette.ink.withValues(alpha: 0.7),
+                              ),
                             ),
                             const Spacer(),
                             Text(
                               Fmt.duration(d.seconds),
-                              style: AppText.subtitle.copyWith(color: Palette.ink),
+                              style: AppText.subtitle.copyWith(
+                                color: Palette.ink,
+                              ),
                             ),
                           ],
                         ),
@@ -140,20 +170,46 @@ class _Content extends StatelessWidget {
                     index: 1,
                     child: GLCard(
                       color: Palette.inkCard,
-                      semanticLabel: '$gratitude gratitude entries and $wins wins this $periodWord',
+                      semanticLabel:
+                          '$gratitude gratitude entries and $wins wins this $periodWord',
                       child: ExcludeSemantics(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Journal', style: AppText.caption.copyWith(color: Palette.white.withValues(alpha: 0.7), fontWeight: FontWeight.w700)),
+                            Text(
+                              'Journal',
+                              style: AppText.caption.copyWith(
+                                color: Palette.white.withValues(alpha: 0.7),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                             const SizedBox(height: Space.sm),
-                            Text('${gratitude + wins}', style: AppText.display.copyWith(color: Palette.white, fontSize: 36)),
+                            Text(
+                              '${gratitude + wins}',
+                              style: AppText.display.copyWith(
+                                color: Palette.white,
+                                fontSize: 36,
+                              ),
+                            ),
                             const SizedBox(height: 4),
-                            Text('entries', style: AppText.caption.copyWith(color: Palette.white.withValues(alpha: 0.7))),
+                            Text(
+                              'entries',
+                              style: AppText.caption.copyWith(
+                                color: Palette.white.withValues(alpha: 0.7),
+                              ),
+                            ),
                             const SizedBox(height: Space.md),
-                            _Legend(color: Palette.butter, label: 'Gratitude', value: gratitude),
+                            _Legend(
+                              color: Palette.butter,
+                              label: 'Gratitude',
+                              value: gratitude,
+                            ),
                             const SizedBox(height: 4),
-                            _Legend(color: Palette.blush, label: 'Wins', value: wins),
+                            _Legend(
+                              color: Palette.blush,
+                              label: 'Wins',
+                              value: wins,
+                            ),
                           ],
                         ),
                       ),
@@ -165,7 +221,12 @@ class _Content extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(Space.gutter, Space.md, Space.gutter, 0),
+          padding: const EdgeInsets.fromLTRB(
+            Space.gutter,
+            Space.md,
+            Space.gutter,
+            0,
+          ),
           child: GLCard(
             border: true,
             child: Column(
@@ -173,15 +234,23 @@ class _Content extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Expanded(child: Text('Overview', style: context.text.titleMedium)),
+                    Expanded(
+                      child: Text('Overview', style: context.text.titleMedium),
+                    ),
                     Text(rangeLabel, style: context.text.bodySmall),
                   ],
                 ),
                 const SizedBox(height: 2),
-                Text(Fmt.duration(d.seconds), style: AppText.numeral.copyWith(color: gl.text, fontSize: 26)),
+                Text(
+                  Fmt.duration(d.seconds),
+                  style: AppText.numeral.copyWith(color: gl.text, fontSize: 26),
+                ),
                 const SizedBox(height: Space.md),
                 HoursBarChart(
-                  bars: [for (final b in d.buckets) ChartBar(b.label, b.seconds, highlight: b.highlight)],
+                  bars: [
+                    for (final b in d.buckets)
+                      ChartBar(b.label, b.seconds, highlight: b.highlight),
+                  ],
                   barColor: gl.inverse,
                   highlightColor: Palette.limeDeep,
                   height: 190,
@@ -210,7 +279,11 @@ class _Content extends StatelessWidget {
                 children: [
                   for (var i = 0; i < d.bySkill.length; i++) ...[
                     if (i > 0) const SizedBox(height: Space.md),
-                    _SkillBar(share: d.bySkill[i], max: d.bySkill.first.seconds, total: d.seconds),
+                    _SkillBar(
+                      share: d.bySkill[i],
+                      max: d.bySkill.first.seconds,
+                      total: d.seconds,
+                    ),
                   ],
                 ],
               ),
@@ -243,7 +316,12 @@ class _Content extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(Space.gutter, Space.sm, Space.gutter, 0),
+          padding: const EdgeInsets.fromLTRB(
+            Space.gutter,
+            Space.sm,
+            Space.gutter,
+            0,
+          ),
           child: Text(
             '${Fmt.plural(d.activeDays, 'active day')} · ${Fmt.plural(d.sessions, 'session')} this $periodWord',
             style: context.text.bodySmall,
@@ -274,7 +352,11 @@ class _Content extends StatelessWidget {
 }
 
 class _Legend extends StatelessWidget {
-  const _Legend({required this.color, required this.label, required this.value});
+  const _Legend({
+    required this.color,
+    required this.label,
+    required this.value,
+  });
 
   final Color color;
   final String label;
@@ -284,19 +366,38 @@ class _Legend extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: 6),
         Expanded(
-          child: Text(label, style: AppText.caption.copyWith(color: Palette.white.withValues(alpha: 0.8))),
+          child: Text(
+            label,
+            style: AppText.caption.copyWith(
+              color: Palette.white.withValues(alpha: 0.8),
+            ),
+          ),
         ),
-        Text('$value', style: AppText.caption.copyWith(color: Palette.white, fontWeight: FontWeight.w800)),
+        Text(
+          '$value',
+          style: AppText.caption.copyWith(
+            color: Palette.white,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
       ],
     );
   }
 }
 
 class _SkillBar extends StatelessWidget {
-  const _SkillBar({required this.share, required this.max, required this.total});
+  const _SkillBar({
+    required this.share,
+    required this.max,
+    required this.total,
+  });
 
   final SkillShare share;
   final int max;
@@ -307,7 +408,8 @@ class _SkillBar extends StatelessWidget {
     final color = Color(share.skill.colorValue);
     final pct = total == 0 ? 0 : (share.seconds / total * 100).round();
     return Semantics(
-      label: '${share.skill.name}: ${Fmt.duration(share.seconds)}, $pct percent',
+      label:
+          '${share.skill.name}: ${Fmt.duration(share.seconds)}, $pct percent',
       child: ExcludeSemantics(
         child: Row(
           children: [
@@ -324,14 +426,25 @@ class _SkillBar extends StatelessWidget {
                           share.skill.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: AppText.body.copyWith(fontWeight: FontWeight.w700),
+                          style: AppText.body.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                      Text(Fmt.duration(share.seconds), style: AppText.caption.copyWith(fontWeight: FontWeight.w700)),
+                      Text(
+                        Fmt.duration(share.seconds),
+                        style: AppText.caption.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  ProgressBar(value: max == 0 ? 0 : share.seconds / max, height: 10, color: color),
+                  ProgressBar(
+                    value: max == 0 ? 0 : share.seconds / max,
+                    height: 10,
+                    color: color,
+                  ),
                 ],
               ),
             ),
@@ -343,7 +456,12 @@ class _SkillBar extends StatelessWidget {
 }
 
 class _StreakRing extends StatelessWidget {
-  const _StreakRing({required this.label, required this.current, required this.best, required this.color});
+  const _StreakRing({
+    required this.label,
+    required this.current,
+    required this.best,
+    required this.color,
+  });
 
   final String label;
   final int current;
@@ -363,16 +481,37 @@ class _StreakRing extends StatelessWidget {
               size: 56,
               stroke: 6,
               color: Palette.ink,
-              child: const AppImage(AppAssets.streakFlame, width: 26, height: 26),
+              child: const AppImage(
+                AppAssets.streakFlame,
+                width: 26,
+                height: 26,
+              ),
             ),
             const SizedBox(width: Space.sm),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: AppText.caption.copyWith(color: Palette.ink, fontWeight: FontWeight.w700)),
-                  Text('${current}d', style: AppText.numeral.copyWith(color: Palette.ink, fontSize: 24)),
-                  Text('best ${best}d', style: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.7))),
+                  Text(
+                    label,
+                    style: AppText.caption.copyWith(
+                      color: Palette.ink,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    '${current}d',
+                    style: AppText.numeral.copyWith(
+                      color: Palette.ink,
+                      fontSize: 24,
+                    ),
+                  ),
+                  Text(
+                    'best ${best}d',
+                    style: AppText.caption.copyWith(
+                      color: Palette.ink.withValues(alpha: 0.7),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -422,10 +561,17 @@ class _RecapPromo extends StatelessWidget {
                     const SizedBox(height: Space.xs),
                     Text(
                       'LOOK HOW\nFAR YOU\'VE\nCOME.',
-                      style: AppText.display.copyWith(color: Palette.white, fontSize: 30, height: 0.95),
+                      style: AppText.display.copyWith(
+                        color: Palette.white,
+                        fontSize: 30,
+                        height: 0.95,
+                      ),
                     ),
                     const Spacer(),
-                    const Icon(PhosphorIconsBold.arrowUpRight, color: Palette.lime),
+                    const Icon(
+                      PhosphorIconsBold.arrowUpRight,
+                      color: Palette.lime,
+                    ),
                   ],
                 ),
               ),

@@ -58,23 +58,24 @@ class MilestoneRepository {
   /// isn't flooded.
   Future<List<Achievement>> reconcile(int skillId) {
     return _db.transaction(() async {
-      final skill = await (_db.select(_db.skills)
-            ..where((s) => s.id.equals(skillId)))
-          .getSingleOrNull();
+      final skill = await (_db.select(
+        _db.skills,
+      )..where((s) => s.id.equals(skillId))).getSingleOrNull();
       if (skill == null) return const <Achievement>[];
 
       final sum = _db.practiceSessions.durationSec.sum();
-      final totalRow = await (_db.selectOnly(_db.practiceSessions)
-            ..addColumns([sum])
-            ..where(_db.practiceSessions.skillId.equals(skillId)))
-          .getSingle();
+      final totalRow =
+          await (_db.selectOnly(_db.practiceSessions)
+                ..addColumns([sum])
+                ..where(_db.practiceSessions.skillId.equals(skillId)))
+              .getSingle();
       final total = totalRow.read(sum) ?? 0;
 
       final reached = Levels.reachedMilestones(total).toSet();
       final existing = {
-        for (final m in await (_db.select(_db.milestones)
-              ..where((m) => m.skillId.equals(skillId)))
-            .get())
+        for (final m in await (_db.select(
+          _db.milestones,
+        )..where((m) => m.skillId.equals(skillId))).get())
           m.hours,
       };
 
@@ -83,12 +84,11 @@ class MilestoneRepository {
         await (_db.delete(_db.milestones)
               ..where((m) => m.skillId.equals(skillId) & m.hours.isIn(removed)))
             .go();
-        await (_db.delete(_db.entries)
-              ..where(
-                (e) =>
-                    e.isAuto.equals(true) &
-                    e.milestoneRef.isIn(removed.map((h) => ref(skillId, h))),
-              ))
+        await (_db.delete(_db.entries)..where(
+              (e) =>
+                  e.isAuto.equals(true) &
+                  e.milestoneRef.isIn(removed.map((h) => ref(skillId, h))),
+            ))
             .go();
       }
 
@@ -98,7 +98,9 @@ class MilestoneRepository {
       final now = _clock.now();
       final today = _clock.today();
       for (final h in added) {
-        await _db.into(_db.milestones).insert(
+        await _db
+            .into(_db.milestones)
+            .insert(
               MilestonesCompanion.insert(
                 skillId: skillId,
                 hours: h,

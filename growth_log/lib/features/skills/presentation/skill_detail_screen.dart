@@ -52,7 +52,10 @@ class SkillDetailScreen extends ConsumerWidget {
                     message: 'It may have been deleted.',
                     compact: true,
                   ),
-                  TextButton(onPressed: () => context.go(Routes.skills), child: const Text('Back to skills')),
+                  TextButton(
+                    onPressed: () => context.go(Routes.skills),
+                    child: const Text('Back to skills'),
+                  ),
                 ],
               ),
             );
@@ -85,9 +88,16 @@ class _Body extends ConsumerWidget {
           child: Container(
             decoration: BoxDecoration(
               color: color,
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(Radii.hero + 8)),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(Radii.hero + 8),
+              ),
             ),
-            padding: EdgeInsets.fromLTRB(Space.gutter, top + Space.sm, Space.gutter, Space.xl),
+            padding: EdgeInsets.fromLTRB(
+              Space.gutter,
+              top + Space.sm,
+              Space.gutter,
+              Space.xl,
+            ),
             child: Column(
               children: [
                 Row(
@@ -97,7 +107,9 @@ class _Body extends ConsumerWidget {
                       tooltip: 'Back',
                       background: Palette.white,
                       foreground: Palette.ink,
-                      onPressed: () => context.canPop() ? context.pop() : context.go(Routes.skills),
+                      onPressed: () => context.canPop()
+                          ? context.pop()
+                          : context.go(Routes.skills),
                     ),
                     Expanded(
                       child: Text(
@@ -136,23 +148,34 @@ class _Body extends ConsumerWidget {
                 ),
                 const SizedBox(height: Space.md),
                 Text.rich(
-                  TextSpan(children: [
-                    TextSpan(
-                      text: Fmt.hours(stats.totalSec),
-                      style: AppText.display.copyWith(color: Palette.ink, fontSize: 56),
-                    ),
-                    TextSpan(
-                      text: ' hours',
-                      style: AppText.displayItalic.copyWith(color: Palette.ink, fontSize: 28),
-                    ),
-                  ]),
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: Fmt.hours(stats.totalSec),
+                        style: AppText.display.copyWith(
+                          color: Palette.ink,
+                          fontSize: 56,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' hours',
+                        style: AppText.displayItalic.copyWith(
+                          color: Palette.ink,
+                          fontSize: 28,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: Space.xxs),
                 Text(
                   level.isMax
                       ? 'Master level reached. Legendary.'
                       : '${Fmt.hours(level.secondsToNext)} h to ${level.next!.name}',
-                  style: AppText.body.copyWith(color: Palette.ink, fontWeight: FontWeight.w700),
+                  style: AppText.body.copyWith(
+                    color: Palette.ink,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 if (s.description != null) ...[
                   const SizedBox(height: Space.xs),
@@ -161,7 +184,9 @@ class _Body extends ConsumerWidget {
                     textAlign: TextAlign.center,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: AppText.body.copyWith(color: Palette.ink.withValues(alpha: 0.75)),
+                    style: AppText.body.copyWith(
+                      color: Palette.ink.withValues(alpha: 0.75),
+                    ),
                   ),
                 ],
                 const SizedBox(height: Space.lg),
@@ -174,7 +199,9 @@ class _Body extends ConsumerWidget {
                         expand: true,
                         background: Palette.ink,
                         foreground: color,
-                        onPressed: archived ? null : () => startOrOpenTimer(context, ref, s.id),
+                        onPressed: archived
+                            ? null
+                            : () => startOrOpenTimer(context, ref, s.id),
                       ),
                     ),
                     const SizedBox(width: Space.xs),
@@ -185,7 +212,8 @@ class _Body extends ConsumerWidget {
                         expand: true,
                         background: Palette.white.withValues(alpha: 0.6),
                         foreground: Palette.ink,
-                        onPressed: () => showSessionSheet(context, skillId: s.id),
+                        onPressed: () =>
+                            showSessionSheet(context, skillId: s.id),
                       ),
                     ),
                   ],
@@ -195,7 +223,12 @@ class _Body extends ConsumerWidget {
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(Space.gutter, Space.lg, Space.gutter, 0),
+          padding: const EdgeInsets.fromLTRB(
+            Space.gutter,
+            Space.lg,
+            Space.gutter,
+            0,
+          ),
           sliver: SliverToBoxAdapter(
             child: Row(
               children: [
@@ -204,7 +237,11 @@ class _Body extends ConsumerWidget {
                     label: 'Streak',
                     value: '${stats.streak.current}d',
                     caption: 'Best ${stats.streak.longest}d',
-                    leading: const AppImage(AppAssets.streakFlame, width: 22, height: 22),
+                    leading: const AppImage(
+                      AppAssets.streakFlame,
+                      width: 22,
+                      height: 22,
+                    ),
                   ),
                 ),
                 const SizedBox(width: Space.xs),
@@ -227,11 +264,11 @@ class _Body extends ConsumerWidget {
             ),
           ),
         ),
-        SliverToBoxAdapter(child: _Charts(detail: detail, today: today)),
-        SliverToBoxAdapter(child: _Milestones(detail: detail)),
         SliverToBoxAdapter(
-          child: _Target(stats: stats),
+          child: _Charts(detail: detail, today: today),
         ),
+        SliverToBoxAdapter(child: _Milestones(detail: detail)),
+        SliverToBoxAdapter(child: _Target(stats: stats)),
         const SliverToBoxAdapter(child: SectionHeader('Sessions')),
         if (detail.sessions.isEmpty)
           SliverToBoxAdapter(
@@ -241,7 +278,9 @@ class _Body extends ConsumerWidget {
                 border: true,
                 child: Text(
                   'No sessions yet. Start the timer or log time you already put in.',
-                  style: context.text.bodyMedium?.copyWith(color: context.gl.muted),
+                  style: context.text.bodyMedium?.copyWith(
+                    color: context.gl.muted,
+                  ),
                 ),
               ),
             ),
@@ -252,10 +291,15 @@ class _Body extends ConsumerWidget {
             sliver: SliverList.separated(
               itemCount: detail.sessions.length,
               separatorBuilder: (_, _) => const SizedBox(height: Space.xs),
-              itemBuilder: (_, i) => _SessionRow(session: detail.sessions[i], today: today),
+              itemBuilder: (_, i) =>
+                  _SessionRow(session: detail.sessions[i], today: today),
             ),
           ),
-        SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom + Space.xxl)),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: MediaQuery.paddingOf(context).bottom + Space.xxl,
+          ),
+        ),
       ],
     );
   }
@@ -278,7 +322,10 @@ class _Menu extends ConsumerWidget {
       itemBuilder: (_) => [
         const PopupMenuItem(value: 'edit', child: Text('Edit skill')),
         PopupMenuItem(value: 'win', child: Text('Log a win for ${s.name}')),
-        PopupMenuItem(value: 'archive', child: Text(archived ? 'Unarchive' : 'Archive')),
+        PopupMenuItem(
+          value: 'archive',
+          child: Text(archived ? 'Unarchive' : 'Archive'),
+        ),
         const PopupMenuItem(
           value: 'delete',
           child: Text('Delete', style: TextStyle(color: Palette.danger)),
@@ -287,25 +334,44 @@ class _Menu extends ConsumerWidget {
       child: Container(
         width: 44,
         height: 44,
-        decoration: const BoxDecoration(color: Palette.white, shape: BoxShape.circle),
-        child: const Icon(PhosphorIconsBold.dotsThree, color: Palette.ink, size: 20),
+        decoration: const BoxDecoration(
+          color: Palette.white,
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(
+          PhosphorIconsBold.dotsThree,
+          color: Palette.ink,
+          size: 20,
+        ),
       ),
     );
   }
 
-  Future<void> _onSelected(BuildContext context, WidgetRef ref, String v) async {
+  Future<void> _onSelected(
+    BuildContext context,
+    WidgetRef ref,
+    String v,
+  ) async {
     final s = detail.skill;
     final actions = ref.read(appActionsProvider);
     switch (v) {
       case 'edit':
         unawaited(context.push(Routes.editSkill(s.id)));
       case 'win':
-        unawaited(context.push(Routes.newEntry(type: EntryType.win, skillId: s.id)));
+        unawaited(
+          context.push(Routes.newEntry(type: EntryType.win, skillId: s.id)),
+        );
       case 'archive':
         final archiving = s.archivedAt == null;
-        await guarded(context, () => actions.setArchived(s.id, archived: archiving));
+        await guarded(
+          context,
+          () => actions.setArchived(s.id, archived: archiving),
+        );
         if (context.mounted) {
-          showSnack(context, archiving ? '${s.name} archived' : '${s.name} is back');
+          showSnack(
+            context,
+            archiving ? '${s.name} archived' : '${s.name} is back',
+          );
         }
       case 'delete':
         await _delete(context, ref);
@@ -323,17 +389,26 @@ class _Menu extends ConsumerWidget {
           count == 0
               ? 'This skill has no sessions yet.'
               : 'This permanently deletes ${Fmt.plural(count, 'session')} '
-                  '(${Fmt.hours(detail.stats.totalSec)} h) and its milestones. '
-                  'Journal entries linked to it are kept.\n\n'
-                  'Archive instead to keep the history.',
+                    '(${Fmt.hours(detail.stats.totalSec)} h) and its milestones. '
+                    'Journal entries linked to it are kept.\n\n'
+                    'Archive instead to keep the history.',
         ),
         actionsOverflowButtonSpacing: 8,
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
           if (count > 0 && s.archivedAt == null)
-            TextButton(onPressed: () => Navigator.pop(context, 'archive'), child: const Text('Archive')),
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'archive'),
+              child: const Text('Archive'),
+            ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Palette.danger, foregroundColor: Palette.white),
+            style: FilledButton.styleFrom(
+              backgroundColor: Palette.danger,
+              foregroundColor: Palette.white,
+            ),
             onPressed: () => Navigator.pop(context, 'delete'),
             child: const Text('Delete'),
           ),
@@ -412,19 +487,30 @@ class _ChartsState extends State<_Charts> {
             );
           }(),
       ];
-      title = '${Fmt.monthYear(Days.addMonths(end, -5))} – ${Fmt.monthShort(end)}';
+      title =
+          '${Fmt.monthYear(Days.addMonths(end, -5))} – ${Fmt.monthShort(end)}';
     }
     final total = bars.fold<int>(0, (a, b) => a + b.seconds);
-    final earliest = daily.keys.isEmpty ? today : daily.keys.reduce((a, b) => a < b ? a : b);
+    final earliest = daily.keys.isEmpty
+        ? today
+        : daily.keys.reduce((a, b) => a < b ? a : b);
     final canGoBack = _range == _ChartRange.week
         ? Days.add(Days.weekStart(today), -7 * _offset) > earliest
         : Days.addMonths(Days.monthStart(today), -6 * _offset - 5) > earliest;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(Space.gutter, Space.md, Space.gutter, 0),
+      padding: const EdgeInsets.fromLTRB(
+        Space.gutter,
+        Space.md,
+        Space.gutter,
+        0,
+      ),
       child: Container(
         padding: const EdgeInsets.all(Space.lg),
-        decoration: const BoxDecoration(color: Palette.inkCard, borderRadius: Radii.cardR),
+        decoration: const BoxDecoration(
+          color: Palette.inkCard,
+          borderRadius: Radii.cardR,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -434,10 +520,18 @@ class _ChartsState extends State<_Charts> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: AppText.caption.copyWith(color: Palette.white.withValues(alpha: 0.7))),
+                      Text(
+                        title,
+                        style: AppText.caption.copyWith(
+                          color: Palette.white.withValues(alpha: 0.7),
+                        ),
+                      ),
                       Text(
                         Fmt.duration(total),
-                        style: AppText.numeral.copyWith(color: Palette.white, fontSize: 28),
+                        style: AppText.numeral.copyWith(
+                          color: Palette.white,
+                          fontSize: 28,
+                        ),
                       ),
                     ],
                   ),
@@ -457,7 +551,9 @@ class _ChartsState extends State<_Charts> {
                   size: 36,
                   background: Palette.white.withValues(alpha: 0.1),
                   foreground: Palette.white,
-                  onPressed: _offset > 0 ? () => setState(() => _offset--) : null,
+                  onPressed: _offset > 0
+                      ? () => setState(() => _offset--)
+                      : null,
                 ),
               ],
             ),
@@ -515,7 +611,8 @@ class _Milestones extends StatelessWidget {
               final m = reached[h];
               final level = Levels.levelAtExactly(h);
               return Semantics(
-                label: '$h hours ${level == null ? '' : '(${level.name})'} '
+                label:
+                    '$h hours ${level == null ? '' : '(${level.name})'} '
                     '${m == null ? 'not reached yet' : 'reached ${Fmt.shortDate(m.dayKey)}'}',
                 child: ExcludeSemantics(
                   child: Container(
@@ -530,22 +627,31 @@ class _Milestones extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
-                          m != null ? PhosphorIconsFill.sealCheck : PhosphorIconsRegular.lockSimple,
+                          m != null
+                              ? PhosphorIconsFill.sealCheck
+                              : PhosphorIconsRegular.lockSimple,
                           size: 18,
                           color: m != null ? Palette.ink : gl.muted,
                         ),
                         const Spacer(),
                         Text(
                           '${Fmt.number(h)}h',
-                          style: AppText.subtitle.copyWith(color: m != null ? Palette.ink : gl.text),
+                          style: AppText.subtitle.copyWith(
+                            color: m != null ? Palette.ink : gl.text,
+                          ),
                         ),
                         Text(
-                          level?.name ?? (m != null ? Fmt.shortDate(m.dayKey) : 'Milestone'),
+                          level?.name ??
+                              (m != null
+                                  ? Fmt.shortDate(m.dayKey)
+                                  : 'Milestone'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppText.caption.copyWith(
                             fontSize: 11,
-                            color: m != null ? Palette.ink.withValues(alpha: 0.7) : gl.muted,
+                            color: m != null
+                                ? Palette.ink.withValues(alpha: 0.7)
+                                : gl.muted,
                           ),
                         ),
                       ],
@@ -569,9 +675,17 @@ class _Target extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = stats.skill;
-    final remaining = (s.targetHours * 3600 - stats.totalSec).clamp(0, double.infinity);
+    final remaining = (s.targetHours * 3600 - stats.totalSec).clamp(
+      0,
+      double.infinity,
+    );
     return Padding(
-      padding: const EdgeInsets.fromLTRB(Space.gutter, Space.md, Space.gutter, 0),
+      padding: const EdgeInsets.fromLTRB(
+        Space.gutter,
+        Space.md,
+        Space.gutter,
+        0,
+      ),
       child: GLCard(
         color: Palette.limeSoft,
         child: Row(
@@ -593,7 +707,9 @@ class _Target extends StatelessWidget {
                     remaining == 0
                         ? 'Goal complete. Time for a bigger one?'
                         : '${(stats.targetFraction * 100).toStringAsFixed(stats.targetFraction < 0.1 ? 1 : 0)}% · ${Fmt.hours(remaining)} h to go',
-                    style: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.75)),
+                    style: AppText.caption.copyWith(
+                      color: Palette.ink.withValues(alpha: 0.75),
+                    ),
                   ),
                 ],
               ),
@@ -621,7 +737,10 @@ class _SessionRow extends ConsumerWidget {
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: Space.lg),
-        decoration: const BoxDecoration(color: Palette.danger, borderRadius: Radii.cardSmallR),
+        decoration: const BoxDecoration(
+          color: Palette.danger,
+          borderRadius: Radii.cardSmallR,
+        ),
         child: const Icon(PhosphorIconsBold.trash, color: Palette.white),
       ),
       confirmDismiss: (_) => confirm(
@@ -635,23 +754,37 @@ class _SessionRow extends ConsumerWidget {
         final actions = ref.read(appActionsProvider);
         await guarded(context, () => actions.deleteSession(s));
         if (context.mounted) {
-          showSnack(context, 'Session deleted', actionLabel: 'Undo', onAction: () => actions.restoreSession(s));
+          showSnack(
+            context,
+            'Session deleted',
+            actionLabel: 'Undo',
+            onAction: () => actions.restoreSession(s),
+          );
         }
       },
       child: GLCard(
         radius: Radii.cardSmall,
-        padding: const EdgeInsets.symmetric(horizontal: Space.md, vertical: Space.sm),
+        padding: const EdgeInsets.symmetric(
+          horizontal: Space.md,
+          vertical: Space.sm,
+        ),
         border: true,
         onTap: () => showSessionSheet(context, existing: s),
-        semanticLabel: '${Fmt.duration(s.durationSec)}, ${Fmt.dayLabel(s.dayKey, today)}. Tap to edit',
+        semanticLabel:
+            '${Fmt.duration(s.durationSec)}, ${Fmt.dayLabel(s.dayKey, today)}. Tap to edit',
         child: Row(
           children: [
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(color: gl.canvas, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: gl.canvas,
+                shape: BoxShape.circle,
+              ),
               child: Icon(
-                s.source == 'timer' ? PhosphorIconsRegular.timer : PhosphorIconsRegular.pencilSimple,
+                s.source == 'timer'
+                    ? PhosphorIconsRegular.timer
+                    : PhosphorIconsRegular.pencilSimple,
                 size: 18,
                 color: gl.text,
               ),
@@ -661,7 +794,10 @@ class _SessionRow extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(Fmt.dayLabel(s.dayKey, today), style: AppText.body.copyWith(fontWeight: FontWeight.w700)),
+                  Text(
+                    Fmt.dayLabel(s.dayKey, today),
+                    style: AppText.body.copyWith(fontWeight: FontWeight.w700),
+                  ),
                   if (s.note != null)
                     Text(
                       s.note!,
@@ -671,7 +807,9 @@ class _SessionRow extends ConsumerWidget {
                     )
                   else
                     Text(
-                      s.source == 'timer' ? 'Timer · started ${Fmt.time(s.startedAt)}' : 'Logged manually',
+                      s.source == 'timer'
+                          ? 'Timer · started ${Fmt.time(s.startedAt)}'
+                          : 'Logged manually',
                       style: context.text.bodySmall,
                     ),
                 ],

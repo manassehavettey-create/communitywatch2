@@ -22,30 +22,37 @@ final databaseProvider = Provider<AppDatabase>(
 
 final clockProvider = Provider<Clock>((ref) => const Clock());
 
-final notificationServiceProvider =
-    Provider<NotificationService>((ref) => NotificationService());
+final notificationServiceProvider = Provider<NotificationService>(
+  (ref) => NotificationService(),
+);
 
 final lockServiceProvider = Provider<LockService>((ref) => LockService());
 
 final skillRepositoryProvider = Provider(
-  (ref) => SkillRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
+  (ref) =>
+      SkillRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
 );
 
 final timerRepositoryProvider = Provider(
-  (ref) => TimerRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
+  (ref) =>
+      TimerRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
 );
 
 final entryRepositoryProvider = Provider(
-  (ref) => EntryRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
+  (ref) =>
+      EntryRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
 );
 
 final milestoneRepositoryProvider = Provider(
-  (ref) =>
-      MilestoneRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
+  (ref) => MilestoneRepository(
+    ref.watch(databaseProvider),
+    ref.watch(clockProvider),
+  ),
 );
 
-final settingsRepositoryProvider =
-    Provider((ref) => SettingsRepository(ref.watch(databaseProvider)));
+final settingsRepositoryProvider = Provider(
+  (ref) => SettingsRepository(ref.watch(databaseProvider)),
+);
 
 final backupServiceProvider = Provider(
   (ref) => BackupService(ref.watch(databaseProvider), ref.watch(clockProvider)),
@@ -70,7 +77,10 @@ class TodayNotifier extends Notifier<DayKey> {
     _timer?.cancel();
     final now = clock.now();
     final midnight = DateTime(now.year, now.month, now.day + 1);
-    _timer = Timer(midnight.difference(now) + const Duration(seconds: 1), refresh);
+    _timer = Timer(
+      midnight.difference(now) + const Duration(seconds: 1),
+      refresh,
+    );
   }
 
   void refresh() {
@@ -81,12 +91,16 @@ class TodayNotifier extends Notifier<DayKey> {
   }
 }
 
-final todayProvider = NotifierProvider<TodayNotifier, DayKey>(TodayNotifier.new);
+final todayProvider = NotifierProvider<TodayNotifier, DayKey>(
+  TodayNotifier.new,
+);
 
 // --------------------------------------------------------------- settings
 
 /// Overridden in `main()` with the settings read before the first frame.
-final initialSettingsProvider = Provider<AppSettings>((ref) => const AppSettings());
+final initialSettingsProvider = Provider<AppSettings>(
+  (ref) => const AppSettings(),
+);
 
 class SettingsController extends Notifier<AppSettings> {
   @override
@@ -112,13 +126,16 @@ class SettingsController extends Notifier<AppSettings> {
 
   Future<void> setLogReminder({required bool enabled, int? minutes}) async {
     await _repo.set(SettingKeys.logReminderEnabled, enabled);
-    if (minutes != null) await _repo.set(SettingKeys.logReminderMinutes, minutes);
+    if (minutes != null) {
+      await _repo.set(SettingKeys.logReminderMinutes, minutes);
+    }
     state = await _repo.load();
   }
 }
 
-final settingsProvider =
-    NotifierProvider<SettingsController, AppSettings>(SettingsController.new);
+final settingsProvider = NotifierProvider<SettingsController, AppSettings>(
+  SettingsController.new,
+);
 
 final hapticsProvider = Provider<Haptics>(
   (ref) => Haptics(

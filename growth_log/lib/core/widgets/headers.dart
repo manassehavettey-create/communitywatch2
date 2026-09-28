@@ -83,7 +83,12 @@ class TabHeader extends StatelessWidget {
                 DisplayTitle(bold: bold, italic: italic),
                 if (subtitle != null) ...[
                   const SizedBox(height: Space.xxs),
-                  Text(subtitle!, style: context.text.bodyMedium?.copyWith(color: context.gl.muted)),
+                  Text(
+                    subtitle!,
+                    style: context.text.bodyMedium?.copyWith(
+                      color: context.gl.muted,
+                    ),
+                  ),
                 ],
               ],
             ),

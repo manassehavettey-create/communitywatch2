@@ -13,8 +13,9 @@ class LogFilterController extends Notifier<EntryFilter> {
   void clear() => state = EntryFilter(query: state.query);
 }
 
-final logFilterProvider =
-    NotifierProvider<LogFilterController, EntryFilter>(LogFilterController.new);
+final logFilterProvider = NotifierProvider<LogFilterController, EntryFilter>(
+  LogFilterController.new,
+);
 
 final logEntriesProvider = StreamProvider<List<EntryView>>((ref) {
   final repo = ref.watch(entryRepositoryProvider);
@@ -39,7 +40,9 @@ final logStreakProvider = StreamProvider<Streak>((ref) {
   return repo.watch(() async => Streaks.compute(await repo.entryDays(), today));
 });
 
-final entryProvider =
-    FutureProvider.autoDispose.family<EntryView?, int>((ref, id) {
+final entryProvider = FutureProvider.autoDispose.family<EntryView?, int>((
+  ref,
+  id,
+) {
   return ref.watch(entryRepositoryProvider).getEntry(id);
 });

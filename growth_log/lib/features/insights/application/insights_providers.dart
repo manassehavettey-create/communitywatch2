@@ -95,91 +95,105 @@ class InsightsData {
   }
 }
 
-final insightsProvider =
-    StreamProvider.autoDispose.family<InsightsData, InsightPeriod>((ref, period) {
-  final db = ref.watch(databaseProvider);
-  final skillsRepo = ref.watch(skillRepositoryProvider);
-  final entries = ref.watch(entryRepositoryProvider);
-  final today = ref.watch(todayProvider);
-  final monday = ref.watch(settingsProvider.select((s) => s.weekStartsMonday));
-
-  return db.watchTables(
-    [db.skills, db.practiceSessions, db.entries, db.entryTags, db.tags],
-    () async {
-      final (from, to) = periodRange(period, today, monday);
-      final (pFrom, pTo) = previousRange(period, from);
-      final daily = await skillsRepo.dailySeconds(from: from, to: to);
-      final prev = await skillsRepo.dailySeconds(from: pFrom, to: pTo);
-      final seconds = daily.values.fold<int>(0, (a, b) => a + b);
-
-      final buckets = <ChartBucket>[];
-      switch (period) {
-        case InsightPeriod.week:
-          for (var i = 0; i < 7; i++) {
-            final d = Days.add(from, i);
-            buckets.add(ChartBucket(
-              Fmt.weekdayShort(d).substring(0, 2),
-              daily[d] ?? 0,
-              highlight: d == today,
-            ));
-          }
-        case InsightPeriod.month:
-          for (final d in Days.range(from, to)) {
-            final day = d % 100;
-            buckets.add(ChartBucket(
-              day == 1 || day % 5 == 0 ? '$day' : '',
-              daily[d] ?? 0,
-              highlight: d == today,
-            ));
-          }
-        case InsightPeriod.year:
-          for (var m = 0; m < 12; m++) {
-            final start = Days.addMonths(from, m);
-            final end = Days.monthEnd(start);
-            var sum = 0;
-            daily.forEach((d, s) {
-              if (d >= start && d <= end) sum += s;
-            });
-            buckets.add(ChartBucket(
-              Fmt.monthShort(start).substring(0, 1),
-              sum,
-              highlight: today >= start && today <= end,
-            ));
-          }
-      }
-
-      final totals = await skillsRepo.totalsBySkill(from: from, to: to);
-      final allSkills = {for (final s in await skillsRepo.allSkills()) s.id: s};
-      final bySkill = [
-        for (final e in totals.entries)
-          if (allSkills[e.key] != null) SkillShare(allSkills[e.key]!, e.value),
-      ]..sort((a, b) => b.seconds.compareTo(a.seconds));
-
-      final sessions = await skillsRepo.sessionsBetween(from, to);
-      final entryDays = await entries.entryDays();
-      final practiceDays = await skillsRepo.practiceDays();
-
-      return InsightsData(
-        period: period,
-        from: from,
-        to: to,
-        seconds: seconds,
-        prevSeconds: prev.values.fold<int>(0, (a, b) => a + b),
-        buckets: buckets,
-        bySkill: bySkill,
-        counts: await entries.countsBetween(from, to),
-        topTags: (await entries.tagCounts(from: from, to: to)).take(8).toList(),
-        practiceStreak: Streaks.compute(practiceDays, today),
-        logStreak: Streaks.compute(entryDays, today),
-        activeDays: {
-          ...daily.keys,
-          ...entryDays.where((d) => d >= from && d <= to),
-        }.length,
-        sessions: sessions.length,
+final insightsProvider = StreamProvider.autoDispose
+    .family<InsightsData, InsightPeriod>((ref, period) {
+      final db = ref.watch(databaseProvider);
+      final skillsRepo = ref.watch(skillRepositoryProvider);
+      final entries = ref.watch(entryRepositoryProvider);
+      final today = ref.watch(todayProvider);
+      final monday = ref.watch(
+        settingsProvider.select((s) => s.weekStartsMonday),
       );
-    },
-  );
-});
+
+      return db.watchTables(
+        [db.skills, db.practiceSessions, db.entries, db.entryTags, db.tags],
+        () async {
+          final (from, to) = periodRange(period, today, monday);
+          final (pFrom, pTo) = previousRange(period, from);
+          final daily = await skillsRepo.dailySeconds(from: from, to: to);
+          final prev = await skillsRepo.dailySeconds(from: pFrom, to: pTo);
+          final seconds = daily.values.fold<int>(0, (a, b) => a + b);
+
+          final buckets = <ChartBucket>[];
+          switch (period) {
+            case InsightPeriod.week:
+              for (var i = 0; i < 7; i++) {
+                final d = Days.add(from, i);
+                buckets.add(
+                  ChartBucket(
+                    Fmt.weekdayShort(d).substring(0, 2),
+                    daily[d] ?? 0,
+                    highlight: d == today,
+                  ),
+                );
+              }
+            case InsightPeriod.month:
+              for (final d in Days.range(from, to)) {
+                final day = d % 100;
+                buckets.add(
+                  ChartBucket(
+                    day == 1 || day % 5 == 0 ? '$day' : '',
+                    daily[d] ?? 0,
+                    highlight: d == today,
+                  ),
+                );
+              }
+            case InsightPeriod.year:
+              for (var m = 0; m < 12; m++) {
+                final start = Days.addMonths(from, m);
+                final end = Days.monthEnd(start);
+                var sum = 0;
+                daily.forEach((d, s) {
+                  if (d >= start && d <= end) sum += s;
+                });
+                buckets.add(
+                  ChartBucket(
+                    Fmt.monthShort(start).substring(0, 1),
+                    sum,
+                    highlight: today >= start && today <= end,
+                  ),
+                );
+              }
+          }
+
+          final totals = await skillsRepo.totalsBySkill(from: from, to: to);
+          final allSkills = {
+            for (final s in await skillsRepo.allSkills()) s.id: s,
+          };
+          final bySkill = [
+            for (final e in totals.entries)
+              if (allSkills[e.key] != null)
+                SkillShare(allSkills[e.key]!, e.value),
+          ]..sort((a, b) => b.seconds.compareTo(a.seconds));
+
+          final sessions = await skillsRepo.sessionsBetween(from, to);
+          final entryDays = await entries.entryDays();
+          final practiceDays = await skillsRepo.practiceDays();
+
+          return InsightsData(
+            period: period,
+            from: from,
+            to: to,
+            seconds: seconds,
+            prevSeconds: prev.values.fold<int>(0, (a, b) => a + b),
+            buckets: buckets,
+            bySkill: bySkill,
+            counts: await entries.countsBetween(from, to),
+            topTags: (await entries.tagCounts(
+              from: from,
+              to: to,
+            )).take(8).toList(),
+            practiceStreak: Streaks.compute(practiceDays, today),
+            logStreak: Streaks.compute(entryDays, today),
+            activeDays: {
+              ...daily.keys,
+              ...entryDays.where((d) => d >= from && d <= to),
+            }.length,
+            sessions: sessions.length,
+          );
+        },
+      );
+    });
 
 // ------------------------------------------------------------------ recap
 
@@ -224,8 +238,10 @@ class RecapData {
   bool get isEmpty => entryCount == 0 && sessions == 0;
 }
 
-final recapProvider =
-    FutureProvider.autoDispose.family<RecapData, DayKey>((ref, month) async {
+final recapProvider = FutureProvider.autoDispose.family<RecapData, DayKey>((
+  ref,
+  month,
+) async {
   final skillsRepo = ref.watch(skillRepositoryProvider);
   final entries = ref.watch(entryRepositoryProvider);
   final milestones = ref.watch(milestoneRepositoryProvider);
@@ -250,7 +266,8 @@ final recapProvider =
 
   final ms = [
     for (final m in await milestones.between(from, to))
-      if (skills[m.skillId] != null) RecapMilestone(skills[m.skillId]!, m.hours),
+      if (skills[m.skillId] != null)
+        RecapMilestone(skills[m.skillId]!, m.hours),
   ];
 
   MapEntry<int, int>? top;
@@ -258,7 +275,10 @@ final recapProvider =
     if (top == null || e.value > top.value) top = e;
   }
 
-  final allDays = {...await skillsRepo.practiceDays(), ...await entries.entryDays()};
+  final allDays = {
+    ...await skillsRepo.practiceDays(),
+    ...await entries.entryDays(),
+  };
   return RecapData(
     month: from,
     gratitudeCount: counts[EntryType.gratitude] ?? 0,
@@ -269,10 +289,10 @@ final recapProvider =
       ...daily.keys,
       ...monthEntries.map((e) => e.entry.dayKey),
     }.length,
-    topTags: (await entries.tagCounts(from: from, to: to))
-        .where((t) => t.name != 'milestone')
-        .take(6)
-        .toList(),
+    topTags: (await entries.tagCounts(
+      from: from,
+      to: to,
+    )).where((t) => t.name != 'milestone').take(6).toList(),
     milestones: ms,
     wins: wins.take(12).toList(),
     topSkill: top == null ? null : skills[top.key],
@@ -284,8 +304,9 @@ final recapProvider =
 final _recapTickProvider = StreamProvider.autoDispose<int>((ref) {
   final db = ref.watch(databaseProvider);
   var i = 0;
-  return db.watchTables(
-    [db.practiceSessions, db.entries, db.milestones],
-    () async => i++,
-  );
+  return db.watchTables([
+    db.practiceSessions,
+    db.entries,
+    db.milestones,
+  ], () async => i++);
 });

@@ -43,45 +43,63 @@ void main() {
       );
       expect(
         () => env.skills.createSkill(
-          const SkillDraft(name: 'ok', iconKey: 'x', colorValue: 1, targetHours: 0),
+          const SkillDraft(
+            name: 'ok',
+            iconKey: 'x',
+            colorValue: 1,
+            targetHours: 0,
+          ),
         ),
         throwsA(isA<ValidationException>()),
       );
     });
 
-    test('archive hides from active list, disables reminder, stops timer',
-        () async {
-      final id = await env.skill();
-      await env.skills.setReminder(id, enabled: true);
-      await env.timer.start(id);
-      await env.skills.setArchived(id, archived: true);
+    test(
+      'archive hides from active list, disables reminder, stops timer',
+      () async {
+        final id = await env.skill();
+        await env.skills.setReminder(id, enabled: true);
+        await env.timer.start(id);
+        await env.skills.setArchived(id, archived: true);
 
-      expect(await env.skills.watchSkills().first, isEmpty);
-      final archived = await env.skills.watchSkills(archived: true).first;
-      expect(archived.single.reminderEnabled, isFalse);
-      expect(await env.timer.active(), isNull);
+        expect(await env.skills.watchSkills().first, isEmpty);
+        final archived = await env.skills.watchSkills(archived: true).first;
+        expect(archived.single.reminderEnabled, isFalse);
+        expect(await env.timer.active(), isNull);
 
-      await env.skills.setArchived(id, archived: false);
-      expect((await env.skills.watchSkills().first).single.id, id);
-    });
+        await env.skills.setArchived(id, archived: false);
+        expect((await env.skills.watchSkills().first).single.id, id);
+      },
+    );
 
-    test('deleting a skill removes sessions + milestones, keeps entries',
-        () async {
-      final id = await env.skill();
-      await env.skills.addSession(skillId: id, dayKey: 20260928, durationSec: 2 * 3600);
-      await env.milestones.reconcile(id);
-      final manual = await env.entries.addEntry(
-        EntryDraft(type: EntryType.win, body: 'Played live', dayKey: 20260928, skillId: id),
-      );
+    test(
+      'deleting a skill removes sessions + milestones, keeps entries',
+      () async {
+        final id = await env.skill();
+        await env.skills.addSession(
+          skillId: id,
+          dayKey: 20260928,
+          durationSec: 2 * 3600,
+        );
+        await env.milestones.reconcile(id);
+        final manual = await env.entries.addEntry(
+          EntryDraft(
+            type: EntryType.win,
+            body: 'Played live',
+            dayKey: 20260928,
+            skillId: id,
+          ),
+        );
 
-      await env.skills.deleteSkill(id);
+        await env.skills.deleteSkill(id);
 
-      expect(await env.skills.sessionCount(id), 0);
-      expect(await env.milestones.watchForSkill(id).first, isEmpty);
-      final kept = await env.entries.getEntry(manual);
-      expect(kept, isNotNull);
-      expect(kept!.entry.skillId, isNull);
-    });
+        expect(await env.skills.sessionCount(id), 0);
+        expect(await env.milestones.watchForSkill(id).first, isEmpty);
+        final kept = await env.entries.getEntry(manual);
+        expect(kept, isNotNull);
+        expect(kept!.entry.skillId, isNull);
+      },
+    );
 
     test('reorder persists order', () async {
       final a = await env.skill('A');
@@ -97,16 +115,28 @@ void main() {
     test('totals, daily seconds and practice days', () async {
       final a = await env.skill('A');
       final b = await env.skill('B');
-      await env.skills.addSession(skillId: a, dayKey: 20260927, durationSec: 1800);
-      await env.skills.addSession(skillId: a, dayKey: 20260928, durationSec: 3600);
-      await env.skills.addSession(skillId: b, dayKey: 20260928, durationSec: 600);
+      await env.skills.addSession(
+        skillId: a,
+        dayKey: 20260927,
+        durationSec: 1800,
+      );
+      await env.skills.addSession(
+        skillId: a,
+        dayKey: 20260928,
+        durationSec: 3600,
+      );
+      await env.skills.addSession(
+        skillId: b,
+        dayKey: 20260928,
+        durationSec: 600,
+      );
 
       expect(await env.skills.totalSeconds(a), 5400);
       expect(await env.skills.totalsBySkill(), {a: 5400, b: 600});
-      expect(
-        await env.skills.totalsBySkill(from: 20260928, to: 20260928),
-        {a: 3600, b: 600},
-      );
+      expect(await env.skills.totalsBySkill(from: 20260928, to: 20260928), {
+        a: 3600,
+        b: 600,
+      });
       expect(await env.skills.dailySeconds(), {20260927: 1800, 20260928: 4200});
       expect(await env.skills.dailySeconds(skillId: b), {20260928: 600});
       expect(await env.skills.practiceDays(skillId: a), {20260927, 20260928});
@@ -119,15 +149,27 @@ void main() {
     test('validation: min 1 minute, max 24 h, not in the future', () async {
       final a = await env.skill();
       expect(
-        () => env.skills.addSession(skillId: a, dayKey: 20260928, durationSec: 59),
+        () => env.skills.addSession(
+          skillId: a,
+          dayKey: 20260928,
+          durationSec: 59,
+        ),
         throwsA(isA<ValidationException>()),
       );
       expect(
-        () => env.skills.addSession(skillId: a, dayKey: 20260928, durationSec: 86401),
+        () => env.skills.addSession(
+          skillId: a,
+          dayKey: 20260928,
+          durationSec: 86401,
+        ),
         throwsA(isA<ValidationException>()),
       );
       expect(
-        () => env.skills.addSession(skillId: a, dayKey: 20260929, durationSec: 600),
+        () => env.skills.addSession(
+          skillId: a,
+          dayKey: 20260929,
+          durationSec: 600,
+        ),
         throwsA(isA<ValidationException>()),
       );
     });
@@ -158,7 +200,11 @@ void main() {
 
     test('delete and restore (undo)', () async {
       final a = await env.skill();
-      final s = await env.skills.addSession(skillId: a, dayKey: 20260928, durationSec: 600);
+      final s = await env.skills.addSession(
+        skillId: a,
+        dayKey: 20260928,
+        durationSec: 600,
+      );
       final row = (await env.skills.getSession(s))!;
       await env.skills.deleteSession(s);
       expect(await env.skills.totalSeconds(a), 0);
@@ -172,7 +218,11 @@ void main() {
       final values = <int>[];
       final sub = stream.listen(values.add);
       await pumpEventQueue();
-      await env.skills.addSession(skillId: a, dayKey: 20260928, durationSec: 600);
+      await env.skills.addSession(
+        skillId: a,
+        dayKey: 20260928,
+        durationSec: 600,
+      );
       await pumpEventQueue();
       await sub.cancel();
       expect(values.first, 0);

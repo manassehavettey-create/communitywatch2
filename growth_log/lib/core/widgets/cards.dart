@@ -116,7 +116,12 @@ class SectionHeader extends StatelessWidget {
     super.key,
     this.actionLabel,
     this.onAction,
-    this.padding = const EdgeInsets.fromLTRB(Space.gutter, Space.xl, Space.gutter, Space.sm),
+    this.padding = const EdgeInsets.fromLTRB(
+      Space.gutter,
+      Space.xl,
+      Space.gutter,
+      Space.sm,
+    ),
   });
 
   final String title;
@@ -223,7 +228,9 @@ class StatTile extends StatelessWidget {
                 caption!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppText.caption.copyWith(color: fg.withValues(alpha: 0.7)),
+                style: AppText.caption.copyWith(
+                  color: fg.withValues(alpha: 0.7),
+                ),
               ),
             ],
           ],

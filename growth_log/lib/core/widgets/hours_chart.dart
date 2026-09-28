@@ -8,7 +8,12 @@ import '../theme/tokens.dart';
 import '../utils/format.dart';
 
 class ChartBar {
-  const ChartBar(this.label, this.seconds, {this.highlight = false, this.tooltip});
+  const ChartBar(
+    this.label,
+    this.seconds, {
+    this.highlight = false,
+    this.tooltip,
+  });
   final String label;
   final int seconds;
   final bool highlight;
@@ -69,7 +74,9 @@ class HoursBarChart extends StatelessWidget {
                   reservedSize: 26,
                   getTitlesWidget: (value, meta) {
                     final i = value.toInt();
-                    if (i < 0 || i >= bars.length) return const SizedBox.shrink();
+                    if (i < 0 || i >= bars.length) {
+                      return const SizedBox.shrink();
+                    }
                     return SideTitleWidget(
                       meta: meta,
                       space: 6,
@@ -78,7 +85,9 @@ class HoursBarChart extends StatelessWidget {
                         style: AppText.caption.copyWith(
                           color: labels,
                           fontSize: 11,
-                          fontWeight: bars[i].highlight ? FontWeight.w800 : FontWeight.w500,
+                          fontWeight: bars[i].highlight
+                              ? FontWeight.w800
+                              : FontWeight.w500,
                         ),
                       ),
                     );
@@ -90,7 +99,10 @@ class HoursBarChart extends StatelessWidget {
               touchTooltipData: BarTouchTooltipData(
                 getTooltipColor: (_) => tooltipColor,
                 tooltipBorderRadius: Radii.pillR,
-                tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                tooltipPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 getTooltipItem: (group, gi, rod, ri) {
                   final b = bars[group.x];
                   return BarTooltipItem(
@@ -111,7 +123,9 @@ class HoursBarChart extends StatelessWidget {
                     BarChartRodData(
                       toY: bars[i].seconds / 3600,
                       width: width,
-                      color: bars[i].highlight ? (highlightColor ?? barColor) : barColor,
+                      color: bars[i].highlight
+                          ? (highlightColor ?? barColor)
+                          : barColor,
                       borderRadius: BorderRadius.circular(width / 2),
                       backDrawRodData: BackgroundBarChartRodData(
                         show: true,

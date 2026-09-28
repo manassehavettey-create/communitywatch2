@@ -35,16 +35,36 @@ class LevelProgress {
 }
 
 abstract final class Levels {
-  static const novice =
-      Level(0, 'Novice', 0, 'assets/images/badges/badge_novice.png');
-  static const apprentice =
-      Level(1, 'Apprentice', 20, 'assets/images/badges/badge_apprentice.png');
-  static const skilled =
-      Level(2, 'Skilled', 100, 'assets/images/badges/badge_skilled.png');
-  static const expert =
-      Level(3, 'Expert', 1000, 'assets/images/badges/badge_expert.png');
-  static const master =
-      Level(4, 'Master', 10000, 'assets/images/badges/badge_master.png');
+  static const novice = Level(
+    0,
+    'Novice',
+    0,
+    'assets/images/badges/badge_novice.png',
+  );
+  static const apprentice = Level(
+    1,
+    'Apprentice',
+    20,
+    'assets/images/badges/badge_apprentice.png',
+  );
+  static const skilled = Level(
+    2,
+    'Skilled',
+    100,
+    'assets/images/badges/badge_skilled.png',
+  );
+  static const expert = Level(
+    3,
+    'Expert',
+    1000,
+    'assets/images/badges/badge_expert.png',
+  );
+  static const master = Level(
+    4,
+    'Master',
+    10000,
+    'assets/images/badges/badge_master.png',
+  );
 
   static const all = [novice, apprentice, skilled, expert, master];
 

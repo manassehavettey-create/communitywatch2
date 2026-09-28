@@ -30,7 +30,9 @@ class LogScreen extends ConsumerStatefulWidget {
 }
 
 class _LogScreenState extends ConsumerState<LogScreen> {
-  late final _search = TextEditingController(text: ref.read(logFilterProvider).query);
+  late final _search = TextEditingController(
+    text: ref.read(logFilterProvider).query,
+  );
   Timer? _debounce;
 
   @override
@@ -77,18 +79,30 @@ class _LogScreenState extends ConsumerState<LogScreen> {
           if (streak != null)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(Space.gutter, 0, Space.gutter, Space.md),
+                padding: const EdgeInsets.fromLTRB(
+                  Space.gutter,
+                  0,
+                  Space.gutter,
+                  Space.md,
+                ),
                 child: Row(
                   children: [
-                    const AppImage(AppAssets.streakFlame, width: 26, height: 26),
+                    const AppImage(
+                      AppAssets.streakFlame,
+                      width: 26,
+                      height: 26,
+                    ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         streak.current == 0
                             ? 'Log something today to start a streak'
                             : '${Fmt.plural(streak.current, 'day')} journal streak'
-                                '${streak.activeToday ? '' : ' — add today to keep it'}',
-                        style: AppText.body.copyWith(fontWeight: FontWeight.w700, color: gl.text),
+                                  '${streak.activeToday ? '' : ' — add today to keep it'}',
+                        style: AppText.body.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: gl.text,
+                        ),
                       ),
                     ),
                   ],
@@ -104,7 +118,10 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
                   hintText: 'Search entries, tags, skills',
-                  prefixIcon: Icon(PhosphorIconsRegular.magnifyingGlass, color: gl.muted),
+                  prefixIcon: Icon(
+                    PhosphorIconsRegular.magnifyingGlass,
+                    color: gl.muted,
+                  ),
                   suffixIcon: _search.text.isEmpty
                       ? null
                       : IconButton(
@@ -133,18 +150,28 @@ class _LogScreenState extends ConsumerState<LogScreen> {
             loading: () => [const SliverToBoxAdapter(child: LoadingState())],
             error: (e, _) => [
               SliverToBoxAdapter(
-                child: ErrorState(error: e, onRetry: () => ref.invalidate(logEntriesProvider)),
+                child: ErrorState(
+                  error: e,
+                  onRetry: () => ref.invalidate(logEntriesProvider),
+                ),
               ),
             ],
             data: (list) => _timeline(context, list, filter, today),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: Space.dockClearance + Space.lg)),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: Space.dockClearance + Space.lg),
+          ),
         ],
       ),
     );
   }
 
-  List<Widget> _timeline(BuildContext context, List<EntryView> list, EntryFilter filter, DayKey today) {
+  List<Widget> _timeline(
+    BuildContext context,
+    List<EntryView> list,
+    EntryFilter filter,
+    DayKey today,
+  ) {
     if (list.isEmpty) {
       final filtered = !filter.isEmpty;
       return [
@@ -159,7 +186,9 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                     actionLabel: 'Clear filters',
                     onAction: () {
                       _search.clear();
-                      ref.read(logFilterProvider.notifier).set(EntryFilter.none);
+                      ref
+                          .read(logFilterProvider.notifier)
+                          .set(EntryFilter.none);
                     },
                   )
                 : EmptyState(
@@ -190,14 +219,20 @@ class _LogScreenState extends ConsumerState<LogScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: Space.lg, bottom: Space.sm),
+                  padding: const EdgeInsets.only(
+                    top: Space.lg,
+                    bottom: Space.sm,
+                  ),
                   child: Semantics(
                     header: true,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text(Fmt.dayLabel(day, today), style: context.text.titleLarge),
+                        Text(
+                          Fmt.dayLabel(day, today),
+                          style: context.text.titleLarge,
+                        ),
                         const SizedBox(width: Space.xs),
                         Text(
                           Fmt.plural(items.length, 'entry', 'entries'),
@@ -209,7 +244,10 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                 ),
                 for (var j = 0; j < items.length; j++) ...[
                   if (j > 0) const SizedBox(height: Space.xs),
-                  FadeSlideIn(index: i < 3 ? j : 0, child: EntryCard(view: items[j])),
+                  FadeSlideIn(
+                    index: i < 3 ? j : 0,
+                    child: EntryCard(view: items[j]),
+                  ),
                 ],
               ],
             );
@@ -228,7 +266,12 @@ class _FilterBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ctrl = ref.read(logFilterProvider.notifier);
-    Widget chip(String label, bool active, VoidCallback onTap, {IconData? icon}) {
+    Widget chip(
+      String label,
+      bool active,
+      VoidCallback onTap, {
+      IconData? icon,
+    }) {
       final gl = context.gl;
       return Padding(
         padding: const EdgeInsets.only(right: Space.xs),
@@ -250,7 +293,11 @@ class _FilterBar extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (icon != null) ...[
-                    Icon(icon, size: 16, color: active ? gl.onInverse : gl.text),
+                    Icon(
+                      icon,
+                      size: 16,
+                      color: active ? gl.onInverse : gl.text,
+                    ),
                     const SizedBox(width: 6),
                   ],
                   Text(
@@ -273,15 +320,30 @@ class _FilterBar extends ConsumerWidget {
       height: 64,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(Space.gutter, Space.sm + 2, Space.gutter, Space.xs),
+        padding: const EdgeInsets.fromLTRB(
+          Space.gutter,
+          Space.sm + 2,
+          Space.gutter,
+          Space.xs,
+        ),
         children: [
-          chip('All', filter.type == null, () => ctrl.set(filter.copyWith(type: () => null))),
-          chip('Gratitude', filter.type == EntryType.gratitude,
-              () => ctrl.set(filter.copyWith(type: () => EntryType.gratitude)),
-              icon: PhosphorIconsFill.heart),
-          chip('Wins', filter.type == EntryType.win,
-              () => ctrl.set(filter.copyWith(type: () => EntryType.win)),
-              icon: PhosphorIconsFill.trophy),
+          chip(
+            'All',
+            filter.type == null,
+            () => ctrl.set(filter.copyWith(type: () => null)),
+          ),
+          chip(
+            'Gratitude',
+            filter.type == EntryType.gratitude,
+            () => ctrl.set(filter.copyWith(type: () => EntryType.gratitude)),
+            icon: PhosphorIconsFill.heart,
+          ),
+          chip(
+            'Wins',
+            filter.type == EntryType.win,
+            () => ctrl.set(filter.copyWith(type: () => EntryType.win)),
+            icon: PhosphorIconsFill.trophy,
+          ),
           chip(
             filter.tags.isEmpty ? 'Tags' : 'Tags · ${filter.tags.length}',
             filter.tags.isNotEmpty,
@@ -302,7 +364,8 @@ class _FilterBar extends ConsumerWidget {
             () => showFilterSheet(context, FilterSection.dates),
             icon: PhosphorIconsRegular.calendarBlank,
           ),
-          if (filter.activeCount > 0) chip('Clear', false, ctrl.clear, icon: PhosphorIconsBold.x),
+          if (filter.activeCount > 0)
+            chip('Clear', false, ctrl.clear, icon: PhosphorIconsBold.x),
         ],
       ),
     );

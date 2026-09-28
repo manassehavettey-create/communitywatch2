@@ -20,7 +20,8 @@ class GrowthLogApp extends ConsumerStatefulWidget {
   ConsumerState<GrowthLogApp> createState() => _GrowthLogAppState();
 }
 
-class _GrowthLogAppState extends ConsumerState<GrowthLogApp> with WidgetsBindingObserver {
+class _GrowthLogAppState extends ConsumerState<GrowthLogApp>
+    with WidgetsBindingObserver {
   StreamSubscription<String>? _taps;
   bool _precached = false;
 
@@ -99,10 +100,11 @@ class _GrowthLogAppState extends ConsumerState<GrowthLogApp> with WidgetsBinding
       builder: (context, child) {
         final dark = Theme.of(context).brightness == Brightness.dark;
         return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: (dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
-            statusBarColor: Colors.transparent,
-            systemNavigationBarColor: Colors.transparent,
-          ),
+          value: (dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+              .copyWith(
+                statusBarColor: Colors.transparent,
+                systemNavigationBarColor: Colors.transparent,
+              ),
           // Cap text scaling so big-type layouts stay intact while still
           // honouring larger accessibility sizes.
           child: MediaQuery.withClampedTextScaling(

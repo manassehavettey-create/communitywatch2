@@ -24,7 +24,8 @@ class LockGate extends ConsumerStatefulWidget {
   ConsumerState<LockGate> createState() => _LockGateState();
 }
 
-class _LockGateState extends ConsumerState<LockGate> with WidgetsBindingObserver {
+class _LockGateState extends ConsumerState<LockGate>
+    with WidgetsBindingObserver {
   late bool _locked = ref.read(settingsProvider).lockEnabled;
   DateTime? _backgroundedAt;
 
@@ -54,12 +55,17 @@ class _LockGateState extends ConsumerState<LockGate> with WidgetsBindingObserver
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final enabled = ref.read(settingsProvider).lockEnabled;
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
       _backgroundedAt ??= DateTime.now();
     } else if (state == AppLifecycleState.resumed) {
-      final away = _backgroundedAt == null ? Duration.zero : DateTime.now().difference(_backgroundedAt!);
+      final away = _backgroundedAt == null
+          ? Duration.zero
+          : DateTime.now().difference(_backgroundedAt!);
       _backgroundedAt = null;
-      if (enabled && !_locked && away > LockGate.relockAfter) setState(() => _locked = true);
+      if (enabled && !_locked && away > LockGate.relockAfter) {
+        setState(() => _locked = true);
+      }
     }
   }
 
@@ -76,7 +82,9 @@ class _LockGateState extends ConsumerState<LockGate> with WidgetsBindingObserver
         ),
         if (_locked)
           Positioned.fill(
-            child: LockScreen(onUnlocked: () => setState(() => _locked = false)),
+            child: LockScreen(
+              onUnlocked: () => setState(() => _locked = false),
+            ),
           ),
       ],
     );
@@ -125,7 +133,8 @@ class _LockScreenState extends ConsumerState<LockScreen> {
     if (ok && mounted) widget.onUnlocked();
   }
 
-  bool get _coolingDown => _cooldownUntil != null && DateTime.now().isBefore(_cooldownUntil!);
+  bool get _coolingDown =>
+      _cooldownUntil != null && DateTime.now().isBefore(_cooldownUntil!);
 
   Future<void> _submit(String pin) async {
     if (_coolingDown) return;
@@ -154,7 +163,9 @@ class _LockScreenState extends ConsumerState<LockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final wait = _coolingDown ? _cooldownUntil!.difference(DateTime.now()).inSeconds + 1 : 0;
+    final wait = _coolingDown
+        ? _cooldownUntil!.difference(DateTime.now()).inSeconds + 1
+        : 0;
     return Material(
       color: Palette.ink,
       child: SafeArea(
@@ -168,18 +179,28 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                   width: 72,
                   height: 72,
                   padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(color: Palette.lime, shape: BoxShape.circle),
+                  decoration: const BoxDecoration(
+                    color: Palette.lime,
+                    shape: BoxShape.circle,
+                  ),
                   child: const AppImage(AppAssets.splashLogo),
                 ),
                 const SizedBox(height: Space.lg),
                 Text(
                   'Welcome back',
-                  style: AppText.display.copyWith(color: Palette.white, fontSize: 32),
+                  style: AppText.display.copyWith(
+                    color: Palette.white,
+                    fontSize: 32,
+                  ),
                 ),
                 const SizedBox(height: Space.xs),
                 Text(
-                  wait > 0 ? 'Too many tries. Try again in ${wait}s.' : 'Enter your PIN to unlock',
-                  style: AppText.body.copyWith(color: Palette.white.withValues(alpha: 0.7)),
+                  wait > 0
+                      ? 'Too many tries. Try again in ${wait}s.'
+                      : 'Enter your PIN to unlock',
+                  style: AppText.body.copyWith(
+                    color: Palette.white.withValues(alpha: 0.7),
+                  ),
                 ),
                 const SizedBox(height: Space.xxl),
                 PinPad(
@@ -200,7 +221,10 @@ class _LockScreenState extends ConsumerState<LockScreen> {
 /// Asks for a new PIN twice. Returns the PIN, or null if cancelled.
 Future<String?> showCreatePin(BuildContext context) {
   return Navigator.of(context).push<String>(
-    MaterialPageRoute(fullscreenDialog: true, builder: (_) => const _CreatePinScreen()),
+    MaterialPageRoute(
+      fullscreenDialog: true,
+      builder: (_) => const _CreatePinScreen(),
+    ),
   );
 }
 
@@ -255,15 +279,28 @@ class _CreatePinScreenState extends State<_CreatePinScreen> {
             const Spacer(),
             Text(
               _first == null ? 'Choose a PIN' : 'Confirm your PIN',
-              style: AppText.display.copyWith(color: Palette.white, fontSize: 32),
+              style: AppText.display.copyWith(
+                color: Palette.white,
+                fontSize: 32,
+              ),
             ),
             const SizedBox(height: Space.xs),
             Text(
-              _error ? "Those didn't match — try again." : '${LockService.pinLength} digits you will remember',
-              style: AppText.body.copyWith(color: _error ? Palette.blush : Palette.white.withValues(alpha: 0.7)),
+              _error
+                  ? "Those didn't match — try again."
+                  : '${LockService.pinLength} digits you will remember',
+              style: AppText.body.copyWith(
+                color: _error
+                    ? Palette.blush
+                    : Palette.white.withValues(alpha: 0.7),
+              ),
             ),
             const SizedBox(height: Space.xxl),
-            PinPad(key: ValueKey(_first == null), onComplete: _onPin, error: _error),
+            PinPad(
+              key: ValueKey(_first == null),
+              onComplete: _onPin,
+              error: _error,
+            ),
             const Spacer(),
           ],
         ),

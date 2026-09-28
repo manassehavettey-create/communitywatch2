@@ -51,8 +51,10 @@ class AppSettings {
       onboardingDone: b(SettingKeys.onboardingDone, false),
       weekStartsMonday: b(SettingKeys.weekStartsMonday, true),
       logReminderEnabled: b(SettingKeys.logReminderEnabled, false),
-      logReminderMinutes:
-          i(SettingKeys.logReminderMinutes, 21 * 60).clamp(0, 1439),
+      logReminderMinutes: i(
+        SettingKeys.logReminderMinutes,
+        21 * 60,
+      ).clamp(0, 1439),
       lockEnabled: b(SettingKeys.lockEnabled, false),
       biometricEnabled: b(SettingKeys.biometricEnabled, false),
       hapticsEnabled: b(SettingKeys.hapticsEnabled, true),
@@ -66,13 +68,14 @@ class SettingsRepository {
   final AppDatabase _db;
 
   Future<Map<String, String>> all() async => {
-        for (final r in await _db.select(_db.settings).get()) r.key: r.value,
-      };
+    for (final r in await _db.select(_db.settings).get()) r.key: r.value,
+  };
 
   Future<AppSettings> load() async => AppSettings.fromMap(await all());
 
-  Future<void> set(String key, Object value) =>
-      _db.into(_db.settings).insertOnConflictUpdate(
-            SettingsCompanion(key: Value(key), value: Value(value.toString())),
-          );
+  Future<void> set(String key, Object value) => _db
+      .into(_db.settings)
+      .insertOnConflictUpdate(
+        SettingsCompanion(key: Value(key), value: Value(value.toString())),
+      );
 }

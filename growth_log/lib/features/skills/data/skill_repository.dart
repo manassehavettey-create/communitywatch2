@@ -67,20 +67,22 @@ class SkillRepository {
   Future<List<SkillRow>> listSkills({bool archived = false}) =>
       _skillsQuery(archived).get();
 
-  Future<List<SkillRow>> allSkills() => (_db.select(_db.skills)
-        ..orderBy([(s) => OrderingTerm.asc(s.sortOrder)]))
-      .get();
+  Future<List<SkillRow>> allSkills() => (_db.select(
+    _db.skills,
+  )..orderBy([(s) => OrderingTerm.asc(s.sortOrder)])).get();
 
-  Stream<SkillRow?> watchSkill(int id) =>
-      (_db.select(_db.skills)..where((s) => s.id.equals(id)))
-          .watchSingleOrNull();
+  Stream<SkillRow?> watchSkill(int id) => (_db.select(
+    _db.skills,
+  )..where((s) => s.id.equals(id))).watchSingleOrNull();
 
   Future<SkillRow?> getSkill(int id) =>
       (_db.select(_db.skills)..where((s) => s.id.equals(id))).getSingleOrNull();
 
   SkillsCompanion _companion(SkillDraft d) {
     final name = d.name.trim();
-    if (name.isEmpty) throw const ValidationException('Give your skill a name.');
+    if (name.isEmpty) {
+      throw const ValidationException('Give your skill a name.');
+    }
     if (name.length > SkillLimits.nameMax) {
       throw const ValidationException('That name is a little long.');
     }
@@ -106,10 +108,13 @@ class SkillRepository {
   Future<int> createSkill(SkillDraft draft) async {
     final companion = _companion(draft);
     final maxOrder = _db.skills.sortOrder.max();
-    final row = await (_db.selectOnly(_db.skills)..addColumns([maxOrder]))
-        .getSingle();
+    final row = await (_db.selectOnly(
+      _db.skills,
+    )..addColumns([maxOrder])).getSingle();
     final next = (row.read(maxOrder) ?? -1) + 1;
-    return _db.into(_db.skills).insert(
+    return _db
+        .into(_db.skills)
+        .insert(
           companion.copyWith(
             sortOrder: Value(next),
             createdAt: Value(_clock.now()),
@@ -118,9 +123,9 @@ class SkillRepository {
   }
 
   Future<void> updateSkill(int id, SkillDraft draft) async {
-    final updated = await (_db.update(_db.skills)
-          ..where((s) => s.id.equals(id)))
-        .write(_companion(draft));
+    final updated = await (_db.update(
+      _db.skills,
+    )..where((s) => s.id.equals(id))).write(_companion(draft));
     if (updated == 0) throw const ValidationException('Skill not found.');
   }
 
@@ -128,8 +133,9 @@ class SkillRepository {
       (_db.update(_db.skills)..where((s) => s.id.equals(id))).write(
         SkillsCompanion(
           reminderEnabled: Value(enabled),
-          reminderMinutes:
-              minutes == null ? const Value.absent() : Value(minutes),
+          reminderMinutes: minutes == null
+              ? const Value.absent()
+              : Value(minutes),
         ),
       );
 
@@ -139,14 +145,13 @@ class SkillRepository {
         SkillsCompanion(
           archivedAt: Value(archived ? _clock.now() : null),
           // Archived skills don't nag.
-          reminderEnabled:
-              archived ? const Value(false) : const Value.absent(),
+          reminderEnabled: archived ? const Value(false) : const Value.absent(),
         ),
       );
       if (archived) {
-        await (_db.delete(_db.activeTimers)
-              ..where((t) => t.skillId.equals(id)))
-            .go();
+        await (_db.delete(
+          _db.activeTimers,
+        )..where((t) => t.skillId.equals(id))).go();
       }
     });
   }
@@ -157,12 +162,11 @@ class SkillRepository {
       (_db.delete(_db.skills)..where((s) => s.id.equals(id))).go();
 
   Future<void> reorder(List<int> orderedIds) => _db.transaction(() async {
-        for (var i = 0; i < orderedIds.length; i++) {
-          await (_db.update(_db.skills)
-                ..where((s) => s.id.equals(orderedIds[i])))
-              .write(SkillsCompanion(sortOrder: Value(i)));
-        }
-      });
+    for (var i = 0; i < orderedIds.length; i++) {
+      await (_db.update(_db.skills)..where((s) => s.id.equals(orderedIds[i])))
+          .write(SkillsCompanion(sortOrder: Value(i)));
+    }
+  });
 
   // -------------------------------------------------------------- sessions
 
@@ -178,9 +182,9 @@ class SkillRepository {
     return q.watch();
   }
 
-  Future<SessionRow?> getSession(int id) =>
-      (_db.select(_db.practiceSessions)..where((s) => s.id.equals(id)))
-          .getSingleOrNull();
+  Future<SessionRow?> getSession(int id) => (_db.select(
+    _db.practiceSessions,
+  )..where((s) => s.id.equals(id))).getSingleOrNull();
 
   void _checkSession(int durationSec, String? note, DayKey dayKey) {
     if (durationSec < 60) {
@@ -213,11 +217,14 @@ class SkillRepository {
     _checkSession(durationSec, note, dayKey);
     final now = _clock.now();
     final date = Days.dateOf(dayKey);
-    final start = startedAt ??
+    final start =
+        startedAt ??
         (dayKey == Days.keyOf(now)
             ? now.subtract(Duration(seconds: durationSec))
             : DateTime(date.year, date.month, date.day, 12));
-    return _db.into(_db.practiceSessions).insert(
+    return _db
+        .into(_db.practiceSessions)
+        .insert(
           PracticeSessionsCompanion.insert(
             skillId: skillId,
             startedAt: start,
@@ -245,8 +252,9 @@ class SkillRepository {
       final d = Days.dateOf(dayKey);
       start = DateTime(d.year, d.month, d.day, start.hour, start.minute);
     }
-    await (_db.update(_db.practiceSessions)..where((s) => s.id.equals(id)))
-        .write(
+    await (_db.update(
+      _db.practiceSessions,
+    )..where((s) => s.id.equals(id))).write(
       PracticeSessionsCompanion(
         skillId: Value(skillId),
         dayKey: Value(dayKey),
@@ -261,15 +269,17 @@ class SkillRepository {
       (_db.delete(_db.practiceSessions)..where((s) => s.id.equals(id))).go();
 
   /// Re-inserts a previously deleted session (for "Undo").
-  Future<void> restoreSession(SessionRow row) =>
-      _db.into(_db.practiceSessions).insert(row, mode: InsertMode.insertOrReplace);
+  Future<void> restoreSession(SessionRow row) => _db
+      .into(_db.practiceSessions)
+      .insert(row, mode: InsertMode.insertOrReplace);
 
   Future<int> sessionCount(int skillId) async {
     final count = _db.practiceSessions.id.count();
-    final row = await (_db.selectOnly(_db.practiceSessions)
-          ..addColumns([count])
-          ..where(_db.practiceSessions.skillId.equals(skillId)))
-        .getSingle();
+    final row =
+        await (_db.selectOnly(_db.practiceSessions)
+              ..addColumns([count])
+              ..where(_db.practiceSessions.skillId.equals(skillId)))
+            .getSingle();
     return row.read(count) ?? 0;
   }
 
@@ -277,10 +287,11 @@ class SkillRepository {
 
   Future<int> totalSeconds(int skillId) async {
     final sum = _db.practiceSessions.durationSec.sum();
-    final row = await (_db.selectOnly(_db.practiceSessions)
-          ..addColumns([sum])
-          ..where(_db.practiceSessions.skillId.equals(skillId)))
-        .getSingle();
+    final row =
+        await (_db.selectOnly(_db.practiceSessions)
+              ..addColumns([sum])
+              ..where(_db.practiceSessions.skillId.equals(skillId)))
+            .getSingle();
     return row.read(sum) ?? 0;
   }
 
@@ -337,12 +348,10 @@ class SkillRepository {
   }
 
   Future<List<SessionRow>> sessionsBetween(DayKey from, DayKey to) =>
-      (_db.select(_db.practiceSessions)
-            ..where((s) => s.dayKey.isBetweenValues(from, to)))
-          .get();
+      (_db.select(
+        _db.practiceSessions,
+      )..where((s) => s.dayKey.isBetweenValues(from, to))).get();
 
-  Stream<T> watch<T>(Future<T> Function() load) => _db.watchTables(
-        [_db.skills, _db.practiceSessions, _db.milestones],
-        load,
-      );
+  Stream<T> watch<T>(Future<T> Function() load) =>
+      _db.watchTables([_db.skills, _db.practiceSessions, _db.milestones], load);
 }

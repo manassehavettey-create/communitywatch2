@@ -16,7 +16,10 @@ import '../domain/levels.dart';
 
 /// Shows the right celebration for newly reached milestones: a full-screen
 /// level-up for level thresholds, a snackbar for smaller marks.
-Future<void> celebrate(BuildContext context, List<Achievement>? achievements) async {
+Future<void> celebrate(
+  BuildContext context,
+  List<Achievement>? achievements,
+) async {
   if (achievements == null || achievements.isEmpty || !context.mounted) return;
   final levelUps = achievements.where((a) => a.level != null).toList();
   if (levelUps.isNotEmpty) {
@@ -30,9 +33,10 @@ Future<void> celebrate(BuildContext context, List<Achievement>? achievements) as
         transitionsBuilder: (_, anim, _, child) => FadeTransition(
           opacity: anim,
           child: ScaleTransition(
-            scale: Tween(begin: 1.08, end: 1.0).animate(
-              CurvedAnimation(parent: anim, curve: Motion.standard),
-            ),
+            scale: Tween(
+              begin: 1.08,
+              end: 1.0,
+            ).animate(CurvedAnimation(parent: anim, curve: Motion.standard)),
             child: child,
           ),
         ),
@@ -58,9 +62,13 @@ class LevelUpScreen extends ConsumerStatefulWidget {
 
 class _LevelUpScreenState extends ConsumerState<LevelUpScreen>
     with SingleTickerProviderStateMixin {
-  late final _confetti = ConfettiController(duration: const Duration(seconds: 2));
-  late final _intro = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
-    ..forward();
+  late final _confetti = ConfettiController(
+    duration: const Duration(seconds: 2),
+  );
+  late final _intro = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..forward();
 
   @override
   void initState() {
@@ -92,9 +100,9 @@ class _LevelUpScreenState extends ConsumerState<LevelUpScreen>
     );
 
     Animation<double> step(double from, double to) => CurvedAnimation(
-          parent: _intro,
-          curve: Interval(from, to, curve: Curves.easeOutBack),
-        );
+      parent: _intro,
+      curve: Interval(from, to, curve: Curves.easeOutBack),
+    );
 
     return Scaffold(
       backgroundColor: Palette.electric,
@@ -108,12 +116,20 @@ class _LevelUpScreenState extends ConsumerState<LevelUpScreen>
             child: ScaleTransition(
               scale: step(0.2, 0.8),
               alignment: Alignment.bottomCenter,
-              child: const AppImage(AppAssets.levelUpHero, semanticLabel: 'Celebrating'),
+              child: const AppImage(
+                AppAssets.levelUpHero,
+                semanticLabel: 'Celebrating',
+              ),
             ),
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(Space.xl, Space.lg, Space.xl, Space.lg),
+              padding: const EdgeInsets.fromLTRB(
+                Space.xl,
+                Space.lg,
+                Space.xl,
+                Space.lg,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

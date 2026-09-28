@@ -56,7 +56,11 @@ class _PressableState extends State<Pressable> {
           scale: _down ? widget.scale : 1,
           duration: Motion.fast,
           curve: Curves.easeOut,
-          child: widget.child,
+          // An explicit label replaces the child's own semantics so screen
+          // readers don't announce the text twice.
+          child: widget.semanticLabel == null
+              ? widget.child
+              : ExcludeSemantics(child: widget.child),
         ),
       ),
     );

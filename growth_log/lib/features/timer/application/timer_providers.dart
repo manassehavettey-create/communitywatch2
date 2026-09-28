@@ -17,8 +17,9 @@ final activeTimerProvider = StreamProvider<ActiveTimerView?>((ref) {
   return db.watchTables([db.activeTimers, db.skills], () async {
     final t = await db.select(db.activeTimers).getSingleOrNull();
     if (t == null) return null;
-    final s = await (db.select(db.skills)..where((s) => s.id.equals(t.skillId)))
-        .getSingleOrNull();
+    final s = await (db.select(
+      db.skills,
+    )..where((s) => s.id.equals(t.skillId))).getSingleOrNull();
     return s == null ? null : ActiveTimerView(timer: t, skill: s);
   });
 });

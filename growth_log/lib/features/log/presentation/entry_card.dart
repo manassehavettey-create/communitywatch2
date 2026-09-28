@@ -14,7 +14,8 @@ import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/skill_icons.dart';
 import '../data/entry_repository.dart';
 
-Color entryColor(EntryType t) => t == EntryType.win ? Palette.blush : Palette.butter;
+Color entryColor(EntryType t) =>
+    t == EntryType.win ? Palette.blush : Palette.butter;
 
 class EntryCard extends ConsumerWidget {
   const EntryCard({super.key, required this.view, this.compact = false});
@@ -34,7 +35,10 @@ class EntryCard extends ConsumerWidget {
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: Space.lg),
-        decoration: const BoxDecoration(color: Palette.danger, borderRadius: Radii.cardR),
+        decoration: const BoxDecoration(
+          color: Palette.danger,
+          borderRadius: Radii.cardR,
+        ),
         child: const Icon(PhosphorIconsBold.trash, color: Palette.white),
       ),
       confirmDismiss: (_) => confirm(
@@ -48,13 +52,19 @@ class EntryCard extends ConsumerWidget {
         final actions = ref.read(appActionsProvider);
         await guarded(context, () => actions.deleteEntry(view));
         if (context.mounted) {
-          showSnack(context, 'Entry deleted', actionLabel: 'Undo', onAction: () => actions.restoreEntry(view));
+          showSnack(
+            context,
+            'Entry deleted',
+            actionLabel: 'Undo',
+            onAction: () => actions.restoreEntry(view),
+          );
         }
       },
       child: GLCard(
         color: color,
         onTap: () => context.push(Routes.entry(e.id)),
-        semanticLabel: '${view.type.label}${e.mood == null ? '' : ' ${e.mood}'}: ${e.body}. '
+        semanticLabel:
+            '${view.type.label}${e.mood == null ? '' : ' ${e.mood}'}: ${e.body}. '
             '${view.tags.isEmpty ? '' : 'Tags ${view.tags.join(', ')}. '}'
             '${skill == null ? '' : 'Skill ${skill.name}. '}Tap to edit, swipe to delete',
         child: ExcludeSemantics(
@@ -65,15 +75,20 @@ class EntryCard extends ConsumerWidget {
                 children: [
                   TagChip(
                     view.isMilestone ? 'Milestone' : view.type.label,
-                    icon: view.type == EntryType.win ? PhosphorIconsFill.trophy : PhosphorIconsFill.heart,
+                    icon: view.type == EntryType.win
+                        ? PhosphorIconsFill.trophy
+                        : PhosphorIconsFill.heart,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     Fmt.time(e.createdAt),
-                    style: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.6)),
+                    style: AppText.caption.copyWith(
+                      color: Palette.ink.withValues(alpha: 0.6),
+                    ),
                   ),
                   const Spacer(),
-                  if (e.mood != null) Text(e.mood!, style: const TextStyle(fontSize: 22)),
+                  if (e.mood != null)
+                    Text(e.mood!, style: const TextStyle(fontSize: 22)),
                 ],
               ),
               const SizedBox(height: Space.sm),

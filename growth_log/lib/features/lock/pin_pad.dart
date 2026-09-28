@@ -36,7 +36,10 @@ class PinPad extends StatefulWidget {
 
 class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
   String _pin = '';
-  late final _shake = AnimationController(vsync: this, duration: const Duration(milliseconds: 380));
+  late final _shake = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 380),
+  );
 
   @override
   void didUpdateWidget(PinPad old) {
@@ -75,11 +78,11 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
     final fg = widget.foreground;
     final keyBg = widget.keyColor ?? fg.withValues(alpha: 0.08);
     Widget key(String d) => _Key(
-          label: d,
-          fg: fg,
-          bg: keyBg,
-          onTap: widget.enabled ? () => _tap(d) : null,
-        );
+      label: d,
+      fg: fg,
+      bg: keyBg,
+      onTap: widget.enabled ? () => _tap(d) : null,
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -104,9 +107,14 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
                     width: 16,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: i < _pin.length ? (widget.error ? Palette.danger : Palette.lime) : Colors.transparent,
+                      color: i < _pin.length
+                          ? (widget.error ? Palette.danger : Palette.lime)
+                          : Colors.transparent,
                       shape: BoxShape.circle,
-                      border: Border.all(color: widget.error ? Palette.danger : fg, width: 2),
+                      border: Border.all(
+                        color: widget.error ? Palette.danger : fg,
+                        width: 2,
+                      ),
                     ),
                   ),
               ],
@@ -119,7 +127,10 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
           ['4', '5', '6'],
           ['7', '8', '9'],
         ]) ...[
-          Row(mainAxisSize: MainAxisSize.min, children: [for (final d in row) key(d)]),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [for (final d in row) key(d)],
+          ),
           const SizedBox(height: Space.sm),
         ],
         Row(
@@ -150,7 +161,14 @@ class _PinPadState extends State<PinPad> with SingleTickerProviderStateMixin {
 }
 
 class _Key extends StatelessWidget {
-  const _Key({this.label, this.icon, this.semantic, required this.fg, required this.bg, this.onTap});
+  const _Key({
+    this.label,
+    this.icon,
+    this.semantic,
+    required this.fg,
+    required this.bg,
+    this.onTap,
+  });
 
   final String? label;
   final IconData? icon;
@@ -174,7 +192,14 @@ class _Key extends StatelessWidget {
           decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
           alignment: Alignment.center,
           child: label != null
-              ? Text(label!, style: AppText.display.copyWith(color: fg, fontSize: 28, letterSpacing: 0))
+              ? Text(
+                  label!,
+                  style: AppText.display.copyWith(
+                    color: fg,
+                    fontSize: 28,
+                    letterSpacing: 0,
+                  ),
+                )
               : Icon(icon, color: fg, size: 28),
         ),
       ),

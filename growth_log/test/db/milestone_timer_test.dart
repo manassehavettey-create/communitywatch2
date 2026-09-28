@@ -17,11 +17,17 @@ void main() {
   group('milestones', () {
     test('crossing a mark records it and auto-logs one win', () async {
       final id = await env.skill('Piano');
-      await env.skills.addSession(skillId: id, dayKey: 20260928, durationSec: h);
+      await env.skills.addSession(
+        skillId: id,
+        dayKey: 20260928,
+        durationSec: h,
+      );
       final got = await env.milestones.reconcile(id);
 
       expect(got.map((a) => a.hours), [1]);
-      final wins = await env.entries.query(const EntryFilter(type: EntryType.win));
+      final wins = await env.entries.query(
+        const EntryFilter(type: EntryType.win),
+      );
       expect(wins, hasLength(1));
       expect(wins.single.entry.isAuto, isTrue);
       expect(wins.single.entry.skillId, id);
@@ -31,40 +37,61 @@ void main() {
 
     test('reconcile is idempotent — no duplicate wins', () async {
       final id = await env.skill();
-      await env.skills.addSession(skillId: id, dayKey: 20260928, durationSec: h);
+      await env.skills.addSession(
+        skillId: id,
+        dayKey: 20260928,
+        durationSec: h,
+      );
       await env.milestones.reconcile(id);
       final again = await env.milestones.reconcile(id);
       expect(again, isEmpty);
       expect(await env.entries.query(EntryFilter.none), hasLength(1));
     });
 
-    test('back-filling many hours records all, logs only the highest', () async {
-      final id = await env.skill('Chess');
-      await env.skills.addSession(skillId: id, dayKey: 20260928, durationSec: 22 * h);
-      final got = await env.milestones.reconcile(id);
-      expect(got.map((a) => a.hours), [1, 5, 10, 20]);
-      expect(got.last.level, Levels.apprentice);
-      final wins = await env.entries.query(EntryFilter.none);
-      expect(wins, hasLength(1));
-      expect(wins.single.entry.body, contains('Apprentice'));
-    });
+    test(
+      'back-filling many hours records all, logs only the highest',
+      () async {
+        final id = await env.skill('Chess');
+        await env.skills.addSession(
+          skillId: id,
+          dayKey: 20260928,
+          durationSec: 22 * h,
+        );
+        final got = await env.milestones.reconcile(id);
+        expect(got.map((a) => a.hours), [1, 5, 10, 20]);
+        expect(got.last.level, Levels.apprentice);
+        final wins = await env.entries.query(EntryFilter.none);
+        expect(wins, hasLength(1));
+        expect(wins.single.entry.body, contains('Apprentice'));
+      },
+    );
 
-    test('deleting sessions un-reaches milestones and removes auto wins',
-        () async {
-      final id = await env.skill();
-      final s = await env.skills.addSession(skillId: id, dayKey: 20260928, durationSec: 6 * h);
-      await env.milestones.reconcile(id);
-      expect(await env.entries.query(EntryFilter.none), hasLength(1));
+    test(
+      'deleting sessions un-reaches milestones and removes auto wins',
+      () async {
+        final id = await env.skill();
+        final s = await env.skills.addSession(
+          skillId: id,
+          dayKey: 20260928,
+          durationSec: 6 * h,
+        );
+        await env.milestones.reconcile(id);
+        expect(await env.entries.query(EntryFilter.none), hasLength(1));
 
-      await env.skills.deleteSession(s);
-      await env.milestones.reconcile(id);
-      expect(await env.milestones.watchForSkill(id).first, isEmpty);
-      expect(await env.entries.query(EntryFilter.none), isEmpty);
-    });
+        await env.skills.deleteSession(s);
+        await env.milestones.reconcile(id);
+        expect(await env.milestones.watchForSkill(id).first, isEmpty);
+        expect(await env.entries.query(EntryFilter.none), isEmpty);
+      },
+    );
 
     test('an auto win the user edited is never auto-removed', () async {
       final id = await env.skill();
-      final s = await env.skills.addSession(skillId: id, dayKey: 20260928, durationSec: h);
+      final s = await env.skills.addSession(
+        skillId: id,
+        dayKey: 20260928,
+        durationSec: h,
+      );
       await env.milestones.reconcile(id);
       final win = (await env.entries.query(EntryFilter.none)).single;
       await env.entries.updateEntry(
@@ -139,25 +166,27 @@ void main() {
       expect(s.durationSec, 75 * 60);
     });
 
-    test('forgotten timer is capped at 24 h, and a custom duration wins',
-        () async {
-      final a = await env.skill();
-      await env.timer.start(a);
-      env.clock.advance(const Duration(hours: 30));
-      final capped = await env.timer.stop();
-      expect(
-        (await env.skills.getSession(capped!.sessionId!))!.durationSec,
-        24 * h,
-      );
+    test(
+      'forgotten timer is capped at 24 h, and a custom duration wins',
+      () async {
+        final a = await env.skill();
+        await env.timer.start(a);
+        env.clock.advance(const Duration(hours: 30));
+        final capped = await env.timer.stop();
+        expect(
+          (await env.skills.getSession(capped!.sessionId!))!.durationSec,
+          24 * h,
+        );
 
-      await env.timer.start(a);
-      env.clock.advance(const Duration(hours: 5));
-      final custom = await env.timer.stop(durationSec: 90 * 60);
-      expect(
-        (await env.skills.getSession(custom!.sessionId!))!.durationSec,
-        90 * 60,
-      );
-    });
+        await env.timer.start(a);
+        env.clock.advance(const Duration(hours: 5));
+        final custom = await env.timer.stop(durationSec: 90 * 60);
+        expect(
+          (await env.skills.getSession(custom!.sessionId!))!.durationSec,
+          90 * 60,
+        );
+      },
+    );
 
     test('deleting the skill cancels its running timer', () async {
       final a = await env.skill();

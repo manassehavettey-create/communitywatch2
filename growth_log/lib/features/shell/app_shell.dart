@@ -53,9 +53,17 @@ class _DockItem {
 
 const _items = [
   _DockItem('Home', PhosphorIconsRegular.house, PhosphorIconsFill.house),
-  _DockItem('Skills', PhosphorIconsRegular.squaresFour, PhosphorIconsFill.squaresFour),
+  _DockItem(
+    'Skills',
+    PhosphorIconsRegular.squaresFour,
+    PhosphorIconsFill.squaresFour,
+  ),
   _DockItem('Log', PhosphorIconsRegular.notebook, PhosphorIconsFill.notebook),
-  _DockItem('Insights', PhosphorIconsRegular.chartBar, PhosphorIconsFill.chartBar),
+  _DockItem(
+    'Insights',
+    PhosphorIconsRegular.chartBar,
+    PhosphorIconsFill.chartBar,
+  ),
 ];
 
 /// Dark floating navigation pill with a raised centre "+" button.
@@ -185,7 +193,13 @@ class _QuickAddSheet extends ConsumerWidget {
       router.push(location);
     }
 
-    Widget tile(String title, String sub, IconData icon, Color color, VoidCallback onTap) {
+    Widget tile(
+      String title,
+      String sub,
+      IconData icon,
+      Color color,
+      VoidCallback onTap,
+    ) {
       return Expanded(
         child: Pressable(
           onTap: onTap,
@@ -208,12 +222,17 @@ class _QuickAddSheet extends ConsumerWidget {
                     child: Icon(icon, color: color, size: 20),
                   ),
                   const Spacer(),
-                  Text(title, style: AppText.subtitle.copyWith(color: Palette.ink)),
+                  Text(
+                    title,
+                    style: AppText.subtitle.copyWith(color: Palette.ink),
+                  ),
                   Text(
                     sub,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.7)),
+                    style: AppText.caption.copyWith(
+                      color: Palette.ink.withValues(alpha: 0.7),
+                    ),
                   ),
                 ],
               ),
@@ -231,7 +250,9 @@ class _QuickAddSheet extends ConsumerWidget {
             children: [
               tile(
                 running == null ? 'Start timer' : 'Open timer',
-                running == null ? 'Track live' : 'Practising ${running.skill.name}',
+                running == null
+                    ? 'Track live'
+                    : 'Practising ${running.skill.name}',
                 PhosphorIconsFill.timer,
                 Palette.lime,
                 () => go(Routes.timer()),

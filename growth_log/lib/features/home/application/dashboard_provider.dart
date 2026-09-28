@@ -31,7 +31,9 @@ class Dashboard {
   final Map<DayKey, int> entryCountByDay;
   final Map<DayKey, int> sessionCountByDay;
 
-  List<DayKey> get weekDays => [for (var i = 0; i < 7; i++) Days.add(weekStart, i)];
+  List<DayKey> get weekDays => [
+    for (var i = 0; i < 7; i++) Days.add(weekStart, i),
+  ];
 }
 
 final dashboardProvider = StreamProvider<Dashboard>((ref) {

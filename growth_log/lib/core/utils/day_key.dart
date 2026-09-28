@@ -25,9 +25,11 @@ abstract final class Days {
     final da = dateOf(a);
     final db = dateOf(b);
     // Compare as UTC dates to avoid DST hour offsets.
-    return DateTime.utc(db.year, db.month, db.day)
-        .difference(DateTime.utc(da.year, da.month, da.day))
-        .inDays;
+    return DateTime.utc(
+      db.year,
+      db.month,
+      db.day,
+    ).difference(DateTime.utc(da.year, da.month, da.day)).inDays;
   }
 
   /// First day of the week containing [key].

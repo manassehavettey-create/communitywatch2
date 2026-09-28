@@ -19,7 +19,11 @@ import '../../application/skill_providers.dart';
 
 /// Starts a timer for [skillId] (or opens the running one) and shows the
 /// full-screen timer.
-Future<void> startOrOpenTimer(BuildContext context, WidgetRef ref, int skillId) async {
+Future<void> startOrOpenTimer(
+  BuildContext context,
+  WidgetRef ref,
+  int skillId,
+) async {
   final running = ref.read(activeTimerProvider).value;
   final router = GoRouter.of(context);
   if (running == null) {
@@ -63,7 +67,10 @@ class SkillTile extends ConsumerWidget {
               bottom: 18,
               child: Opacity(
                 opacity: 0.95,
-                child: AppImage(level.current.badgeAsset, width: tall ? 84 : 64),
+                child: AppImage(
+                  level.current.badgeAsset,
+                  width: tall ? 84 : 64,
+                ),
               ),
             ),
             Column(
@@ -93,29 +100,46 @@ class SkillTile extends ConsumerWidget {
                   s.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: AppText.title.copyWith(color: Palette.ink, fontSize: 19),
+                  style: AppText.title.copyWith(
+                    color: Palette.ink,
+                    fontSize: 19,
+                  ),
                 ),
                 const Spacer(),
                 Text.rich(
-                  TextSpan(children: [
-                    TextSpan(
-                      text: Fmt.hours(stats.totalSec),
-                      style: AppText.numeral.copyWith(color: Palette.ink, fontSize: 24),
-                    ),
-                    TextSpan(
-                      text: ' h',
-                      style: AppText.body.copyWith(color: Palette.ink, fontWeight: FontWeight.w700),
-                    ),
-                  ]),
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: Fmt.hours(stats.totalSec),
+                        style: AppText.numeral.copyWith(
+                          color: Palette.ink,
+                          fontSize: 24,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' h',
+                        style: AppText.body.copyWith(
+                          color: Palette.ink,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Text(
                   stats.weekSec > 0
                       ? '${Fmt.duration(stats.weekSec)} this week'
                       : 'Not yet this week',
-                  style: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.7)),
+                  style: AppText.caption.copyWith(
+                    color: Palette.ink.withValues(alpha: 0.7),
+                  ),
                 ),
                 const SizedBox(height: Space.xs),
-                ProgressBar(value: level.fraction, height: 6, color: Palette.ink),
+                ProgressBar(
+                  value: level.fraction,
+                  height: 6,
+                  color: Palette.ink,
+                ),
               ],
             ),
           ],
@@ -127,7 +151,12 @@ class SkillTile extends ConsumerWidget {
 
 /// Wide card for the Skills tab: ring with badge, level, hours and target.
 class SkillListCard extends ConsumerWidget {
-  const SkillListCard({super.key, required this.stats, this.archived = false, this.dragHandle});
+  const SkillListCard({
+    super.key,
+    required this.stats,
+    this.archived = false,
+    this.dragHandle,
+  });
 
   final SkillStats stats;
   final bool archived;
@@ -144,7 +173,8 @@ class SkillListCard extends ConsumerWidget {
       border: archived,
       padding: const EdgeInsets.all(Space.md),
       onTap: () => context.push(Routes.skill(s.id)),
-      semanticLabel: '${s.name}, ${level.current.name}, '
+      semanticLabel:
+          '${s.name}, ${level.current.name}, '
           '${Fmt.hours(stats.totalSec)} of ${Fmt.number(s.targetHours.round())} hours',
       child: Row(
         children: [
@@ -181,7 +211,9 @@ class SkillListCard extends ConsumerWidget {
                       : '${level.current.name} · ${Fmt.hours(level.secondsToNext)} h to ${level.next!.name}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppText.caption.copyWith(color: fg.withValues(alpha: 0.75)),
+                  style: AppText.caption.copyWith(
+                    color: fg.withValues(alpha: 0.75),
+                  ),
                 ),
                 const SizedBox(height: Space.xs),
                 ProgressBar(value: stats.targetFraction, height: 6, color: fg),
@@ -190,7 +222,10 @@ class SkillListCard extends ConsumerWidget {
                   children: [
                     Text(
                       '${Fmt.hours(stats.totalSec)} / ${Fmt.number(s.targetHours.round())} h',
-                      style: AppText.caption.copyWith(color: fg, fontWeight: FontWeight.w700),
+                      style: AppText.caption.copyWith(
+                        color: fg,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const Spacer(),
                     if (stats.streak.current > 0)
@@ -205,7 +240,10 @@ class SkillListCard extends ConsumerWidget {
               ],
             ),
           ),
-          if (dragHandle != null) ...[const SizedBox(width: Space.xs), dragHandle!],
+          if (dragHandle != null) ...[
+            const SizedBox(width: Space.xs),
+            dragHandle!,
+          ],
         ],
       ),
     );

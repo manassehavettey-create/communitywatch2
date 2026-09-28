@@ -45,7 +45,7 @@ String promptForDay(DayKey day) =>
 /// permission denied): failures are logged, never thrown into the UI.
 class NotificationService {
   NotificationService([FlutterLocalNotificationsPlugin? plugin])
-      : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+    : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   static const _timerId = 1;
   static const _skillBase = 100000;
@@ -118,13 +118,17 @@ class NotificationService {
     if (!_ready) return false;
     try {
       if (defaultTargetPlatform == TargetPlatform.android) {
-        final android = _plugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+        final android = _plugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
         return await android?.requestNotificationsPermission() ?? false;
       }
       if (defaultTargetPlatform == TargetPlatform.iOS) {
-        final ios = _plugin.resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>();
+        final ios = _plugin
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >();
         return await ios?.requestPermissions(
               alert: true,
               badge: true,
@@ -190,7 +194,8 @@ class NotificationService {
     }
   }
 
-  Future<void> cancelSkillReminder(int skillId) => _cancel(_skillBase + skillId);
+  Future<void> cancelSkillReminder(int skillId) =>
+      _cancel(_skillBase + skillId);
 
   /// Schedules the journal reminder for the next [logDaysAhead] days, each
   /// with its own rotating prompt. Today is skipped if already logged.

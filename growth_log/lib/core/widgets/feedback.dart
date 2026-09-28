@@ -112,7 +112,12 @@ class SheetScaffold extends StatelessWidget {
     return SafeArea(
       top: false,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(Space.gutter, 0, Space.gutter, Space.lg),
+        padding: const EdgeInsets.fromLTRB(
+          Space.gutter,
+          0,
+          Space.gutter,
+          Space.lg,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
@@ -178,8 +183,10 @@ class _FadeSlideInState extends State<FadeSlideIn>
     return FadeTransition(
       opacity: _curve,
       child: SlideTransition(
-        position: Tween(begin: const Offset(0, 0.06), end: Offset.zero)
-            .animate(_curve),
+        position: Tween(
+          begin: const Offset(0, 0.06),
+          end: Offset.zero,
+        ).animate(_curve),
         child: widget.child,
       ),
     );

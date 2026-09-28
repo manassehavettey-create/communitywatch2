@@ -216,8 +216,9 @@ abstract final class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         titleTextStyle: t(AppText.subtitle),
-        systemOverlayStyle:
-            isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        systemOverlayStyle: isDark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
       ),
       dividerTheme: DividerThemeData(color: c.hairline, thickness: 1, space: 1),
       filledButtonTheme: FilledButtonThemeData(
@@ -252,8 +253,10 @@ abstract final class AppTheme {
         fillColor: c.surface,
         hintStyle: AppText.body.copyWith(color: c.muted),
         labelStyle: AppText.body.copyWith(color: c.muted),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 18,
+        ),
         border: OutlineInputBorder(
           borderRadius: Radii.cardSmallR,
           borderSide: BorderSide(color: c.hairline),

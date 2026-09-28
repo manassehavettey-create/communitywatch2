@@ -14,8 +14,8 @@ AppDatabase memoryDb() {
 
 class TestEnv {
   TestEnv({DateTime? now})
-      : db = memoryDb(),
-        clock = FixedClock(now ?? DateTime(2026, 9, 28, 10));
+    : db = memoryDb(),
+      clock = FixedClock(now ?? DateTime(2026, 9, 28, 10));
 
   final AppDatabase db;
   final FixedClock clock;
@@ -26,8 +26,8 @@ class TestEnv {
   late final timer = TimerRepository(db, clock);
 
   Future<int> skill([String name = 'Guitar']) => skills.createSkill(
-        SkillDraft(name: name, iconKey: 'guitar', colorValue: 0xFFC8EC64),
-      );
+    SkillDraft(name: name, iconKey: 'guitar', colorValue: 0xFFC8EC64),
+  );
 
   Future<void> dispose() => db.close();
 }

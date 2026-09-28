@@ -32,14 +32,21 @@ class TimerScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final timer = ref.watch(activeTimerProvider);
-    return AsyncView(
-      value: timer,
-      onRetry: () => ref.invalidate(activeTimerProvider),
-      data: (t) => AnimatedSwitcher(
-        duration: Motion.slow,
-        child: t == null
-            ? _PickSkill(key: const ValueKey('pick'), initialSkillId: initialSkillId)
-            : _Running(key: ValueKey('run-${t.timer.startedAt}'), view: t),
+    // One Scaffold for both states: cross-fading two Scaffolds would give
+    // snackbars shown during the transition duplicate Hero tags.
+    return Scaffold(
+      body: AsyncView(
+        value: timer,
+        onRetry: () => ref.invalidate(activeTimerProvider),
+        data: (t) => AnimatedSwitcher(
+          duration: Motion.slow,
+          child: t == null
+              ? _PickSkill(
+                  key: const ValueKey('pick'),
+                  initialSkillId: initialSkillId,
+                )
+              : _Running(key: ValueKey('run-${t.timer.startedAt}'), view: t),
+        ),
       ),
     );
   }
@@ -76,8 +83,9 @@ class _PickSkillState extends ConsumerState<_PickSkill> {
   Widget build(BuildContext context) {
     final skills = ref.watch(skillsOverviewProvider);
     final gl = context.gl;
-    return Scaffold(
-      body: SafeArea(
+    return ColoredBox(
+      color: gl.canvas,
+      child: SafeArea(
         child: AsyncView(
           value: skills,
           data: (list) {
@@ -92,16 +100,24 @@ class _PickSkillState extends ConsumerState<_PickSkill> {
                 ),
               );
             }
-            if (_selected == null || !list.any((s) => s.skill.id == _selected)) {
+            if (_selected == null ||
+                !list.any((s) => s.skill.id == _selected)) {
               _selected = list.first.skill.id;
             }
-            final selected = list.firstWhere((s) => s.skill.id == _selected).skill;
+            final selected = list
+                .firstWhere((s) => s.skill.id == _selected)
+                .skill;
             final color = Color(selected.colorValue);
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(Space.gutter, Space.sm, Space.gutter, 0),
+                  padding: const EdgeInsets.fromLTRB(
+                    Space.gutter,
+                    Space.sm,
+                    Space.gutter,
+                    0,
+                  ),
                   child: Row(
                     children: [
                       CircleIconButton(
@@ -113,14 +129,26 @@ class _PickSkillState extends ConsumerState<_PickSkill> {
                   ),
                 ),
                 const Padding(
-                  padding: EdgeInsets.fromLTRB(Space.gutter, Space.lg, Space.gutter, Space.md),
-                  child: DisplayTitle(bold: 'What are you', italic: 'practising?', size: 36),
+                  padding: EdgeInsets.fromLTRB(
+                    Space.gutter,
+                    Space.lg,
+                    Space.gutter,
+                    Space.md,
+                  ),
+                  child: DisplayTitle(
+                    bold: 'What are you',
+                    italic: 'practising?',
+                    size: 36,
+                  ),
                 ),
                 Expanded(
                   child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Space.gutter,
+                    ),
                     itemCount: list.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: Space.xs),
+                    separatorBuilder: (_, _) =>
+                        const SizedBox(height: Space.xs),
                     itemBuilder: (_, i) {
                       final s = list[i].skill;
                       final sel = s.id == _selected;
@@ -135,7 +163,9 @@ class _PickSkillState extends ConsumerState<_PickSkill> {
                             decoration: BoxDecoration(
                               color: sel ? Color(s.colorValue) : gl.surface,
                               borderRadius: Radii.pillR,
-                              border: Border.all(color: sel ? Color(s.colorValue) : gl.hairline),
+                              border: Border.all(
+                                color: sel ? Color(s.colorValue) : gl.hairline,
+                              ),
                             ),
                             child: Row(
                               children: [
@@ -146,7 +176,9 @@ class _PickSkillState extends ConsumerState<_PickSkill> {
                                     s.name,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: AppText.subtitle.copyWith(color: sel ? Palette.ink : gl.text),
+                                    style: AppText.subtitle.copyWith(
+                                      color: sel ? Palette.ink : gl.text,
+                                    ),
                                   ),
                                 ),
                                 Text(
@@ -169,7 +201,10 @@ class _PickSkillState extends ConsumerState<_PickSkill> {
                   padding: const EdgeInsets.all(Space.xl),
                   child: Center(
                     child: _starting
-                        ? const SizedBox(height: 112, child: LoadingState(height: 112))
+                        ? const SizedBox(
+                            height: 112,
+                            child: LoadingState(height: 112),
+                          )
                         : Semantics(
                             button: true,
                             label: 'Start ${selected.name} timer',
@@ -179,11 +214,21 @@ class _PickSkillState extends ConsumerState<_PickSkill> {
                               child: Container(
                                 width: 112,
                                 height: 112,
-                                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  shape: BoxShape.circle,
+                                ),
                                 child: Container(
                                   margin: const EdgeInsets.all(10),
-                                  decoration: const BoxDecoration(color: Palette.ink, shape: BoxShape.circle),
-                                  child: Icon(PhosphorIconsFill.play, color: color, size: 38),
+                                  decoration: const BoxDecoration(
+                                    color: Palette.ink,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    PhosphorIconsFill.play,
+                                    color: color,
+                                    size: 38,
+                                  ),
                                 ),
                               ),
                             ),
@@ -208,9 +253,12 @@ class _Running extends ConsumerStatefulWidget {
   ConsumerState<_Running> createState() => _RunningState();
 }
 
-class _RunningState extends ConsumerState<_Running> with SingleTickerProviderStateMixin {
-  late final _pulse = AnimationController(vsync: this, duration: const Duration(seconds: 2))
-    ..repeat();
+class _RunningState extends ConsumerState<_Running>
+    with SingleTickerProviderStateMixin {
+  late final _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 2),
+  )..repeat();
 
   @override
   void dispose() {
@@ -219,7 +267,9 @@ class _RunningState extends ConsumerState<_Running> with SingleTickerProviderSta
   }
 
   Future<void> _stop() async {
-    final elapsed = ref.read(timerRepositoryProvider).elapsed(widget.view.timer);
+    final elapsed = ref
+        .read(timerRepositoryProvider)
+        .elapsed(widget.view.timer);
     await showAppSheet<void>(
       context,
       builder: (_) => StopTimerSheet(view: widget.view, elapsed: elapsed),
@@ -245,13 +295,15 @@ class _RunningState extends ConsumerState<_Running> with SingleTickerProviderSta
     ref.watch(tickerProvider);
     final skill = widget.view.skill;
     final color = Color(skill.colorValue);
-    final elapsed = ref.read(timerRepositoryProvider).elapsed(widget.view.timer);
+    final elapsed = ref
+        .read(timerRepositoryProvider)
+        .elapsed(widget.view.timer);
     final readout = Fmt.clock(elapsed);
     final width = MediaQuery.sizeOf(context).width;
 
-    return Scaffold(
-      backgroundColor: color,
-      body: SafeArea(
+    return ColoredBox(
+      color: color,
+      child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(Space.gutter),
           child: Column(
@@ -263,12 +315,20 @@ class _RunningState extends ConsumerState<_Running> with SingleTickerProviderSta
                     tooltip: 'Minimise',
                     background: Palette.white,
                     foreground: Palette.ink,
-                    onPressed: () => context.canPop() ? context.pop() : context.go(Routes.home),
+                    onPressed: () => context.canPop()
+                        ? context.pop()
+                        : context.go(Routes.home),
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: const BoxDecoration(color: Palette.ink, borderRadius: Radii.pillR),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Palette.ink,
+                      borderRadius: Radii.pillR,
+                    ),
                     child: Row(
                       children: [
                         FadeTransition(
@@ -276,11 +336,20 @@ class _RunningState extends ConsumerState<_Running> with SingleTickerProviderSta
                           child: Container(
                             width: 8,
                             height: 8,
-                            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Text('Recording', style: AppText.caption.copyWith(color: Palette.white, fontWeight: FontWeight.w700)),
+                        Text(
+                          'Recording',
+                          style: AppText.caption.copyWith(
+                            color: Palette.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -304,8 +373,15 @@ class _RunningState extends ConsumerState<_Running> with SingleTickerProviderSta
                     Container(
                       width: width * 0.5,
                       height: width * 0.5,
-                      decoration: const BoxDecoration(color: Palette.ink, shape: BoxShape.circle),
-                      child: Icon(SkillIcons.of(skill.iconKey), color: color, size: width * 0.16),
+                      decoration: const BoxDecoration(
+                        color: Palette.ink,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        SkillIcons.of(skill.iconKey),
+                        color: color,
+                        size: width * 0.16,
+                      ),
                     ),
                   ],
                 ),
@@ -337,7 +413,9 @@ class _RunningState extends ConsumerState<_Running> with SingleTickerProviderSta
               Text(
                 'Started ${Fmt.time(widget.view.timer.startedAt)}'
                 '${elapsed.inHours >= 12 ? ' · still going?' : ''}',
-                style: AppText.body.copyWith(color: Palette.ink.withValues(alpha: 0.7)),
+                style: AppText.body.copyWith(
+                  color: Palette.ink.withValues(alpha: 0.7),
+                ),
               ),
               const Spacer(),
               PillButton(
@@ -351,7 +429,10 @@ class _RunningState extends ConsumerState<_Running> with SingleTickerProviderSta
               const SizedBox(height: Space.xs),
               TextButton(
                 onPressed: _discard,
-                child: Text('Discard', style: AppText.button.copyWith(color: Palette.ink)),
+                child: Text(
+                  'Discard',
+                  style: AppText.button.copyWith(color: Palette.ink),
+                ),
               ),
             ],
           ),
@@ -381,7 +462,11 @@ class _PulsePainter extends CustomPainter {
     }
     final dot = Paint()..color = Palette.ink;
     final a = t * 2 * math.pi - math.pi / 2;
-    canvas.drawCircle(center + Offset(math.cos(a), math.sin(a)) * maxR * 0.78, 6, dot);
+    canvas.drawCircle(
+      center + Offset(math.cos(a), math.sin(a)) * maxR * 0.78,
+      6,
+      dot,
+    );
   }
 
   @override
@@ -424,7 +509,9 @@ class _StopTimerSheetState extends ConsumerState<StopTimerSheet> {
     final root = rootNavigatorKey.currentContext;
     final edited = _minutes != (widget.elapsed.inSeconds / 60).floor();
     final result = await guarded(context, () async {
-      final r = await ref.read(appActionsProvider).stopTimer(
+      final r = await ref
+          .read(appActionsProvider)
+          .stopTimer(
             durationSec: edited ? _minutes * 60 : null,
             note: _note.text,
           );
@@ -437,7 +524,10 @@ class _StopTimerSheetState extends ConsumerState<StopTimerSheet> {
     if (router.canPop()) router.pop();
     if (root != null && root.mounted) {
       if (result.isEmpty) {
-        showSnack(root, 'Saved ${Fmt.duration(_minutes * 60)} of ${widget.view.skill.name}');
+        showSnack(
+          root,
+          'Saved ${Fmt.duration(_minutes * 60)} of ${widget.view.skill.name}',
+        );
       }
       await celebrate(root, result);
     }
@@ -458,7 +548,10 @@ class _StopTimerSheetState extends ConsumerState<StopTimerSheet> {
         title: 'Under a minute',
         primaryLabel: 'Keep going',
         onPrimary: () => Navigator.pop(context),
-        secondary: TextButton(onPressed: _discardShort, child: const Text('Discard')),
+        secondary: TextButton(
+          onPressed: _discardShort,
+          child: const Text('Discard'),
+        ),
         child: Text(
           'Sessions need at least one minute to count. Keep the timer running, or discard it.',
           style: context.text.bodyMedium?.copyWith(color: context.gl.muted),
@@ -477,7 +570,10 @@ class _StopTimerSheetState extends ConsumerState<StopTimerSheet> {
             Container(
               margin: const EdgeInsets.only(bottom: Space.sm),
               padding: const EdgeInsets.all(Space.md),
-              decoration: const BoxDecoration(color: Palette.butter, borderRadius: Radii.cardSmallR),
+              decoration: const BoxDecoration(
+                color: Palette.butter,
+                borderRadius: Radii.cardSmallR,
+              ),
               child: Text(
                 'This timer ran for ${Fmt.duration(widget.elapsed.inSeconds)}. Forgot to stop it? Adjust the time below.',
                 style: AppText.body.copyWith(color: Palette.ink),
@@ -488,20 +584,27 @@ class _StopTimerSheetState extends ConsumerState<StopTimerSheet> {
               CircleIconButton(
                 icon: PhosphorIconsBold.minus,
                 tooltip: 'Less time',
-                onPressed: _minutes > 1 ? () => setState(() => _minutes = math.max(1, _minutes - 5)) : null,
+                onPressed: _minutes > 1
+                    ? () => setState(() => _minutes = math.max(1, _minutes - 5))
+                    : null,
               ),
               Expanded(
                 child: Text(
                   Fmt.duration(_minutes * 60),
                   textAlign: TextAlign.center,
-                  style: AppText.display.copyWith(fontSize: 40, color: context.gl.text),
+                  style: AppText.display.copyWith(
+                    fontSize: 40,
+                    color: context.gl.text,
+                  ),
                 ),
               ),
               CircleIconButton(
                 icon: PhosphorIconsBold.plus,
                 tooltip: 'More time',
                 onPressed: _minutes < 24 * 60
-                    ? () => setState(() => _minutes = math.min(24 * 60, _minutes + 5))
+                    ? () => setState(
+                        () => _minutes = math.min(24 * 60, _minutes + 5),
+                      )
                     : null,
               ),
             ],
@@ -537,10 +640,19 @@ class TimerBanner extends ConsumerWidget {
     final color = Color(view.skill.colorValue);
     return Pressable(
       onTap: () => context.push(Routes.timer()),
-      semanticLabel: 'Timer running for ${view.skill.name}, ${Fmt.duration(elapsed.inSeconds)}. Open timer',
+      semanticLabel:
+          'Timer running for ${view.skill.name}, ${Fmt.duration(elapsed.inSeconds)}. Open timer',
       child: Container(
-        padding: const EdgeInsets.fromLTRB(Space.md, Space.sm, Space.sm, Space.sm),
-        decoration: const BoxDecoration(color: Palette.inkCard, borderRadius: Radii.pillR),
+        padding: const EdgeInsets.fromLTRB(
+          Space.md,
+          Space.sm,
+          Space.sm,
+          Space.sm,
+        ),
+        decoration: const BoxDecoration(
+          color: Palette.inkCard,
+          borderRadius: Radii.pillR,
+        ),
         child: ExcludeSemantics(
           child: Row(
             children: [
@@ -554,7 +666,9 @@ class TimerBanner extends ConsumerWidget {
                       view.skill.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: AppText.caption.copyWith(color: Palette.white.withValues(alpha: 0.7)),
+                      style: AppText.caption.copyWith(
+                        color: Palette.white.withValues(alpha: 0.7),
+                      ),
                     ),
                     Text(
                       Fmt.clock(elapsed),
@@ -567,9 +681,21 @@ class TimerBanner extends ConsumerWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(color: color, borderRadius: Radii.pillR),
-                child: Text('Open', style: AppText.button.copyWith(color: Palette.ink, fontSize: 13)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: Radii.pillR,
+                ),
+                child: Text(
+                  'Open',
+                  style: AppText.button.copyWith(
+                    color: Palette.ink,
+                    fontSize: 13,
+                  ),
+                ),
               ),
             ],
           ),

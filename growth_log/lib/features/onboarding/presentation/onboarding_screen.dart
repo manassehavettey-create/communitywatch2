@@ -78,7 +78,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    _controller.addListener(() => setState(() => _page = _controller.page ?? 0));
+    _controller.addListener(
+      () => setState(() => _page = _controller.page ?? 0),
+    );
   }
 
   @override
@@ -116,22 +118,36 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(Space.gutter, Space.sm, Space.gutter, 0),
+              padding: const EdgeInsets.fromLTRB(
+                Space.gutter,
+                Space.sm,
+                Space.gutter,
+                0,
+              ),
               child: Row(
                 children: [
                   Container(
                     width: 32,
                     height: 32,
                     padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(color: fg, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: fg,
+                      shape: BoxShape.circle,
+                    ),
                     child: const AppImage(AppAssets.splashLogo),
                   ),
                   const SizedBox(width: 8),
-                  Text('Growth Log', style: AppText.subtitle.copyWith(color: fg)),
+                  Text(
+                    'Growth Log',
+                    style: AppText.subtitle.copyWith(color: fg),
+                  ),
                   const Spacer(),
                   Text(
                     '${index + 1}/${_pages.length}',
-                    style: AppText.caption.copyWith(color: fg, fontWeight: FontWeight.w700),
+                    style: AppText.caption.copyWith(
+                      color: fg,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),
@@ -145,7 +161,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   final delta = (i - _page).clamp(-1.0, 1.0);
                   return LayoutBuilder(
                     builder: (context, c) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: Space.gutter,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -164,22 +182,33 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           Semantics(
                             header: true,
                             child: Text.rich(
-                              TextSpan(children: [
-                                TextSpan(
-                                  text: '${p.bold}\n',
-                                  style: AppText.display.copyWith(color: p.fg, fontSize: 46),
-                                ),
-                                TextSpan(
-                                  text: p.italic,
-                                  style: AppText.displayItalic.copyWith(color: p.fg, fontSize: 46),
-                                ),
-                              ]),
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: '${p.bold}\n',
+                                    style: AppText.display.copyWith(
+                                      color: p.fg,
+                                      fontSize: 46,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: p.italic,
+                                    style: AppText.displayItalic.copyWith(
+                                      color: p.fg,
+                                      fontSize: 46,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           const SizedBox(height: Space.md),
                           Text(
                             p.body,
-                            style: AppText.body.copyWith(color: p.fg.withValues(alpha: 0.8), fontSize: 16),
+                            style: AppText.body.copyWith(
+                              color: p.fg.withValues(alpha: 0.8),
+                              fontSize: 16,
+                            ),
                           ),
                         ],
                       ),
@@ -189,7 +218,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(Space.gutter, Space.lg, Space.gutter, Space.lg),
+              padding: const EdgeInsets.fromLTRB(
+                Space.gutter,
+                Space.lg,
+                Space.gutter,
+                Space.lg,
+              ),
               child: Row(
                 children: [
                   AnimatedOpacity(
@@ -197,7 +231,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     opacity: last ? 0 : 1,
                     child: TextButton(
                       onPressed: last ? null : () => context.go(Routes.setup),
-                      child: Text('Skip', style: AppText.button.copyWith(color: fg)),
+                      child: Text(
+                        'Skip',
+                        style: AppText.button.copyWith(color: fg),
+                      ),
                     ),
                   ),
                   const Spacer(),

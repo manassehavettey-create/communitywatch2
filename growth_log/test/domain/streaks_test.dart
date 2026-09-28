@@ -29,19 +29,25 @@ void main() {
   });
 
   test('longest streak is tracked separately from current', () {
-    final s = Streaks.compute(
-      [20260901, 20260902, 20260903, 20260904, 20260927, 20260928],
-      today,
-    );
+    final s = Streaks.compute([
+      20260901,
+      20260902,
+      20260903,
+      20260904,
+      20260927,
+      20260928,
+    ], today);
     expect(s.current, 2);
     expect(s.longest, 4);
   });
 
   test('crosses month and year boundaries', () {
-    final s = Streaks.compute(
-      [20251230, 20251231, 20260101, 20260102],
+    final s = Streaks.compute([
+      20251230,
+      20251231,
+      20260101,
       20260102,
-    );
+    ], 20260102);
     expect(s.current, 4);
   });
 

@@ -20,8 +20,13 @@ void main() {
     int day = 20260928,
     List<String> tags = const [],
     int? skillId,
-  }) =>
-      EntryDraft(type: type, body: body, dayKey: day, tags: tags, skillId: skillId);
+  }) => EntryDraft(
+    type: type,
+    body: body,
+    dayKey: day,
+    tags: tags,
+    skillId: skillId,
+  );
 
   group('entries', () {
     test('tags are normalised, de-duplicated and counted', () async {
@@ -38,41 +43,59 @@ void main() {
 
     test('filters: type, tag, skill, date range and text', () async {
       final guitar = await env.skill('Guitar');
-      await env.entries.addEntry(draft('Sunny walk', day: 20260920, tags: ['outdoors']));
       await env.entries.addEntry(
-        draft('Nailed the solo', type: EntryType.win, skillId: guitar, tags: ['music']),
+        draft('Sunny walk', day: 20260920, tags: ['outdoors']),
+      );
+      await env.entries.addEntry(
+        draft(
+          'Nailed the solo',
+          type: EntryType.win,
+          skillId: guitar,
+          tags: ['music'],
+        ),
       );
       await env.entries.addEntry(draft('Coffee with Sam', day: 20260927));
 
-      Future<List<String>> bodies(EntryFilter f) async =>
-          [for (final v in await env.entries.query(f)) v.entry.body];
+      Future<List<String>> bodies(EntryFilter f) async => [
+        for (final v in await env.entries.query(f)) v.entry.body,
+      ];
 
       expect(await bodies(EntryFilter.none), [
         'Nailed the solo',
         'Coffee with Sam',
         'Sunny walk',
       ]);
-      expect(await bodies(const EntryFilter(type: EntryType.win)), ['Nailed the solo']);
-      expect(await bodies(const EntryFilter(tags: {'outdoors'})), ['Sunny walk']);
+      expect(await bodies(const EntryFilter(type: EntryType.win)), [
+        'Nailed the solo',
+      ]);
+      expect(await bodies(const EntryFilter(tags: {'outdoors'})), [
+        'Sunny walk',
+      ]);
       expect(await bodies(EntryFilter(skillId: guitar)), ['Nailed the solo']);
-      expect(
-        await bodies(const EntryFilter(from: 20260921, to: 20260927)),
-        ['Coffee with Sam'],
-      );
-      expect(await bodies(const EntryFilter(query: 'COFFEE')), ['Coffee with Sam']);
+      expect(await bodies(const EntryFilter(from: 20260921, to: 20260927)), [
+        'Coffee with Sam',
+      ]);
+      expect(await bodies(const EntryFilter(query: 'COFFEE')), [
+        'Coffee with Sam',
+      ]);
       // Search also matches tag names and linked skill names.
-      expect(await bodies(const EntryFilter(query: 'guitar')), ['Nailed the solo']);
+      expect(await bodies(const EntryFilter(query: 'guitar')), [
+        'Nailed the solo',
+      ]);
     });
 
-    test('very long text is rejected, long-but-valid text round-trips', () async {
-      expect(
-        () => env.entries.addEntry(draft('x' * (EntryLimits.bodyMax + 1))),
-        throwsA(isA<ValidationException>()),
-      );
-      final body = 'y' * EntryLimits.bodyMax;
-      final id = await env.entries.addEntry(draft(body));
-      expect((await env.entries.getEntry(id))!.entry.body, body);
-    });
+    test(
+      'very long text is rejected, long-but-valid text round-trips',
+      () async {
+        expect(
+          () => env.entries.addEntry(draft('x' * (EntryLimits.bodyMax + 1))),
+          throwsA(isA<ValidationException>()),
+        );
+        final body = 'y' * EntryLimits.bodyMax;
+        final id = await env.entries.addEntry(draft(body));
+        expect((await env.entries.getEntry(id))!.entry.body, body);
+      },
+    );
 
     test('update replaces tags and prunes orphans; delete + restore', () async {
       final id = await env.entries.addEntry(draft('a', tags: ['old']));
@@ -112,7 +135,12 @@ void main() {
       await settings.set(SettingKeys.themeMode, 'dark');
       await settings.set(SettingKeys.lockEnabled, true);
       final a = await env.skill('Guitar');
-      await env.skills.addSession(skillId: a, dayKey: 20260928, durationSec: 2 * 3600, note: 'scales');
+      await env.skills.addSession(
+        skillId: a,
+        dayKey: 20260928,
+        durationSec: 2 * 3600,
+        note: 'scales',
+      );
       await env.milestones.reconcile(a);
       await env.entries.addEntry(draft('thanks', tags: ['family'], skillId: a));
       await env.timer.start(a);
@@ -123,7 +151,10 @@ void main() {
       final other = TestEnv();
       addTearDown(other.dispose);
       await other.skill('Something else');
-      final summary = await BackupService(other.db, other.clock).importJson(json);
+      final summary = await BackupService(
+        other.db,
+        other.clock,
+      ).importJson(json);
 
       expect(summary.skills, 1);
       expect(summary.sessions, 1);
@@ -131,7 +162,9 @@ void main() {
       final skills = await other.skills.watchSkills().first;
       expect(skills.single.name, 'Guitar');
       expect(await other.skills.totalSeconds(a), 7200);
-      final entries = await other.entries.query(const EntryFilter(tags: {'family'}));
+      final entries = await other.entries.query(
+        const EntryFilter(tags: {'family'}),
+      );
       expect(entries.single.entry.body, 'thanks');
       expect(await other.milestones.watchForSkill(a).first, hasLength(1));
       expect(await other.timer.active(), isNotNull);
@@ -156,7 +189,16 @@ void main() {
           'data': {
             'skills': [],
             'sessions': [
-              {'id': 1, 'skillId': 42, 'startedAt': 0, 'dayKey': 1, 'durationSec': 60, 'note': null, 'source': 'manual', 'createdAt': 0},
+              {
+                'id': 1,
+                'skillId': 42,
+                'startedAt': 0,
+                'dayKey': 1,
+                'durationSec': 60,
+                'note': null,
+                'source': 'manual',
+                'createdAt': 0,
+              },
             ],
           },
         }),
@@ -170,7 +212,10 @@ void main() {
           },
         }),
       ]) {
-        await expectLater(backup.importJson(bad), throwsA(isA<BackupException>()));
+        await expectLater(
+          backup.importJson(bad),
+          throwsA(isA<BackupException>()),
+        );
       }
       final skills = await env.skills.watchSkills().first;
       expect(skills.single.name, 'Keep me');

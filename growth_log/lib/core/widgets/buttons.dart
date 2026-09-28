@@ -95,14 +95,13 @@ class PillButton extends StatelessWidget {
         child: AnimatedContainer(
           duration: Motion.fast,
           height: height,
-          padding: EdgeInsets.only(
-            left: 24,
-            right: trailingArrow ? 12 : 24,
-          ),
+          padding: EdgeInsets.only(left: 24, right: trailingArrow ? 12 : 24),
           decoration: BoxDecoration(
             color: background,
             borderRadius: Radii.pillR,
-            border: border == null ? null : Border.all(color: border, width: 1.4),
+            border: border == null
+                ? null
+                : Border.all(color: border, width: 1.4),
           ),
           child: content,
         ),
@@ -153,7 +152,11 @@ class CircleIconButton extends StatelessWidget {
                     ? Border.all(color: gl.hairline)
                     : null,
               ),
-              child: Icon(icon, size: size * 0.45, color: foreground ?? gl.text),
+              child: Icon(
+                icon,
+                size: size * 0.45,
+                color: foreground ?? gl.text,
+              ),
             ),
             if (badge)
               Positioned(

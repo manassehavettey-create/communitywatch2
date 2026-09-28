@@ -71,7 +71,9 @@ class _EntryEditorScreenState extends ConsumerState<EntryEditorScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final v = await ref.read(entryRepositoryProvider).getEntry(widget.entryId!);
+      final v = await ref
+          .read(entryRepositoryProvider)
+          .getEntry(widget.entryId!);
       if (v == null) throw Exception('This entry no longer exists.');
       _existing = v;
       _type = v.type;
@@ -165,294 +167,386 @@ class _EntryEditorScreenState extends ConsumerState<EntryEditorScreen> {
   Widget build(BuildContext context) {
     if (_loading) return const Scaffold(body: LoadingState());
     if (_loadError != null) {
-      return Scaffold(appBar: AppBar(), body: ErrorState(error: _loadError!));
+      return Scaffold(
+        appBar: AppBar(),
+        body: ErrorState(error: _loadError!),
+      );
     }
     final color = entryColor(_type);
     final today = ref.watch(todayProvider);
     final prompt = _type == EntryType.gratitude
         ? promptForDay(_day)
         : _winPrompts[Days.between(20240101, _day).abs() % _winPrompts.length];
-    final skills = ref.watch(skillsOverviewProvider).value ?? const <SkillStats>[];
+    final skills =
+        ref.watch(skillsOverviewProvider).value ?? const <SkillStats>[];
     final allTags = ref.watch(allTagsProvider).value ?? const [];
-    final suggestions = allTags.where((t) => !_tags.contains(t.name)).take(8).toList();
+    final suggestions = allTags
+        .where((t) => !_tags.contains(t.name))
+        .take(8)
+        .toList();
     final canSave = _body.text.trim().isNotEmpty && !_saving;
     const white = Color(0x99FFFFFF);
 
     return Scaffold(
-        backgroundColor: color,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(Space.gutter, Space.sm, Space.gutter, 0),
-                child: Row(
-                  children: [
+      backgroundColor: color,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                Space.gutter,
+                Space.sm,
+                Space.gutter,
+                0,
+              ),
+              child: Row(
+                children: [
+                  CircleIconButton(
+                    icon: PhosphorIconsBold.x,
+                    tooltip: 'Close',
+                    background: Palette.white,
+                    foreground: Palette.ink,
+                    onPressed: () => context.pop(),
+                  ),
+                  const Spacer(),
+                  if (_editing)
                     CircleIconButton(
-                      icon: PhosphorIconsBold.x,
-                      tooltip: 'Close',
+                      icon: PhosphorIconsRegular.trash,
+                      tooltip: 'Delete entry',
                       background: Palette.white,
-                      foreground: Palette.ink,
-                      onPressed: () => context.pop(),
+                      foreground: Palette.danger,
+                      onPressed: _delete,
                     ),
-                    const Spacer(),
-                    if (_editing)
-                      CircleIconButton(
-                        icon: PhosphorIconsRegular.trash,
-                        tooltip: 'Delete entry',
-                        background: Palette.white,
-                        foreground: Palette.danger,
-                        onPressed: _delete,
-                      ),
-                  ],
-                ),
+                ],
               ),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(Space.gutter, Space.lg, Space.gutter, Space.lg),
-                  children: [
-                    Row(
-                      children: [
-                        for (final t in EntryType.values) ...[
-                          if (t != EntryType.values.first) const SizedBox(width: Space.xs),
-                          Expanded(
-                            child: Semantics(
-                              selected: _type == t,
-                              button: true,
-                              child: Pressable(
-                                onTap: () => setState(() => _type = t),
-                                child: AnimatedContainer(
-                                  duration: Motion.medium,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: _type == t ? Palette.ink : white,
-                                    borderRadius: Radii.pillR,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        t == EntryType.win ? PhosphorIconsFill.trophy : PhosphorIconsFill.heart,
-                                        size: 18,
-                                        color: _type == t ? color : Palette.ink,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        t.label,
-                                        style: AppText.button.copyWith(color: _type == t ? Palette.white : Palette.ink),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: Space.xl),
-                    AnimatedSwitcher(
-                      duration: Motion.medium,
-                      child: Text(
-                        prompt,
-                        key: ValueKey(prompt),
-                        style: AppText.display.copyWith(color: Palette.ink, fontSize: 32, height: 1.05),
-                      ),
-                    ),
-                    const SizedBox(height: Space.md),
-                    TextField(
-                      controller: _body,
-                      autofocus: !_editing,
-                      minLines: 4,
-                      maxLines: 12,
-                      maxLength: EntryLimits.bodyMax,
-                      textCapitalization: TextCapitalization.sentences,
-                      style: AppText.subtitle.copyWith(color: Palette.ink, fontWeight: FontWeight.w500),
-                      cursorColor: Palette.ink,
-                      decoration: InputDecoration(
-                        hintText: _type == EntryType.win ? 'Shipped the thing…' : 'The sunshine on my walk…',
-                        fillColor: white,
-                        hintStyle: AppText.subtitle.copyWith(color: Palette.ink.withValues(alpha: 0.4)),
-                        counterStyle: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.6)),
-                        border: const OutlineInputBorder(borderRadius: Radii.cardR, borderSide: BorderSide.none),
-                        enabledBorder:
-                            const OutlineInputBorder(borderRadius: Radii.cardR, borderSide: BorderSide.none),
-                        focusedBorder: const OutlineInputBorder(
-                          borderRadius: Radii.cardR,
-                          borderSide: BorderSide(color: Palette.ink, width: 1.4),
-                        ),
-                      ),
-                    ),
-                    _label('Mood'),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        for (final m in _moods)
-                          Semantics(
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  Space.gutter,
+                  Space.lg,
+                  Space.gutter,
+                  Space.lg,
+                ),
+                children: [
+                  Row(
+                    children: [
+                      for (final t in EntryType.values) ...[
+                        if (t != EntryType.values.first)
+                          const SizedBox(width: Space.xs),
+                        Expanded(
+                          child: Semantics(
+                            selected: _type == t,
                             button: true,
-                            selected: _mood == m,
-                            label: 'Mood $m',
                             child: Pressable(
-                              onTap: () => setState(() => _mood = _mood == m ? null : m),
+                              onTap: () => setState(() => _type = t),
                               child: AnimatedContainer(
-                                duration: Motion.fast,
-                                width: 46,
-                                height: 46,
-                                alignment: Alignment.center,
+                                duration: Motion.medium,
+                                height: 48,
                                 decoration: BoxDecoration(
-                                  color: _mood == m ? Palette.ink : white,
-                                  shape: BoxShape.circle,
+                                  color: _type == t ? Palette.ink : white,
+                                  borderRadius: Radii.pillR,
                                 ),
-                                child: Text(m, style: const TextStyle(fontSize: 22)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      t == EntryType.win
+                                          ? PhosphorIconsFill.trophy
+                                          : PhosphorIconsFill.heart,
+                                      size: 18,
+                                      color: _type == t ? color : Palette.ink,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      t.label,
+                                      style: AppText.button.copyWith(
+                                        color: _type == t
+                                            ? Palette.white
+                                            : Palette.ink,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
+                        ),
                       ],
+                    ],
+                  ),
+                  const SizedBox(height: Space.xl),
+                  AnimatedSwitcher(
+                    duration: Motion.medium,
+                    child: Text(
+                      prompt,
+                      key: ValueKey(prompt),
+                      style: AppText.display.copyWith(
+                        color: Palette.ink,
+                        fontSize: 32,
+                        height: 1.05,
+                      ),
                     ),
-                    _label('Tags'),
+                  ),
+                  const SizedBox(height: Space.md),
+                  TextField(
+                    controller: _body,
+                    autofocus: !_editing,
+                    minLines: 4,
+                    maxLines: 12,
+                    maxLength: EntryLimits.bodyMax,
+                    textCapitalization: TextCapitalization.sentences,
+                    style: AppText.subtitle.copyWith(
+                      color: Palette.ink,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    cursorColor: Palette.ink,
+                    decoration: InputDecoration(
+                      hintText: _type == EntryType.win
+                          ? 'Shipped the thing…'
+                          : 'The sunshine on my walk…',
+                      fillColor: white,
+                      hintStyle: AppText.subtitle.copyWith(
+                        color: Palette.ink.withValues(alpha: 0.4),
+                      ),
+                      counterStyle: AppText.caption.copyWith(
+                        color: Palette.ink.withValues(alpha: 0.6),
+                      ),
+                      border: const OutlineInputBorder(
+                        borderRadius: Radii.cardR,
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                        borderRadius: Radii.cardR,
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderRadius: Radii.cardR,
+                        borderSide: BorderSide(color: Palette.ink, width: 1.4),
+                      ),
+                    ),
+                  ),
+                  _label('Mood'),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      for (final m in _moods)
+                        Semantics(
+                          button: true,
+                          selected: _mood == m,
+                          label: 'Mood $m',
+                          child: Pressable(
+                            onTap: () =>
+                                setState(() => _mood = _mood == m ? null : m),
+                            child: AnimatedContainer(
+                              duration: Motion.fast,
+                              width: 46,
+                              height: 46,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: _mood == m ? Palette.ink : white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                m,
+                                style: const TextStyle(fontSize: 22),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  _label('Tags'),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      for (final t in _tags)
+                        InputChip(
+                          label: Text('#$t'),
+                          labelStyle: AppText.caption.copyWith(
+                            color: Palette.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          backgroundColor: Palette.ink,
+                          deleteIconColor: Palette.white,
+                          side: BorderSide.none,
+                          shape: const StadiumBorder(),
+                          onDeleted: () => setState(() => _tags.remove(t)),
+                        ),
+                      SizedBox(
+                        width: 160,
+                        child: TextField(
+                          controller: _tagInput,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: _addTag,
+                          onChanged: (v) {
+                            if (v.endsWith(',') || v.endsWith(' ')) _addTag(v);
+                          },
+                          style: AppText.body.copyWith(color: Palette.ink),
+                          decoration: InputDecoration(
+                            hintText: '+ add tag',
+                            isDense: true,
+                            fillColor: white,
+                            hintStyle: AppText.body.copyWith(
+                              color: Palette.ink.withValues(alpha: 0.45),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            border: const OutlineInputBorder(
+                              borderRadius: Radii.pillR,
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: const OutlineInputBorder(
+                              borderRadius: Radii.pillR,
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius: Radii.pillR,
+                              borderSide: BorderSide(color: Palette.ink),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (suggestions.isNotEmpty) ...[
+                    const SizedBox(height: Space.xs),
                     Wrap(
                       spacing: 6,
                       runSpacing: 6,
-                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        for (final t in _tags)
-                          InputChip(
-                            label: Text('#$t'),
-                            labelStyle: AppText.caption.copyWith(color: Palette.white, fontWeight: FontWeight.w700),
-                            backgroundColor: Palette.ink,
-                            deleteIconColor: Palette.white,
-                            side: BorderSide.none,
-                            shape: const StadiumBorder(),
-                            onDeleted: () => setState(() => _tags.remove(t)),
-                          ),
-                        SizedBox(
-                          width: 160,
-                          child: TextField(
-                            controller: _tagInput,
-                            textInputAction: TextInputAction.done,
-                            onSubmitted: _addTag,
-                            onChanged: (v) {
-                              if (v.endsWith(',') || v.endsWith(' ')) _addTag(v);
-                            },
-                            style: AppText.body.copyWith(color: Palette.ink),
-                            decoration: InputDecoration(
-                              hintText: '+ add tag',
-                              isDense: true,
-                              fillColor: white,
-                              hintStyle: AppText.body.copyWith(color: Palette.ink.withValues(alpha: 0.45)),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                              border: const OutlineInputBorder(borderRadius: Radii.pillR, borderSide: BorderSide.none),
-                              enabledBorder:
-                                  const OutlineInputBorder(borderRadius: Radii.pillR, borderSide: BorderSide.none),
-                              focusedBorder: const OutlineInputBorder(
+                        for (final s in suggestions)
+                          Pressable(
+                            onTap: () => _addTag(s.name),
+                            semanticLabel: 'Add tag ${s.name}',
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
                                 borderRadius: Radii.pillR,
-                                borderSide: BorderSide(color: Palette.ink),
+                                border: Border.all(
+                                  color: Palette.ink.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Text(
+                                '#${s.name}',
+                                style: AppText.caption.copyWith(
+                                  color: Palette.ink,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
-                        ),
                       ],
                     ),
-                    if (suggestions.isNotEmpty) ...[
-                      const SizedBox(height: Space.xs),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
+                  ],
+                  if (skills.isNotEmpty) ...[
+                    _label('Linked skill'),
+                    SizedBox(
+                      height: 44,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
                         children: [
-                          for (final s in suggestions)
-                            Pressable(
-                              onTap: () => _addTag(s.name),
-                              semanticLabel: 'Add tag ${s.name}',
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  borderRadius: Radii.pillR,
-                                  border: Border.all(color: Palette.ink.withValues(alpha: 0.3)),
-                                ),
-                                child: Text(
-                                  '#${s.name}',
-                                  style: AppText.caption.copyWith(color: Palette.ink, fontWeight: FontWeight.w600),
-                                ),
-                              ),
+                          _SkillChip(
+                            label: 'None',
+                            selected: _skillId == null,
+                            onTap: () => setState(() => _skillId = null),
+                          ),
+                          for (final s in skills)
+                            _SkillChip(
+                              label: s.skill.name,
+                              selected: _skillId == s.skill.id,
+                              leading: SkillAvatar(skill: s.skill, size: 30),
+                              onTap: () =>
+                                  setState(() => _skillId = s.skill.id),
                             ),
                         ],
                       ),
-                    ],
-                    if (skills.isNotEmpty) ...[
-                      _label('Linked skill'),
-                      SizedBox(
-                        height: 44,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            _SkillChip(
-                              label: 'None',
-                              selected: _skillId == null,
-                              onTap: () => setState(() => _skillId = null),
-                            ),
-                            for (final s in skills)
-                              _SkillChip(
-                                label: s.skill.name,
-                                selected: _skillId == s.skill.id,
-                                leading: SkillAvatar(skill: s.skill, size: 30),
-                                onTap: () => setState(() => _skillId = s.skill.id),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                    _label('Date'),
-                    Pressable(
-                      onTap: _pickDate,
-                      semanticLabel: 'Date ${Fmt.dayLabel(_day, today)}. Change',
-                      child: Container(
-                        height: 52,
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        decoration: const BoxDecoration(color: white, borderRadius: Radii.pillR),
-                        child: Row(
-                          children: [
-                            const Icon(PhosphorIconsRegular.calendarBlank, color: Palette.ink, size: 20),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                Fmt.dayLabel(_day, today),
-                                style: AppText.body.copyWith(color: Palette.ink, fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                            const Icon(PhosphorIconsRegular.caretRight, color: Palette.ink, size: 18),
-                          ],
-                        ),
-                      ),
                     ),
                   ],
-                ),
+                  _label('Date'),
+                  Pressable(
+                    onTap: _pickDate,
+                    semanticLabel: 'Date ${Fmt.dayLabel(_day, today)}. Change',
+                    child: Container(
+                      height: 52,
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      decoration: const BoxDecoration(
+                        color: white,
+                        borderRadius: Radii.pillR,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            PhosphorIconsRegular.calendarBlank,
+                            color: Palette.ink,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              Fmt.dayLabel(_day, today),
+                              style: AppText.body.copyWith(
+                                color: Palette.ink,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          const Icon(
+                            PhosphorIconsRegular.caretRight,
+                            color: Palette.ink,
+                            size: 18,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(Space.gutter, 0, Space.gutter, Space.md),
-                child: PillButton(
-                  label: _editing ? 'Save changes' : 'Save to log',
-                  trailingArrow: true,
-                  expand: true,
-                  loading: _saving,
-                  background: Palette.ink,
-                  foreground: Palette.white,
-                  onPressed: canSave ? _save : null,
-                ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                Space.gutter,
+                0,
+                Space.gutter,
+                Space.md,
               ),
-            ],
-          ),
+              child: PillButton(
+                label: _editing ? 'Save changes' : 'Save to log',
+                trailingArrow: true,
+                expand: true,
+                loading: _saving,
+                background: Palette.ink,
+                foreground: Palette.white,
+                onPressed: canSave ? _save : null,
+              ),
+            ),
+          ],
         ),
+      ),
     );
   }
 
   Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(top: Space.lg, bottom: Space.xs),
-        child: Text(text, style: AppText.subtitle.copyWith(color: Palette.ink)),
-      );
+    padding: const EdgeInsets.only(top: Space.lg, bottom: Space.xs),
+    child: Text(text, style: AppText.subtitle.copyWith(color: Palette.ink)),
+  );
 }
 
 class _SkillChip extends StatelessWidget {
-  const _SkillChip({required this.label, required this.selected, required this.onTap, this.leading});
+  const _SkillChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.leading,
+  });
 
   final String label;
   final bool selected;

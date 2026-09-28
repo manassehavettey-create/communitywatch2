@@ -39,13 +39,17 @@ class TimerRepository {
         'A timer is already running. Stop it first.',
       );
     }
-    final skill = await (_db.select(_db.skills)
-          ..where((s) => s.id.equals(skillId)))
-        .getSingleOrNull();
+    final skill = await (_db.select(
+      _db.skills,
+    )..where((s) => s.id.equals(skillId))).getSingleOrNull();
     if (skill == null || skill.archivedAt != null) {
       throw const ValidationException('That skill is not available.');
     }
-    final row = ActiveTimerRow(id: 1, skillId: skillId, startedAt: _clock.now());
+    final row = ActiveTimerRow(
+      id: 1,
+      skillId: skillId,
+      startedAt: _clock.now(),
+    );
     await _db.into(_db.activeTimers).insert(row);
     return row;
   }
@@ -57,12 +61,15 @@ class TimerRepository {
     return _db.transaction(() async {
       final timer = await active();
       if (timer == null) return null;
-      final seconds = durationSec ??
+      final seconds =
+          durationSec ??
           elapsed(timer).inSeconds.clamp(0, SkillLimits.maxSessionSec);
       int? sessionId;
       if (seconds >= 60) {
         final clean = note?.trim();
-        sessionId = await _db.into(_db.practiceSessions).insert(
+        sessionId = await _db
+            .into(_db.practiceSessions)
+            .insert(
               PracticeSessionsCompanion.insert(
                 skillId: timer.skillId,
                 startedAt: timer.startedAt,

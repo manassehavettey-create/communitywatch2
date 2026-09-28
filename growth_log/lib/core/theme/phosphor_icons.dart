@@ -38,7 +38,10 @@ abstract final class PhosphorIconsRegular {
   static const keyboard = IconData(0xe2d8, fontFamily: 'PhosphorRegular');
   static const lightbulb = IconData(0xe2dc, fontFamily: 'PhosphorRegular');
   static const lockSimple = IconData(0xe308, fontFamily: 'PhosphorRegular');
-  static const magnifyingGlass = IconData(0xe30c, fontFamily: 'PhosphorRegular');
+  static const magnifyingGlass = IconData(
+    0xe30c,
+    fontFamily: 'PhosphorRegular',
+  );
   static const microphone = IconData(0xe326, fontFamily: 'PhosphorRegular');
   static const mountains = IconData(0xe7ae, fontFamily: 'PhosphorRegular');
   static const musicNotes = IconData(0xe340, fontFamily: 'PhosphorRegular');
@@ -48,7 +51,10 @@ abstract final class PhosphorIconsRegular {
   static const password = IconData(0xe752, fontFamily: 'PhosphorRegular');
   static const penNib = IconData(0xe3ac, fontFamily: 'PhosphorRegular');
   static const pencilSimple = IconData(0xe3b4, fontFamily: 'PhosphorRegular');
-  static const personSimpleRun = IconData(0xe730, fontFamily: 'PhosphorRegular');
+  static const personSimpleRun = IconData(
+    0xe730,
+    fontFamily: 'PhosphorRegular',
+  );
   static const pianoKeys = IconData(0xe9c8, fontFamily: 'PhosphorRegular');
   static const plant = IconData(0xebae, fontFamily: 'PhosphorRegular');
   static const scissors = IconData(0xeae0, fontFamily: 'PhosphorRegular');
@@ -90,7 +96,10 @@ abstract final class PhosphorIconsBold {
 
 abstract final class PhosphorIconsFill {
   static const chartBar = IconData(0xe150, fontFamily: 'PhosphorFill');
-  static const clockCounterClockwise = IconData(0xe1a0, fontFamily: 'PhosphorFill');
+  static const clockCounterClockwise = IconData(
+    0xe1a0,
+    fontFamily: 'PhosphorFill',
+  );
   static const fire = IconData(0xe242, fontFamily: 'PhosphorFill');
   static const heart = IconData(0xe2a8, fontFamily: 'PhosphorFill');
   static const house = IconData(0xe2c2, fontFamily: 'PhosphorFill');

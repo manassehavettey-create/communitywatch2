@@ -39,8 +39,9 @@ class BackupService {
   final Clock _clock;
 
   Future<Map<String, Object?>> exportMap() async {
-    List<Map<String, dynamic>> rows<T extends DataClass>(List<T> list) =>
-        [for (final r in list) r.toJson()];
+    List<Map<String, dynamic>> rows<T extends DataClass>(List<T> list) => [
+      for (final r in list) r.toJson(),
+    ];
 
     final settings = await _db.select(_db.settings).get();
     return {
@@ -130,20 +131,23 @@ class BackupService {
       tags: list('tags', TagRow.fromJson),
       entryTags: list('entryTags', EntryTagRow.fromJson),
       milestones: list('milestones', MilestoneRow.fromJson),
-      settings: list('settings', SettingRow.fromJson)
-          .where((s) => !SettingKeys.notPortable.contains(s.key))
-          .toList(),
+      settings: list(
+        'settings',
+        SettingRow.fromJson,
+      ).where((s) => !SettingKeys.notPortable.contains(s.key)).toList(),
     );
 
     // Referential checks up front so the error message is useful.
     final skillIds = {for (final s in parsed.skills) s.id};
     final entryIds = {for (final e in parsed.entries) e.id};
     final tagIds = {for (final t in parsed.tags) t.id};
-    final ok = parsed.sessions.every((s) => skillIds.contains(s.skillId)) &&
+    final ok =
+        parsed.sessions.every((s) => skillIds.contains(s.skillId)) &&
         parsed.milestones.every((m) => skillIds.contains(m.skillId)) &&
         parsed.activeTimer.every((t) => skillIds.contains(t.skillId)) &&
-        parsed.entries
-            .every((e) => e.skillId == null || skillIds.contains(e.skillId)) &&
+        parsed.entries.every(
+          (e) => e.skillId == null || skillIds.contains(e.skillId),
+        ) &&
         parsed.entryTags.every(
           (et) => entryIds.contains(et.entryId) && tagIds.contains(et.tagId),
         );
@@ -178,8 +182,8 @@ class _Parsed {
   final List<SettingRow> settings;
 
   BackupSummary get summary => BackupSummary(
-        skills: skills.length,
-        sessions: sessions.length,
-        entries: entries.length,
-      );
+    skills: skills.length,
+    sessions: sessions.length,
+    entries: entries.length,
+  );
 }

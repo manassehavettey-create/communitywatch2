@@ -56,7 +56,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (timer != null)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(Space.gutter, 0, Space.gutter, Space.md),
+                  padding: const EdgeInsets.fromLTRB(
+                    Space.gutter,
+                    0,
+                    Space.gutter,
+                    Space.md,
+                  ),
                   child: FadeSlideIn(child: TimerBanner(view: timer)),
                 ),
               ),
@@ -67,15 +72,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 data: (d) => Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    FadeSlideIn(child: _WeekHero(dashboard: d, skills: skills.value ?? const [])),
+                    FadeSlideIn(
+                      child: _WeekHero(
+                        dashboard: d,
+                        skills: skills.value ?? const [],
+                      ),
+                    ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(Space.gutter, Space.lg, Space.gutter, 0),
+                      padding: const EdgeInsets.fromLTRB(
+                        Space.gutter,
+                        Space.lg,
+                        Space.gutter,
+                        0,
+                      ),
                       child: DayStrip(
                         days: d.weekDays,
                         selected: selected,
                         today: today,
                         hasActivity: (day) =>
-                            (d.weekDaily[day] ?? 0) > 0 || (d.entryCountByDay[day] ?? 0) > 0,
+                            (d.weekDaily[day] ?? 0) > 0 ||
+                            (d.entryCountByDay[day] ?? 0) > 0,
                         onSelect: (day) {
                           ref.read(hapticsProvider).tap();
                           setState(() => _selectedDay = day);
@@ -98,7 +114,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 value: skills,
                 loadingHeight: 160,
                 onRetry: () => ref.invalidate(skillsOverviewProvider),
-                data: (list) => list.isEmpty ? const _NoSkills() : _SkillGrid(skills: list),
+                data: (list) =>
+                    list.isEmpty ? const _NoSkills() : _SkillGrid(skills: list),
               ),
             ),
             SectionHeader(
@@ -107,7 +124,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onAction: () => context.go(Routes.log),
             ).sliver,
             SliverToBoxAdapter(child: _TodayLog(today: today)),
-            const SliverToBoxAdapter(child: SizedBox(height: Space.dockClearance + Space.lg)),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: Space.dockClearance + Space.lg),
+            ),
           ],
         ),
       ),
@@ -130,10 +149,10 @@ class _Header extends StatelessWidget {
     final greeting = hour < 5
         ? 'Burning the midnight oil'
         : hour < 12
-            ? 'Good morning'
-            : hour < 18
-                ? 'Good afternoon'
-                : 'Good evening';
+        ? 'Good morning'
+        : hour < 18
+        ? 'Good afternoon'
+        : 'Good evening';
     return Padding(
       padding: EdgeInsets.fromLTRB(
         Space.gutter,
@@ -147,7 +166,10 @@ class _Header extends StatelessWidget {
             width: 48,
             height: 48,
             padding: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(color: Palette.lime, shape: BoxShape.circle),
+            decoration: const BoxDecoration(
+              color: Palette.lime,
+              shape: BoxShape.circle,
+            ),
             child: const AppImage(AppAssets.splashLogo),
           ),
           const SizedBox(width: Space.sm),
@@ -199,7 +221,8 @@ class _WeekHero extends StatelessWidget {
         padding: EdgeInsets.zero,
         clip: true,
         onTap: () => context.go(Routes.insights),
-        semanticLabel: 'This week: ${Fmt.duration(d.weekSec)} practised, $change versus last week',
+        semanticLabel:
+            'This week: ${Fmt.duration(d.weekSec)} practised, $change versus last week',
         child: SizedBox(
           height: 188,
           child: Stack(
@@ -217,16 +240,45 @@ class _WeekHero extends StatelessWidget {
                   children: [
                     Text(
                       'This week',
-                      style: AppText.caption.copyWith(color: Palette.ink, fontWeight: FontWeight.w700),
+                      style: AppText.caption.copyWith(
+                        color: Palette.ink,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text.rich(
-                      TextSpan(children: [
-                        TextSpan(text: '$hours', style: AppText.display.copyWith(color: Palette.ink, fontSize: 52)),
-                        TextSpan(text: 'h ', style: AppText.displayItalic.copyWith(color: Palette.ink, fontSize: 30)),
-                        TextSpan(text: '$minutes', style: AppText.display.copyWith(color: Palette.ink, fontSize: 52)),
-                        TextSpan(text: 'm', style: AppText.displayItalic.copyWith(color: Palette.ink, fontSize: 30)),
-                      ]),
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '$hours',
+                            style: AppText.display.copyWith(
+                              color: Palette.ink,
+                              fontSize: 52,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'h ',
+                            style: AppText.displayItalic.copyWith(
+                              color: Palette.ink,
+                              fontSize: 30,
+                            ),
+                          ),
+                          TextSpan(
+                            text: '$minutes',
+                            style: AppText.display.copyWith(
+                              color: Palette.ink,
+                              fontSize: 52,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'm',
+                            style: AppText.displayItalic.copyWith(
+                              color: Palette.ink,
+                              fontSize: 30,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const Spacer(),
                     Wrap(
@@ -240,7 +292,10 @@ class _WeekHero extends StatelessWidget {
                           icon: PhosphorIconsBold.trendUp,
                         ),
                         if (top != null)
-                          TagChip('Top: ${top.skill.name}', color: Palette.white.withValues(alpha: 0.7)),
+                          TagChip(
+                            'Top: ${top.skill.name}',
+                            color: Palette.white.withValues(alpha: 0.7),
+                          ),
                       ],
                     ),
                   ],
@@ -255,7 +310,11 @@ class _WeekHero extends StatelessWidget {
 }
 
 class _DaySummary extends StatelessWidget {
-  const _DaySummary({required this.day, required this.today, required this.dashboard});
+  const _DaySummary({
+    required this.day,
+    required this.today,
+    required this.dashboard,
+  });
 
   final DayKey day;
   final DayKey today;
@@ -267,13 +326,21 @@ class _DaySummary extends StatelessWidget {
     final sessions = dashboard.sessionCountByDay[day] ?? 0;
     final entries = dashboard.entryCountByDay[day] ?? 0;
     final text = sessions == 0 && entries == 0
-        ? (day == today ? 'Nothing logged yet today — small steps count.' : 'A rest day.')
+        ? (day == today
+              ? 'Nothing logged yet today — small steps count.'
+              : 'A rest day.')
         : [
-            if (sessions > 0) '${Fmt.duration(sec)} across ${Fmt.plural(sessions, 'session')}',
+            if (sessions > 0)
+              '${Fmt.duration(sec)} across ${Fmt.plural(sessions, 'session')}',
             if (entries > 0) Fmt.plural(entries, 'entry', 'entries'),
           ].join(' · ');
     return Padding(
-      padding: const EdgeInsets.fromLTRB(Space.gutter, Space.sm, Space.gutter, 0),
+      padding: const EdgeInsets.fromLTRB(
+        Space.gutter,
+        Space.sm,
+        Space.gutter,
+        0,
+      ),
       child: AnimatedSwitcher(
         duration: Motion.fast,
         child: Row(
@@ -281,7 +348,10 @@ class _DaySummary extends StatelessWidget {
           children: [
             Text(
               '${Fmt.dayLabel(day, today)}  ',
-              style: AppText.caption.copyWith(fontWeight: FontWeight.w800, color: context.gl.text),
+              style: AppText.caption.copyWith(
+                fontWeight: FontWeight.w800,
+                color: context.gl.text,
+              ),
             ),
             Expanded(
               child: Text(
@@ -308,17 +378,28 @@ class _Streaks extends StatelessWidget {
     final p = dashboard.practiceStreak;
     final l = dashboard.logStreak;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(Space.gutter, Space.lg, Space.gutter, 0),
+      padding: const EdgeInsets.fromLTRB(
+        Space.gutter,
+        Space.lg,
+        Space.gutter,
+        0,
+      ),
       child: Row(
         children: [
           Expanded(
             child: StatTile(
               label: 'Practice streak',
               value: Fmt.plural(p.current, 'day'),
-              caption: p.current > 0 && !p.activeToday ? 'Practise today to keep it' : 'Best ${p.longest}',
+              caption: p.current > 0 && !p.activeToday
+                  ? 'Practise today to keep it'
+                  : 'Best ${p.longest}',
               color: Palette.inkCard,
               foreground: Palette.white,
-              leading: const AppImage(AppAssets.streakFlame, width: 28, height: 28),
+              leading: const AppImage(
+                AppAssets.streakFlame,
+                width: 28,
+                height: 28,
+              ),
               onTap: () => context.go(Routes.insights),
             ),
           ),
@@ -327,7 +408,9 @@ class _Streaks extends StatelessWidget {
             child: StatTile(
               label: 'Journal streak',
               value: Fmt.plural(l.current, 'day'),
-              caption: l.current > 0 && !l.activeToday ? 'Log today to keep it' : 'Best ${l.longest}',
+              caption: l.current > 0 && !l.activeToday
+                  ? 'Log today to keep it'
+                  : 'Best ${l.longest}',
               color: Palette.blush,
               foreground: Palette.ink,
               leading: const AppImage(AppAssets.trophy, width: 28, height: 28),
@@ -358,10 +441,15 @@ class _NoSkills extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Add your first skill', style: AppText.subtitle.copyWith(color: Palette.ink)),
+                  Text(
+                    'Add your first skill',
+                    style: AppText.subtitle.copyWith(color: Palette.ink),
+                  ),
                   Text(
                     'Track hours toward mastery.',
-                    style: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.7)),
+                    style: AppText.caption.copyWith(
+                      color: Palette.ink.withValues(alpha: 0.7),
+                    ),
                   ),
                 ],
               ),
@@ -399,13 +487,13 @@ class _SkillGrid extends StatelessWidget {
       (i.isEven ? left : right).add(tile);
     }
     Widget col(List<Widget> items) => Column(
-          children: [
-            for (var i = 0; i < items.length; i++) ...[
-              if (i > 0) const SizedBox(height: Space.sm),
-              items[i],
-            ],
-          ],
-        );
+      children: [
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0) const SizedBox(height: Space.sm),
+          items[i],
+        ],
+      ],
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
       child: Row(
@@ -435,7 +523,10 @@ class _TodayLog extends ConsumerWidget {
         if (list.isEmpty) return _Prompt(today: today);
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
-          child: _StackedEntries(entries: list.take(3).toList(), total: list.length),
+          child: _StackedEntries(
+            entries: list.take(3).toList(),
+            total: list.length,
+          ),
         );
       },
     );
@@ -492,7 +583,8 @@ class _Prompt extends StatelessWidget {
                     expand: true,
                     background: Palette.white.withValues(alpha: 0.7),
                     foreground: Palette.ink,
-                    onPressed: () => context.push(Routes.newEntry(type: EntryType.win)),
+                    onPressed: () =>
+                        context.push(Routes.newEntry(type: EntryType.win)),
                   ),
                 ),
               ],
@@ -536,7 +628,9 @@ class _StackedEntries extends StatelessWidget {
                   ),
                 ),
               ),
-            ExcludeSemantics(child: _EntryFace(view: entries.first, total: total)),
+            ExcludeSemantics(
+              child: _EntryFace(view: entries.first, total: total),
+            ),
           ],
         ),
       ),
@@ -544,7 +638,8 @@ class _StackedEntries extends StatelessWidget {
   }
 }
 
-Color _colorFor(EntryView v) => v.type == EntryType.win ? Palette.blush : Palette.butter;
+Color _colorFor(EntryView v) =>
+    v.type == EntryType.win ? Palette.blush : Palette.butter;
 
 class _EntryFace extends StatelessWidget {
   const _EntryFace({required this.view, required this.total});
@@ -558,7 +653,10 @@ class _EntryFace extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(Space.lg),
-      decoration: BoxDecoration(color: _colorFor(view), borderRadius: Radii.cardR),
+      decoration: BoxDecoration(
+        color: _colorFor(view),
+        borderRadius: Radii.cardR,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -566,10 +664,13 @@ class _EntryFace extends StatelessWidget {
             children: [
               TagChip(
                 view.type.label,
-                icon: view.type == EntryType.win ? PhosphorIconsFill.trophy : PhosphorIconsFill.heart,
+                icon: view.type == EntryType.win
+                    ? PhosphorIconsFill.trophy
+                    : PhosphorIconsFill.heart,
               ),
               const Spacer(),
-              if (e.mood != null) Text(e.mood!, style: const TextStyle(fontSize: 22)),
+              if (e.mood != null)
+                Text(e.mood!, style: const TextStyle(fontSize: 22)),
             ],
           ),
           const SizedBox(height: Space.sm),
@@ -577,13 +678,19 @@ class _EntryFace extends StatelessWidget {
             e.body,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
-            style: AppText.subtitle.copyWith(color: Palette.ink, fontWeight: FontWeight.w600),
+            style: AppText.subtitle.copyWith(
+              color: Palette.ink,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           if (total > 1) ...[
             const SizedBox(height: Space.sm),
             Text(
               '+${total - 1} more today',
-              style: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.7), fontWeight: FontWeight.w700),
+              style: AppText.caption.copyWith(
+                color: Palette.ink.withValues(alpha: 0.7),
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ],

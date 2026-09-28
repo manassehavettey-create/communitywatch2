@@ -53,7 +53,12 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(Space.gutter, 0, Space.gutter, Space.md),
+            padding: const EdgeInsets.fromLTRB(
+              Space.gutter,
+              0,
+              Space.gutter,
+              Space.md,
+            ),
             child: SegmentedPills<bool>(
               values: const [false, true],
               selected: _archived,
@@ -90,7 +95,10 @@ class _ActiveList extends ConsumerWidget {
       data: (skills) {
         if (skills.isEmpty) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.only(top: Space.xl, bottom: Space.dockClearance),
+            padding: const EdgeInsets.only(
+              top: Space.xl,
+              bottom: Space.dockClearance,
+            ),
             child: EmptyState(
               image: AppAssets.emptySkills,
               title: 'Plant your first flag',
@@ -101,15 +109,24 @@ class _ActiveList extends ConsumerWidget {
           );
         }
         return ReorderableListView.builder(
-          padding: const EdgeInsets.fromLTRB(Space.gutter, 0, Space.gutter, Space.dockClearance),
+          padding: const EdgeInsets.fromLTRB(
+            Space.gutter,
+            0,
+            Space.gutter,
+            Space.dockClearance,
+          ),
           buildDefaultDragHandles: false,
           itemCount: skills.length,
-          proxyDecorator: (child, _, _) => Material(color: Colors.transparent, child: child),
+          proxyDecorator: (child, _, _) =>
+              Material(color: Colors.transparent, child: child),
           onReorderItem: (from, to) {
             final ids = skills.map((s) => s.skill.id).toList();
             ids.insert(to, ids.removeAt(from));
             ref.read(hapticsProvider).light();
-            guarded(context, () => ref.read(skillRepositoryProvider).reorder(ids));
+            guarded(
+              context,
+              () => ref.read(skillRepositoryProvider).reorder(ids),
+            );
           },
           itemBuilder: (context, i) {
             final s = skills[i];
@@ -127,7 +144,11 @@ class _ActiveList extends ConsumerWidget {
                             label: 'Reorder ${s.skill.name}',
                             child: const Padding(
                               padding: EdgeInsets.all(6),
-                              child: Icon(PhosphorIconsBold.dotsSixVertical, color: Palette.ink, size: 20),
+                              child: Icon(
+                                PhosphorIconsBold.dotsSixVertical,
+                                color: Palette.ink,
+                                size: 20,
+                              ),
                             ),
                           ),
                         )
@@ -153,7 +174,10 @@ class _ArchivedList extends ConsumerWidget {
       data: (skills) {
         if (skills.isEmpty) {
           return const SingleChildScrollView(
-            padding: EdgeInsets.only(top: Space.xl, bottom: Space.dockClearance),
+            padding: EdgeInsets.only(
+              top: Space.xl,
+              bottom: Space.dockClearance,
+            ),
             child: EmptyState(
               image: AppAssets.emptySearch,
               title: 'Nothing archived',
@@ -163,10 +187,16 @@ class _ArchivedList extends ConsumerWidget {
           );
         }
         return ListView.separated(
-          padding: const EdgeInsets.fromLTRB(Space.gutter, 0, Space.gutter, Space.dockClearance),
+          padding: const EdgeInsets.fromLTRB(
+            Space.gutter,
+            0,
+            Space.gutter,
+            Space.dockClearance,
+          ),
           itemCount: skills.length,
           separatorBuilder: (_, _) => const SizedBox(height: Space.sm),
-          itemBuilder: (_, i) => SkillListCard(stats: skills[i], archived: true),
+          itemBuilder: (_, i) =>
+              SkillListCard(stats: skills[i], archived: true),
         );
       },
     );

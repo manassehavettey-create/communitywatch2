@@ -13,7 +13,8 @@ import '../../skills/data/skill_repository.dart';
 /// Fills the database with realistic sample data. Only reachable from the
 /// Developer section of Settings, which exists in debug builds only.
 class DemoSeeder {
-  DemoSeeder(this._db, this._clock) : assert(kDebugMode, 'Demo data is debug-only');
+  DemoSeeder(this._db, this._clock)
+    : assert(kDebugMode, 'Demo data is debug-only');
 
   final AppDatabase _db;
   final Clock _clock;
@@ -31,12 +32,24 @@ class DemoSeeder {
       ('Drawing', 'paint', Palette.apricot, 10000.0, 0.35, 70),
       ('Running', 'run', Palette.sky, 1000.0, 0.45, 40),
     ];
-    final notes = ['Scales and chords', 'Worked on a hard section', 'Felt easy today', null, null, 'Short but focused'];
+    final notes = [
+      'Scales and chords',
+      'Worked on a hard section',
+      'Felt easy today',
+      null,
+      null,
+      'Short but focused',
+    ];
 
     final ids = <int>[];
     for (final (name, icon, color, target, chance, avgMin) in specs) {
       final id = await skills.createSkill(
-        SkillDraft(name: name, iconKey: icon, colorValue: color.toARGB32(), targetHours: target),
+        SkillDraft(
+          name: name,
+          iconKey: icon,
+          colorValue: color.toARGB32(),
+          targetHours: target,
+        ),
       );
       ids.add(id);
       for (var d = days; d >= 0; d--) {
@@ -69,7 +82,15 @@ class DemoSeeder {
       'Ran 5k without walking',
       'Shipped the project at work',
     ];
-    const tags = ['family', 'friends', 'nature', 'work', 'music', 'health', 'small-joys'];
+    const tags = [
+      'family',
+      'friends',
+      'nature',
+      'work',
+      'music',
+      'health',
+      'small-joys',
+    ];
     const moods = ['😊', '🥰', '😌', '🤩', '💪', null];
 
     for (var d = 60; d >= 0; d--) {

@@ -35,20 +35,28 @@ class RecapScreen extends ConsumerStatefulWidget {
 }
 
 class _RecapScreenState extends ConsumerState<RecapScreen> {
-  late DayKey _month = Days.monthStart(widget.initialMonth ?? ref.read(todayProvider));
+  late DayKey _month = Days.monthStart(
+    widget.initialMonth ?? ref.read(todayProvider),
+  );
   final _cardKey = GlobalKey();
   bool _sharing = false;
 
   Future<void> _share(RecapData d) async {
     setState(() => _sharing = true);
     await guarded(context, () async {
-      final boundary = _cardKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+      final boundary =
+          _cardKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       final image = await boundary.toImage(pixelRatio: 3);
       final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
       image.dispose();
       if (bytes == null) throw Exception('Could not render the card.');
       final dir = await getTemporaryDirectory();
-      final file = File(p.join(dir.path, 'growth-log-${Fmt.monthYear(d.month).replaceAll(' ', '-').toLowerCase()}.png'));
+      final file = File(
+        p.join(
+          dir.path,
+          'growth-log-${Fmt.monthYear(d.month).replaceAll(' ', '-').toLowerCase()}.png',
+        ),
+      );
       await file.writeAsBytes(bytes.buffer.asUint8List());
       await SharePlus.instance.share(
         ShareParams(
@@ -73,7 +81,12 @@ class _RecapScreenState extends ConsumerState<RecapScreen> {
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(Space.gutter, top + Space.sm, Space.gutter, 0),
+              padding: EdgeInsets.fromLTRB(
+                Space.gutter,
+                top + Space.sm,
+                Space.gutter,
+                0,
+              ),
               child: Row(
                 children: [
                   CircleIconButton(
@@ -81,7 +94,9 @@ class _RecapScreenState extends ConsumerState<RecapScreen> {
                     tooltip: 'Back',
                     background: Palette.white,
                     foreground: Palette.ink,
-                    onPressed: () => context.canPop() ? context.pop() : context.go(Routes.insights),
+                    onPressed: () => context.canPop()
+                        ? context.pop()
+                        : context.go(Routes.insights),
                   ),
                   const Spacer(),
                   CircleIconButton(
@@ -91,7 +106,9 @@ class _RecapScreenState extends ConsumerState<RecapScreen> {
                     background: Palette.white.withValues(alpha: 0.15),
                     foreground: Palette.white,
                     onPressed: (data.value?.hasOlder ?? false)
-                        ? () => setState(() => _month = Days.addMonths(_month, -1))
+                        ? () => setState(
+                            () => _month = Days.addMonths(_month, -1),
+                          )
                         : null,
                   ),
                   Padding(
@@ -107,7 +124,11 @@ class _RecapScreenState extends ConsumerState<RecapScreen> {
                     size: 40,
                     background: Palette.white.withValues(alpha: 0.15),
                     foreground: Palette.white,
-                    onPressed: isCurrent ? null : () => setState(() => _month = Days.addMonths(_month, 1)),
+                    onPressed: isCurrent
+                        ? null
+                        : () => setState(
+                            () => _month = Days.addMonths(_month, 1),
+                          ),
                   ),
                 ],
               ),
@@ -124,7 +145,12 @@ class _RecapScreenState extends ConsumerState<RecapScreen> {
                     child: AppImage(AppAssets.recapMountain, width: 230),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(Space.gutter, Space.lg, Space.gutter, 0),
+                    padding: const EdgeInsets.fromLTRB(
+                      Space.gutter,
+                      Space.lg,
+                      Space.gutter,
+                      0,
+                    ),
                     child: Semantics(
                       header: true,
                       label: "Look how far you've come",
@@ -149,12 +175,17 @@ class _RecapScreenState extends ConsumerState<RecapScreen> {
             child: data.when(
               loading: () => const Padding(
                 padding: EdgeInsets.all(Space.xl),
-                child: Center(child: CircularProgressIndicator(color: Palette.white)),
+                child: Center(
+                  child: CircularProgressIndicator(color: Palette.white),
+                ),
               ),
               error: (e, _) => Padding(
                 padding: const EdgeInsets.all(Space.gutter),
                 child: GLCard(
-                  child: ErrorState(error: e, onRetry: () => ref.invalidate(recapProvider(_month))),
+                  child: ErrorState(
+                    error: e,
+                    onRetry: () => ref.invalidate(recapProvider(_month)),
+                  ),
                 ),
               ),
               data: (d) => d.isEmpty
@@ -180,7 +211,11 @@ class _RecapScreenState extends ConsumerState<RecapScreen> {
                     ),
             ),
           ),
-          SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom + Space.xxl)),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: MediaQuery.paddingOf(context).bottom + Space.xxl,
+            ),
+          ),
         ],
       ),
     );
@@ -204,12 +239,17 @@ class _RecapBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final d = data;
     Widget heading(String t) => Padding(
-          padding: const EdgeInsets.fromLTRB(Space.gutter, Space.xl, Space.gutter, Space.sm),
-          child: Semantics(
-            header: true,
-            child: Text(t, style: AppText.title.copyWith(color: Palette.white)),
-          ),
-        );
+      padding: const EdgeInsets.fromLTRB(
+        Space.gutter,
+        Space.xl,
+        Space.gutter,
+        Space.sm,
+      ),
+      child: Semantics(
+        header: true,
+        child: Text(t, style: AppText.title.copyWith(color: Palette.white)),
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -234,7 +274,8 @@ class _RecapBody extends StatelessWidget {
                     child: StatTile(
                       label: 'Entries',
                       value: '${d.entryCount}',
-                      caption: '${d.gratitudeCount} gratitude · ${d.winCount} wins',
+                      caption:
+                          '${d.gratitudeCount} gratitude · ${d.winCount} wins',
                       color: Palette.butter,
                       foreground: Palette.ink,
                     ),
@@ -258,7 +299,9 @@ class _RecapBody extends StatelessWidget {
                     child: StatTile(
                       label: 'Top skill',
                       value: d.topSkill?.name ?? '—',
-                      caption: d.topSkill == null ? 'no practice' : Fmt.duration(d.topSkillSeconds),
+                      caption: d.topSkill == null
+                          ? 'no practice'
+                          : Fmt.duration(d.topSkillSeconds),
                       color: Palette.lavender,
                       foreground: Palette.ink,
                     ),
@@ -277,7 +320,11 @@ class _RecapBody extends StatelessWidget {
               runSpacing: 8,
               children: [
                 for (final t in d.topTags)
-                  TagChip('#${t.name} · ${t.count}', color: Palette.white, foreground: Palette.ink),
+                  TagChip(
+                    '#${t.name} · ${t.count}',
+                    color: Palette.white,
+                    foreground: Palette.ink,
+                  ),
               ],
             ),
           ),
@@ -296,7 +343,9 @@ class _RecapBody extends StatelessWidget {
                     child: Row(
                       children: [
                         AppImage(
-                          (Levels.levelAtExactly(m.hours) ?? Levels.forSeconds(m.hours * 3600)).badgeAsset,
+                          (Levels.levelAtExactly(m.hours) ??
+                                  Levels.forSeconds(m.hours * 3600))
+                              .badgeAsset,
                           width: 48,
                           height: 48,
                         ),
@@ -307,12 +356,17 @@ class _RecapBody extends StatelessWidget {
                             children: [
                               Text(
                                 '${Fmt.number(m.hours)} hours of ${m.skill.name}',
-                                style: AppText.subtitle.copyWith(color: Palette.ink),
+                                style: AppText.subtitle.copyWith(
+                                  color: Palette.ink,
+                                ),
                               ),
-                              if (Levels.levelAtExactly(m.hours) case final level?)
+                              if (Levels.levelAtExactly(m.hours)
+                                  case final level?)
                                 Text(
                                   'Reached ${level.name}',
-                                  style: AppText.caption.copyWith(color: Palette.ink.withValues(alpha: 0.7)),
+                                  style: AppText.caption.copyWith(
+                                    color: Palette.ink.withValues(alpha: 0.7),
+                                  ),
                                 ),
                             ],
                           ),
@@ -338,7 +392,9 @@ class _RecapBody extends StatelessWidget {
               itemBuilder: (_, i) {
                 final w = d.wins[i];
                 return Padding(
-                  padding: EdgeInsets.only(left: i == 0 ? Space.gutter : Space.xs),
+                  padding: EdgeInsets.only(
+                    left: i == 0 ? Space.gutter : Space.xs,
+                  ),
                   child: GLCard(
                     color: i.isEven ? Palette.blush : Palette.lime,
                     child: Column(
@@ -346,9 +402,16 @@ class _RecapBody extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            TagChip(Fmt.shortDate(w.entry.dayKey), icon: PhosphorIconsFill.trophy),
+                            TagChip(
+                              Fmt.shortDate(w.entry.dayKey),
+                              icon: PhosphorIconsFill.trophy,
+                            ),
                             const Spacer(),
-                            if (w.entry.mood != null) Text(w.entry.mood!, style: const TextStyle(fontSize: 22)),
+                            if (w.entry.mood != null)
+                              Text(
+                                w.entry.mood!,
+                                style: const TextStyle(fontSize: 22),
+                              ),
                           ],
                         ),
                         const SizedBox(height: Space.sm),
@@ -357,7 +420,9 @@ class _RecapBody extends StatelessWidget {
                             w.entry.body,
                             maxLines: 4,
                             overflow: TextOverflow.ellipsis,
-                            style: AppText.subtitle.copyWith(color: Palette.ink),
+                            style: AppText.subtitle.copyWith(
+                              color: Palette.ink,
+                            ),
                           ),
                         ),
                       ],
@@ -376,7 +441,12 @@ class _RecapBody extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(Space.gutter, Space.lg, Space.gutter, 0),
+          padding: const EdgeInsets.fromLTRB(
+            Space.gutter,
+            Space.lg,
+            Space.gutter,
+            0,
+          ),
           child: PillButton(
             label: 'Share card',
             icon: PhosphorIconsBold.shareNetwork,
@@ -402,22 +472,39 @@ class ShareCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final d = data;
     Widget stat(String value, String label, Color color) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(color: color, borderRadius: Radii.pillR),
-          child: Text.rich(
-            TextSpan(children: [
-              TextSpan(text: value, style: AppText.subtitle.copyWith(color: Palette.ink, fontWeight: FontWeight.w800)),
-              TextSpan(text: ' $label', style: AppText.caption.copyWith(color: Palette.ink, fontWeight: FontWeight.w600)),
-            ]),
-          ),
-        );
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(color: color, borderRadius: Radii.pillR),
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: value,
+              style: AppText.subtitle.copyWith(
+                color: Palette.ink,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            TextSpan(
+              text: ' $label',
+              style: AppText.caption.copyWith(
+                color: Palette.ink,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
     return MediaQuery.withNoTextScaling(
       child: Container(
         width: 320,
         height: 400,
         clipBehavior: Clip.antiAlias,
-        decoration: const BoxDecoration(color: Palette.ink, borderRadius: Radii.heroR),
+        decoration: const BoxDecoration(
+          color: Palette.ink,
+          borderRadius: Radii.heroR,
+        ),
         child: Stack(
           children: [
             const Positioned(
@@ -436,7 +523,10 @@ class ShareCard extends StatelessWidget {
                         width: 26,
                         height: 26,
                         padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(color: Palette.lime, shape: BoxShape.circle),
+                        decoration: const BoxDecoration(
+                          color: Palette.lime,
+                          shape: BoxShape.circle,
+                        ),
                         child: const AppImage(AppAssets.splashLogo),
                       ),
                       const SizedBox(width: 8),
@@ -454,11 +544,19 @@ class ShareCard extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     'Look how\nfar I\'ve',
-                    style: AppText.display.copyWith(color: Palette.white, fontSize: 38, height: 0.95),
+                    style: AppText.display.copyWith(
+                      color: Palette.white,
+                      fontSize: 38,
+                      height: 0.95,
+                    ),
                   ),
                   Text(
                     'come.',
-                    style: AppText.displayItalic.copyWith(color: Palette.lime, fontSize: 38, height: 1),
+                    style: AppText.displayItalic.copyWith(
+                      color: Palette.lime,
+                      fontSize: 38,
+                      height: 1,
+                    ),
                   ),
                   const Spacer(),
                   Wrap(
@@ -466,7 +564,11 @@ class ShareCard extends StatelessWidget {
                     runSpacing: 6,
                     children: [
                       stat(Fmt.hours(d.seconds), 'hours', Palette.lime),
-                      stat('${d.winCount}', d.winCount == 1 ? 'win' : 'wins', Palette.blush),
+                      stat(
+                        '${d.winCount}',
+                        d.winCount == 1 ? 'win' : 'wins',
+                        Palette.blush,
+                      ),
                       stat('${d.gratitudeCount}', 'thank-yous', Palette.butter),
                       stat('${d.activeDays}', 'active days', Palette.lavender),
                     ],
@@ -477,7 +579,9 @@ class ShareCard extends StatelessWidget {
                       'Most practised: ${d.topSkill!.name}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: AppText.caption.copyWith(color: Palette.white.withValues(alpha: 0.8)),
+                      style: AppText.caption.copyWith(
+                        color: Palette.white.withValues(alpha: 0.8),
+                      ),
                     ),
                   ],
                 ],

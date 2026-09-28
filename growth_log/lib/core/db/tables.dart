@@ -57,9 +57,11 @@ class Entries extends Table {
   TextColumn get type => text()();
   TextColumn get body => text()();
   TextColumn get mood => text().nullable()();
-  IntColumn get skillId => integer()
-      .nullable()
-      .references(Skills, #id, onDelete: KeyAction.setNull)();
+  IntColumn get skillId => integer().nullable().references(
+    Skills,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
   IntColumn get dayKey => integer()();
   DateTimeColumn get createdAt => dateTime()();
 
@@ -99,8 +101,8 @@ class Milestones extends Table {
 
   @override
   List<Set<Column<Object>>> get uniqueKeys => [
-        {skillId, hours},
-      ];
+    {skillId, hours},
+  ];
 }
 
 @DataClassName('SettingRow')

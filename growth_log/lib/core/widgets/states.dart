@@ -32,7 +32,11 @@ class EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AppImage(image, width: compact ? 160 : 240, height: compact ? 120 : 180),
+          AppImage(
+            image,
+            width: compact ? 160 : 240,
+            height: compact ? 120 : 180,
+          ),
           const SizedBox(height: Space.md),
           Text(
             title,

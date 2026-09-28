@@ -15,7 +15,10 @@ import '../application/log_providers.dart';
 enum FilterSection { tags, skill, dates }
 
 Future<void> showFilterSheet(BuildContext context, FilterSection section) {
-  return showAppSheet<void>(context, builder: (_) => _FilterSheet(section: section));
+  return showAppSheet<void>(
+    context,
+    builder: (_) => _FilterSheet(section: section),
+  );
 }
 
 class _FilterSheet extends ConsumerWidget {
@@ -28,7 +31,13 @@ class _FilterSheet extends ConsumerWidget {
     final filter = ref.watch(logFilterProvider);
     final ctrl = ref.read(logFilterProvider.notifier);
 
-    Widget choice(String label, bool selected, VoidCallback onTap, {Widget? leading, Color? color}) {
+    Widget choice(
+      String label,
+      bool selected,
+      VoidCallback onTap, {
+      Widget? leading,
+      Color? color,
+    }) {
       final gl = context.gl;
       return Semantics(
         button: true,
@@ -41,7 +50,9 @@ class _FilterSheet extends ConsumerWidget {
             decoration: BoxDecoration(
               color: selected ? (color ?? gl.inverse) : gl.surface,
               borderRadius: Radii.pillR,
-              border: Border.all(color: selected ? (color ?? gl.inverse) : gl.hairline),
+              border: Border.all(
+                color: selected ? (color ?? gl.inverse) : gl.hairline,
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -51,7 +62,9 @@ class _FilterSheet extends ConsumerWidget {
                   label,
                   style: AppText.body.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: selected ? (color != null ? Palette.ink : gl.onInverse) : gl.text,
+                    color: selected
+                        ? (color != null ? Palette.ink : gl.onInverse)
+                        : gl.text,
                   ),
                 ),
               ],
@@ -69,17 +82,26 @@ class _FilterSheet extends ConsumerWidget {
           primaryLabel: 'Done',
           onPrimary: () => Navigator.pop(context),
           child: tags.isEmpty
-              ? Text('No tags yet. Add tags when you write an entry.', style: context.text.bodySmall)
+              ? Text(
+                  'No tags yet. Add tags when you write an entry.',
+                  style: context.text.bodySmall,
+                )
               : Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
                     for (final t in tags)
-                      choice('#${t.name} · ${t.count}', filter.tags.contains(t.name), () {
-                        final next = {...filter.tags};
-                        next.contains(t.name) ? next.remove(t.name) : next.add(t.name);
-                        ctrl.set(filter.copyWith(tags: next));
-                      }),
+                      choice(
+                        '#${t.name} · ${t.count}',
+                        filter.tags.contains(t.name),
+                        () {
+                          final next = {...filter.tags};
+                          next.contains(t.name)
+                              ? next.remove(t.name)
+                              : next.add(t.name);
+                          ctrl.set(filter.copyWith(tags: next));
+                        },
+                      ),
                   ],
                 ),
         );
@@ -95,7 +117,11 @@ class _FilterSheet extends ConsumerWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              choice('Any skill', filter.skillId == null, () => ctrl.set(filter.copyWith(skillId: () => null))),
+              choice(
+                'Any skill',
+                filter.skillId == null,
+                () => ctrl.set(filter.copyWith(skillId: () => null)),
+              ),
               for (final s in all)
                 choice(
                   s.skill.name,
@@ -130,7 +156,11 @@ class _FilterSheet extends ConsumerWidget {
                 runSpacing: 8,
                 children: [
                   for (final p in presets)
-                    choice(p.$1, filter.from == p.$2 && filter.to == p.$3, () => setRange(p.$2, p.$3)),
+                    choice(
+                      p.$1,
+                      filter.from == p.$2 && filter.to == p.$3,
+                      () => setRange(p.$2, p.$3),
+                    ),
                 ],
               ),
               const SizedBox(height: Space.md),
@@ -141,10 +171,15 @@ class _FilterSheet extends ConsumerWidget {
                     firstDate: DateTime(2000),
                     lastDate: Days.dateOf(today),
                     initialDateRange: filter.from != null && filter.to != null
-                        ? DateTimeRange(start: Days.dateOf(filter.from!), end: Days.dateOf(filter.to!))
+                        ? DateTimeRange(
+                            start: Days.dateOf(filter.from!),
+                            end: Days.dateOf(filter.to!),
+                          )
                         : null,
                   );
-                  if (range != null) setRange(Days.keyOf(range.start), Days.keyOf(range.end));
+                  if (range != null) {
+                    setRange(Days.keyOf(range.start), Days.keyOf(range.end));
+                  }
                 },
                 child: Text(
                   filter.from != null && filter.to != null
