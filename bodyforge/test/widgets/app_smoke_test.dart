@@ -1,12 +1,9 @@
-import 'package:bodyforge/app/app.dart';
 import 'package:bodyforge/app/auth.dart';
-import 'package:bodyforge/app/notifications.dart';
 import 'package:bodyforge/app/providers.dart';
 import 'package:bodyforge/app/router.dart';
 import 'package:bodyforge/app/settings.dart';
 import 'package:bodyforge/data/local/database.dart';
 import 'package:bodyforge/data/repositories/data_context.dart';
-import 'package:bodyforge/data/services/demo_data.dart';
 import 'package:bodyforge/data/services/training_service.dart';
 import 'package:bodyforge/domain/catalog/challenges.dart';
 import 'package:bodyforge/domain/catalog/exercises.dart';
@@ -20,97 +17,28 @@ import 'package:bodyforge/domain/models/local_date.dart';
 import 'package:bodyforge/features/player/completion_screen.dart';
 import 'package:bodyforge/features/player/player_controller.dart';
 import 'package:bodyforge/features/player/player_screen.dart';
-import 'package:drift/drift.dart' show driftRuntimeOptions;
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../domain/helpers.dart';
-
-/// Records scheduling calls instead of talking to the platform plugin.
-class FakeNotifications extends NotificationService {
-  final calls = <String>[];
-  @override
-  Future<void> init() async {}
-  @override
-  Future<bool> requestPermission() async => true;
-  @override
-  Future<void> scheduleTrainingReminders({required List<int> weekdays, required int minutes}) async =>
-      calls.add('train:${weekdays.join(',')}@$minutes');
-  @override
-  Future<void> cancelTrainingReminders() async => calls.add('cancelTrain');
-  @override
-  Future<void> scheduleWeeklyCheck() async => calls.add('weekly');
-  @override
-  Future<void> cancelWeeklyCheck() async => calls.add('cancelWeekly');
-  @override
-  Future<void> scheduleRestEnd(DateTime at, String next) async {}
-  @override
-  Future<void> cancelRestEnd() async {}
-}
-
-const _uid = 'smoke-user';
-
-Future<void> loadAppFonts() async {
-  for (final family in ['Sora', 'Manrope']) {
-    final loader = FontLoader(family);
-    for (final w in [400, 500, 600, 700, 800]) {
-      loader.addFont(rootBundle.load('assets/fonts/$family-$w.ttf'));
-    }
-    await loader.load();
-  }
-}
+import 'harness.dart';
 
 void main() {
-  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   setUpAll(loadAppFonts);
 
+  late Harness h;
   late AppDatabase db;
   late FixedClock clock;
   late ProviderContainer container;
 
   Future<void> boot(WidgetTester tester, {bool seed = true, bool demo = false}) async {
-    tester.view.physicalSize = const Size(1080, 2340);
-    tester.view.devicePixelRatio = 3;
-    addTearDown(tester.view.reset);
-
-    SharedPreferences.setMockInitialValues(seed ? {'bf.auth.localUserId': _uid} : {});
-    final prefs = await SharedPreferences.getInstance();
-    db = AppDatabase(NativeDatabase.memory());
-    clock = FixedClock(DateTime.now());
-    if (seed) {
-      await tester.runAsync(() async {
-        final svc = TrainingService(DataContext(db: db, userId: _uid, clock: clock));
-        await svc.completeOnboarding(profile().copyWith(name: 'Kofi Boateng'));
-        if (demo) await loadDemoData(svc, weeks: 5);
-      });
-    }
-    container = ProviderContainer(
-      retry: (_, _) => null,
-      overrides: [
-        sharedPrefsProvider.overrideWithValue(prefs),
-        databaseProvider.overrideWithValue(db),
-        notificationsProvider.overrideWithValue(FakeNotifications()),
-        clockProvider.overrideWithValue(clock),
-      ],
-    );
-    await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const BodyforgeApp()));
-    await settle(tester, 2500); // splash
+    h = await Harness.boot(tester, seed: seed, demo: demo);
+    db = h.db;
+    clock = h.clock;
+    container = h.container;
   }
 
-  Future<void> shutdown(WidgetTester tester) async {
-    await tester.pumpWidget(const SizedBox());
-    container.dispose();
-    // The database was opened in the test's fake-async zone, so close it there.
-    final closing = db.close();
-    for (var i = 0; i < 10; i++) {
-      await tester.pump(const Duration(milliseconds: 100));
-    }
-    await closing;
-  }
+  Future<void> shutdown(WidgetTester tester) => h.shutdown();
 
   String location() => container.read(routerProvider).routerDelegate.currentConfiguration.uri.toString();
 
@@ -241,16 +169,6 @@ void main() {
     expect(await container.read(trainingRepoProvider).getActiveSession(), isNull);
     await shutdown(tester);
   });
-}
-
-/// Pump frames for [ms] without waiting for infinite animations to stop.
-Future<void> settle(WidgetTester tester, [int ms = 900]) async {
-  for (var t = 0; t < ms; t += 100) {
-    await tester.pump(const Duration(milliseconds: 100));
-  }
-  // Let drift stream queries deliver.
-  await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 30)));
-  await tester.pump(const Duration(milliseconds: 100));
 }
 
 Future<void> visitAll(WidgetTester tester, ProviderContainer container) async {

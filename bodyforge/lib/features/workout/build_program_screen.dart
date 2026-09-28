@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../core/theme/bf_colors.dart';
@@ -63,7 +62,7 @@ class _BuildProgramScreenState extends ConsumerState<BuildProgramScreen> {
     if (!mounted) return;
     Haptics.heavy();
     toast(context, 'New program active from today');
-    context.pop();
+    context.popOr('/workout');
   }
 
   Future<void> _restoreDefault() async {
@@ -72,7 +71,7 @@ class _BuildProgramScreenState extends ConsumerState<BuildProgramScreen> {
     await ref.read(trainingServiceProvider).regenerateProgram(p);
     if (mounted) {
       toast(context, 'Back to your personalised plan');
-      context.pop();
+      context.popOr('/workout');
     }
   }
 

@@ -80,7 +80,7 @@ class BfTopBar extends StatelessWidget {
           CircleIconButton(
             icon: BfIcons.back,
             tooltip: 'Back',
-            onTap: onBack ?? () => context.canPop() ? context.pop() : context.go('/home'),
+            onTap: onBack ?? () => context.popOr('/home'),
           )
         else
           const SizedBox(width: Sizes.iconButton),
@@ -95,4 +95,10 @@ class BfTopBar extends StatelessWidget {
       ]),
     );
   }
+}
+
+extension SafePop on BuildContext {
+  /// Pop this screen, or go to [fallback] when it was opened without a back
+  /// stack (deep link, restored state).
+  void popOr(String fallback) => canPop() ? pop() : go(fallback);
 }

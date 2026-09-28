@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../app/settings.dart';
@@ -69,7 +68,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (original.weightKg != p.weightKg) {
       await ref.read(lifestyleRepoProvider).addMeasurement(MeasurementType.weight, p.weightKg);
     }
-    if (mounted) context.pop();
+    if (mounted) context.popOr('/profile');
   }
 
   @override

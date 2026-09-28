@@ -293,6 +293,32 @@ movement demo) plus step-by-step form cues, so you don't need to generate exerci
 
 ---
 
+## Status (what ships in the app)
+
+All images were processed the same way:
+- background removed with `rembg` (isnet-general-use)
+- trimmed and resized
+- saved as WebP q86
+
+The whole set is about 2.3 MB. `lib/core/assets.dart` is the single registry.
+
+| Group | Status | Alternative used where missing |
+|---|---|---|
+| A cast | Ama ✓ (Kofi appears through the workout-type set) | — |
+| B brand | Logo mark ✓; launcher icons generated from `branding/` | — |
+| C onboarding | Goals ✓, plan ✓ | Welcome uses Kofi's push-up (`type_upper`); the other steps have no hero |
+| D workout types | 7/7 ✓ | — |
+| E environments | 6/6 ✓ | — (large-space image is the weakest; replace if you make a better one) |
+| F medallions | 3/3 ✓ | — |
+| G empty states | 4/5 ✓ | "No achievements" uses the locked lavender medallion |
+| H journey | 0/4 | Phases use athlete shots: Habit → lower body, Body → full body, Forge → core; report header uses the ember medallion |
+| I challenges | 4/4 ✓ | — |
+| J foods | 24/32 ✓ | Banana reuses the plantain photo (it shows bananas). Mackerel, milk, wagashi, orange, pawpaw, pineapple and groundnuts get a typographic tile drawn in code, coloured by food group. Meal ideas show each ingredient's photo or tile. |
+
+To add a missing image later:
+1. Drop it into the listed folder with the listed filename.
+2. Add the id to `Img._foods` for foods, or point the `Img` constant at the new file.
+
 ## Checklist
 
 - [ ] A1–A2 cast
