@@ -45,6 +45,11 @@ class InMemoryRemoteStore implements RemoteStore {
       final id = r['id']! as String;
       final next = {...r, 'synced_at': _stamp().toIso8601String()};
       final existing = t[id];
+      // Mirrors the `bf_last_write_wins` trigger: stale updates are ignored.
+      if (existing != null &&
+          DateTime.parse(r['updated_at']! as String).isBefore(DateTime.parse(existing['updated_at']! as String))) {
+        continue;
+      }
       // Mirrors the `keep_earliest_unlock` trigger in the Supabase migration.
       if (table == 'user_achievements' && existing != null) {
         final a = DateTime.parse(existing['unlocked_at']! as String);
