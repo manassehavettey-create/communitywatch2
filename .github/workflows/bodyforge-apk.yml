@@ -1,7 +1,8 @@
 name: BODYFORGE APK
 
 # Builds an installable Android APK of the BODYFORGE app (bodyforge/) on
-# GitHub's servers. Download it from the run's "Artifacts" section.
+# GitHub's servers and attaches it to a pre-release (Releases page) so it can
+# be downloaded and side-loaded straight from a phone.
 #
 # Cloud sync: add two repository secrets (Settings → Secrets and variables →
 # Actions): BODYFORGE_SUPABASE_URL and BODYFORGE_SUPABASE_KEY (the public
@@ -15,7 +16,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: bodyforge-apk-${{ github.ref }}
@@ -63,19 +64,34 @@ jobs:
       - name: Tests
         run: flutter test --exclude-tags monkey
 
-      - name: Build APK
+      - name: Build universal APK
         run: flutter build apk --release $DEFINES
 
-      - name: Name the APK
+      - name: Build per-ABI APKs
+        run: flutter build apk --release --split-per-abi $DEFINES
+
+      - name: Collect APKs
         run: |
-          short=$(git rev-parse --short HEAD)
-          cp build/app/outputs/flutter-apk/app-release.apk "build/bodyforge-${APK_KIND}-${short}.apk"
-          echo "APK_PATH=bodyforge/build/bodyforge-${APK_KIND}-${short}.apk" >> "$GITHUB_ENV"
-          ls -la build/*.apk
+          mkdir -p ../dist
+          cp build/app/outputs/flutter-apk/app-release.apk ../dist/bodyforge.apk
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk ../dist/bodyforge-arm64.apk
+          ls -la ../dist
 
       - uses: actions/upload-artifact@v4
         with:
           name: bodyforge-apk-${{ env.APK_KIND }}
-          path: ${{ env.APK_PATH }}
+          path: dist/*.apk
           retention-days: 30
-          compression-level: 0
+
+      - name: Publish pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="bodyforge-apk-${GITHUB_SHA::7}"
+          if [ "$APK_KIND" = cloud ]; then sync="Cloud sync is ON (accounts + backup)."; else sync="Offline-only build: every feature works on the phone; accounts and cloud sync are off."; fi
+          gh release create "$tag" ../dist/bodyforge.apk ../dist/bodyforge-arm64.apk \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "BODYFORGE test build (${GITHUB_SHA::7}, $APK_KIND)" \
+            --notes "Side-load test build of BODYFORGE. $sync Signed with a debug key, so it's not for Play Store upload. bodyforge.apk works on any Android phone; bodyforge-arm64.apk is smaller and fits most phones from the last ~8 years."
