@@ -53,7 +53,7 @@ Without Supabase settings the app runs **fully on the device**. Tap *Get started
    psql "<your connection string>" -f supabase/seed.sql
    ```
 
-   The migration only *creates* objects and never drops or truncates anything. The seed is an idempotent upsert of reference data (114 exercises, 6 skill paths / 54 nodes, 32 foods, 4 challenges, 23 achievements), so it is safe to re-run.
+   **Use a new, empty Supabase project for BODYFORGE.** The migration starts with a safety check. If the project already has a table named like one of BODYFORGE's (for example `profiles` from another app), it stops before changing anything and names the clash. It only *creates* objects and never drops or truncates anything. The seed is an idempotent upsert of reference data (114 exercises, 6 skill paths / 54 nodes, 32 foods, 4 challenges, 23 achievements), so it is safe to re-run.
 
 3. Configure Auth in the dashboard:
    - **Authentication → Providers → Email**: enabled. If *Confirm email* is on, the app tells new users to check their inbox before logging in.

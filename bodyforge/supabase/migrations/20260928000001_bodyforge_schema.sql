@@ -7,6 +7,33 @@
 -- possible) and never drops or truncates anything.
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- Safety guard: refuse to run on a project that already has same-named
+-- objects BODYFORGE didn't create (e.g. another app's `profiles` table).
+-- Nothing is changed if this check fails. Re-running on a BODYFORGE database
+-- is fine: every object below is labelled with a 'BODYFORGE' comment.
+-- ─────────────────────────────────────────────────────────────────────────────
+do $guard$
+declare
+  t text;
+  clashes text[] := '{}';
+begin
+  foreach t in array array['exercises', 'skill_paths', 'skill_nodes', 'nutrition_items', 'challenges', 'achievements', 'profiles', 'goals', 'programs', 'program_days', 'workouts', 'workout_sets', 'personal_records', 'measurements', 'skill_progress', 'recovery_checks', 'challenge_progress', 'challenge_checkins', 'user_achievements', 'journey_progress', 'milestones', 'food_prices', 'sync_metadata'] loop
+    if to_regclass('public.' || t) is not null
+       and coalesce(obj_description(to_regclass('public.' || t), 'pg_class'), '') not like 'BODYFORGE%' then
+      clashes := clashes || ('table public.' || t);
+    end if;
+  end loop;
+  if to_regprocedure('public.delete_my_account()') is not null
+     and coalesce(obj_description(to_regprocedure('public.delete_my_account()'), 'pg_proc'), '') not like 'BODYFORGE%' then
+    clashes := clashes || 'function public.delete_my_account()'::text;
+  end if;
+  if array_length(clashes, 1) > 0 then
+    raise exception 'BODYFORGE migration stopped: these already exist and were not created by BODYFORGE: %. Use a new, empty Supabase project for BODYFORGE.', array_to_string(clashes, ', ');
+  end if;
+end
+$guard$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- Helpers
 -- ─────────────────────────────────────────────────────────────────────────────
 
@@ -481,3 +508,31 @@ $$;
 
 revoke all on function public.delete_my_account() from public, anon;
 grant execute on function public.delete_my_account() to authenticated;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Labels (used by the safety guard at the top when re-running)
+-- ─────────────────────────────────────────────────────────────────────────────
+comment on table public.exercises is 'BODYFORGE';
+comment on table public.skill_paths is 'BODYFORGE';
+comment on table public.skill_nodes is 'BODYFORGE';
+comment on table public.nutrition_items is 'BODYFORGE';
+comment on table public.challenges is 'BODYFORGE';
+comment on table public.achievements is 'BODYFORGE';
+comment on table public.profiles is 'BODYFORGE';
+comment on table public.goals is 'BODYFORGE';
+comment on table public.programs is 'BODYFORGE';
+comment on table public.program_days is 'BODYFORGE';
+comment on table public.workouts is 'BODYFORGE';
+comment on table public.workout_sets is 'BODYFORGE';
+comment on table public.personal_records is 'BODYFORGE';
+comment on table public.measurements is 'BODYFORGE';
+comment on table public.skill_progress is 'BODYFORGE';
+comment on table public.recovery_checks is 'BODYFORGE';
+comment on table public.challenge_progress is 'BODYFORGE';
+comment on table public.challenge_checkins is 'BODYFORGE';
+comment on table public.user_achievements is 'BODYFORGE';
+comment on table public.journey_progress is 'BODYFORGE';
+comment on table public.milestones is 'BODYFORGE';
+comment on table public.food_prices is 'BODYFORGE';
+comment on table public.sync_metadata is 'BODYFORGE';
+comment on function public.delete_my_account() is 'BODYFORGE: deletes the signed-in user and (by cascade) all their data';
