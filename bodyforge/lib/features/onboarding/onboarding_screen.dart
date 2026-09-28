@@ -137,7 +137,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 Text('${_step + 1}/${_steps - 1}', style: BfType.number(14, color: c.textMuted)),
               ]),
             ),
+          // Keyed: the header and button above/below come and go, and without a
+          // key the PageView would be rebuilt (losing its page) on the last step.
           Expanded(
+            key: const ValueKey('onboarding-pages'),
             child: PageView(
               controller: _page,
               physics: const NeverScrollableScrollPhysics(),
@@ -585,6 +588,13 @@ class _ForgeState extends ConsumerState<_Forge> {
   String? _error;
   ProgramSpec? _spec;
 
+  // PageView builds pages lazily, so this step may be created already active.
+  @override
+  void initState() {
+    super.initState();
+    if (widget.active) WidgetsBinding.instance.addPostFrameCallback((_) => mounted && !_started ? _run() : null);
+  }
+
   @override
   void didUpdateWidget(_Forge old) {
     super.didUpdateWidget(old);
@@ -602,7 +612,7 @@ class _ForgeState extends ConsumerState<_Forge> {
       Haptics.heavy();
       // The router moves to Home as soon as the profile exists.
     } catch (e) {
-      setState(() => _error = 'Couldn\'t save your plan: $e');
+      if (mounted) setState(() => _error = 'Couldn\'t save your plan: $e');
     }
   }
 

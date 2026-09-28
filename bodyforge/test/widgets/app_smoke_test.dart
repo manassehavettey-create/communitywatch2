@@ -1,4 +1,5 @@
 import 'package:bodyforge/app/app.dart';
+import 'package:bodyforge/app/auth.dart';
 import 'package:bodyforge/app/notifications.dart';
 import 'package:bodyforge/app/providers.dart';
 import 'package:bodyforge/app/router.dart';
@@ -117,6 +118,51 @@ void main() {
     await boot(tester, seed: false);
     expect(location(), '/welcome');
     expect(tester.takeException(), isNull);
+    await shutdown(tester);
+  });
+
+  testWidgets('a new user goes offline through onboarding to a forged plan', (tester) async {
+    await boot(tester, seed: false);
+    await tester.tap(find.text('Get started'));
+    await settle(tester);
+    expect(location(), '/onboarding');
+
+    Future<void> next() async {
+      final btn = find.widgetWithText(BfButton, 'Continue').evaluate().isNotEmpty
+          ? find.widgetWithText(BfButton, 'Continue')
+          : find.widgetWithText(BfButton, 'Forge my plan');
+      await tester.ensureVisible(btn);
+      await tester.tap(btn);
+      await settle(tester);
+    }
+
+    await tester.enterText(find.byType(TextField), 'Ama');
+    await settle(tester, 200);
+    for (var step = 1; step <= 8; step++) {
+      await next();
+      if (step == 5) {
+        final ack = find.text("I understand and I'm ready to train");
+        await tester.ensureVisible(ack);
+        await settle(tester, 400);
+        await tester.tap(ack);
+        await settle(tester, 200);
+      }
+      if (step == 6) {
+        await tester.tap(find.text(Goal.values.first.label));
+        await settle(tester, 200);
+      }
+    }
+    await next(); // Forge my plan
+    await settle(tester, 6000); // the forge animation saves, then routes home
+    expect(tester.takeException(), isNull);
+    expect(location(), '/home');
+
+    final uid = container.read(authProvider).userId!;
+    final svc = TrainingService(DataContext(db: db, userId: uid, clock: clock));
+    final p = await svc.profiles.getProfile();
+    expect(p?.name, 'Ama');
+    expect(p?.goals, {Goal.values.first});
+    expect(await svc.profiles.getActiveProgram(), isNotNull);
     await shutdown(tester);
   });
 
