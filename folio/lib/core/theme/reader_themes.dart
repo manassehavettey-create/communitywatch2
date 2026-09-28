@@ -69,7 +69,14 @@ enum ReaderTheme {
   ///
   /// A photo keeps its colours (a red stays red) instead of becoming a
   /// negative, and white pages turn into a warm, low-glare dark tone.
-  static ColorFilter _nightFilter({required Color whiteTo, required Color blackTo}) {
+  static ColorFilter _nightFilter({required Color whiteTo, required Color blackTo}) =>
+      ColorFilter.matrix(nightMatrix(whiteTo: whiteTo, blackTo: blackTo));
+
+  /// The 4x5 colour matrix behind the Night theme (exposed for tests).
+  static List<double> nightMatrix({
+    Color whiteTo = const Color(0xFF1E1C19),
+    Color blackTo = const Color(0xFFD9D0BF),
+  }) {
     const lr = 0.2126, lg = 0.7152, lb = 0.0722;
     // Inversion matrix rows (per output channel): c - 2L + 255.
     final inv = <List<double>>[
@@ -86,6 +93,6 @@ enum ReaderTheme {
       m.addAll([row[0] * k, row[1] * k, row[2] * k, 0, row[3] * k + lo[ch]]);
     }
     m.addAll([0, 0, 0, 1, 0]);
-    return ColorFilter.matrix(m);
+    return m;
   }
 }

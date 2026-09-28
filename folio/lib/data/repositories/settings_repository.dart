@@ -37,7 +37,6 @@ class AppSettings {
     this.textScale = 18,
     this.lineHeight = 1.6,
     this.textWidth = 640,
-    this.keepScreenOn = true,
     this.dailyGoalMinutes = 20,
     this.reminderEnabled = false,
     this.reminderMinutes = 20 * 60 + 30,
@@ -60,7 +59,6 @@ class AppSettings {
   final double textScale;
   final double lineHeight;
   final double textWidth;
-  final bool keepScreenOn;
   final int dailyGoalMinutes;
   final bool reminderEnabled;
 
@@ -83,7 +81,6 @@ class AppSettings {
     double? textScale,
     double? lineHeight,
     double? textWidth,
-    bool? keepScreenOn,
     int? dailyGoalMinutes,
     bool? reminderEnabled,
     int? reminderMinutes,
@@ -102,7 +99,6 @@ class AppSettings {
         textScale: textScale ?? this.textScale,
         lineHeight: lineHeight ?? this.lineHeight,
         textWidth: textWidth ?? this.textWidth,
-        keepScreenOn: keepScreenOn ?? this.keepScreenOn,
         dailyGoalMinutes: dailyGoalMinutes ?? this.dailyGoalMinutes,
         reminderEnabled: reminderEnabled ?? this.reminderEnabled,
         reminderMinutes: reminderMinutes ?? this.reminderMinutes,
@@ -122,7 +118,6 @@ class AppSettings {
         'textScale': textScale,
         'lineHeight': lineHeight,
         'textWidth': textWidth,
-        'keepScreenOn': keepScreenOn,
         'dailyGoalMinutes': dailyGoalMinutes,
         'reminderEnabled': reminderEnabled,
         'reminderMinutes': reminderMinutes,
@@ -149,7 +144,6 @@ class AppSettings {
       textScale: dbl(j['textScale'], d.textScale).clamp(14.0, 28.0),
       lineHeight: dbl(j['lineHeight'], d.lineHeight).clamp(1.3, 2.0),
       textWidth: dbl(j['textWidth'], d.textWidth).clamp(420.0, 900.0),
-      keepScreenOn: boolean(j['keepScreenOn'], d.keepScreenOn),
       dailyGoalMinutes: integer(j['dailyGoalMinutes'], d.dailyGoalMinutes).clamp(5, 240),
       reminderEnabled: boolean(j['reminderEnabled'], d.reminderEnabled),
       reminderMinutes: integer(j['reminderMinutes'], d.reminderMinutes).clamp(0, 24 * 60 - 1),

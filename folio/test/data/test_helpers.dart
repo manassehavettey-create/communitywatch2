@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:folio/core/db/connection.dart';
 import 'package:folio/core/db/database.dart';
 
@@ -22,4 +24,17 @@ Future<int> seedBook(
           addedAt: addedAt ?? DateTime(2026, 1, 1),
         ),
       );
+}
+
+/// `flutter test` doesn't load native assets for PDFium, so point pdfrx at the
+/// library the build hook downloaded into .dart_tool.
+String? findPdfiumForTests() {
+  for (final root in ['.dart_tool/hooks_runner', 'build/native_assets']) {
+    final dir = Directory(root);
+    if (!dir.existsSync()) continue;
+    for (final e in dir.listSync(recursive: true)) {
+      if (e is File && e.path.endsWith('libpdfium.so')) return e.absolute.path;
+    }
+  }
+  return null;
 }

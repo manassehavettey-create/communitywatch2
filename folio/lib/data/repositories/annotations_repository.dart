@@ -67,6 +67,10 @@ class AnnotationsRepository {
       (db.update(db.highlights)..where((h) => h.id.equals(id)))
           .write(HighlightsCompanion(color: Value(color)));
 
+  /// Re-inserts a deleted highlight exactly as it was (for Undo).
+  Future<void> restoreHighlight(Highlight h) =>
+      db.into(db.highlights).insert(h, mode: InsertMode.insertOrReplace);
+
   Future<void> deleteHighlight(int id) =>
       (db.delete(db.highlights)..where((h) => h.id.equals(id))).go();
 
@@ -120,6 +124,8 @@ class AnnotationsRepository {
         NotesCompanion(body: Value(body.trim()), updatedAt: Value(now ?? DateTime.now())),
       );
 
+  Future<void> restoreNote(Note n) => db.into(db.notes).insert(n, mode: InsertMode.insertOrReplace);
+
   Future<void> deleteNote(int id) => (db.delete(db.notes)..where((n) => n.id.equals(id))).go();
 
   Future<Note?> getNote(int id) =>
@@ -172,6 +178,9 @@ class AnnotationsRepository {
   Future<void> renameBookmark(int id, String title) =>
       (db.update(db.bookmarks)..where((b) => b.id.equals(id)))
           .write(BookmarksCompanion(title: Value(title.trim())));
+
+  Future<void> restoreBookmark(Bookmark b) =>
+      db.into(db.bookmarks).insert(b, mode: InsertMode.insertOrReplace);
 
   Future<void> deleteBookmark(int id) =>
       (db.delete(db.bookmarks)..where((b) => b.id.equals(id))).go();
