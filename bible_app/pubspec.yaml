@@ -43,6 +43,7 @@ dependencies:
   uuid: any
   crypto: any
   collection: any
+  rxdart: any
 
 dev_dependencies:
   flutter_test:

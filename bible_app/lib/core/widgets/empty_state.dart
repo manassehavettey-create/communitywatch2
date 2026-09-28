@@ -20,6 +20,7 @@ class EmptyState extends StatelessWidget {
     this.actionLabel,
     this.onAction,
     this.blobSeed = 3,
+    this.asset,
   });
 
   final IconData icon;
@@ -30,11 +31,15 @@ class EmptyState extends StatelessWidget {
   final VoidCallback? onAction;
   final int blobSeed;
 
+  /// Optional illustration (assets/images/empty/...). The drawn blob is
+  /// used when absent.
+  final String? asset;
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
     final m = Motion.of(context);
-    Widget art = Container(
+    final blob = Container(
       width: 132,
       height: 120,
       alignment: Alignment.center,
@@ -44,6 +49,15 @@ class EmptyState extends StatelessWidget {
       ),
       child: Icon(icon, size: 44, color: p.onPastel),
     );
+    Widget art = asset == null
+        ? blob
+        : Image.asset(
+            asset!,
+            width: 180,
+            height: 180,
+            fit: BoxFit.contain,
+            errorBuilder: (_, _, _) => blob,
+          );
     if (!m.reduced) {
       art = art
           .animate(onPlay: (c) => c.repeat(reverse: true))
