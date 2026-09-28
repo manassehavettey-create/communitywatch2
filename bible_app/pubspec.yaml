@@ -57,6 +57,10 @@ flutter:
   assets:
     - assets/bible/
     - assets/plans/
+    - assets/images/brand/
+    - assets/images/onboarding/
+    - assets/images/empty/
+    - assets/images/cards/
 
   fonts:
     - family: Fraunces

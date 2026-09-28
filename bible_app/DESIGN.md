@@ -15,6 +15,34 @@ copy any layout directly, and nothing here comes from existing Bible apps.
 **Avoid:** gradients, gold, stained-glass or cross clip-art, drop-shadow
 stacks, crowded dashboards, and more than one bright accent on a screen.
 
+### Second set of references
+
+Three more references were added later:
+
+5. A running app with interlocking colour blocks joined by small tabs, huge
+   tabular numerals and outline pill buttons.
+6. A chat and saved-items app with folder-shaped collection cards,
+   speech-bubble cards, grid paper and a floating white pill tab bar.
+7. A mood tracker with pastel geometric shapes as illustration, stat tiles
+   and a calendar of coloured day tiles.
+
+They add these patterns, used sparingly:
+
+- **Linked cards.** Two stacked cards can be joined by a small rounded tab,
+  so they read as one unit. Home uses this for Verse of the Day above
+  Continue Reading, and plans use it for today above tomorrow.
+- **Folder cards.** Saved collections (Bookmarks, Highlights, Notes, Verses)
+  are pastel folders with a tab on top.
+- **Big numerals.** Stats use Urbanist 700 with tabular figures at 40–64 px:
+  the streak, plan percentage and chapter counts.
+- **Reading calendar.** The streak screen shows a month grid of rounded tiles
+  tinted by how much was read that day.
+- **Stat tiles.** Profile uses small pastel tiles, each with a label and one
+  big number.
+- **Shape illustrations.** Where no generated art exists, illustrations are
+  drawn in code from pastel geometric shapes: circle, scallop, arch, blob and
+  pill. They have no faces and no religious symbols.
+
 ## Principles
 
 1. **Paper first.** Screens sit on warm paper, never on pure white. Scripture
