@@ -116,3 +116,44 @@ tool/         seed generator
 ## 5. Debug-only demo data
 
 In **debug builds**, **Settings → Developer → Load 5 weeks of demo data** fills the app with simulated workouts, records and measurements for review. This option does not exist in release builds.
+
+## 6. Tested checklist
+
+Verified in this repository's CI-less environment (Linux, Flutter 3.47.5):
+
+- [x] `flutter analyze`: no issues.
+- [x] 288 tests pass: domain, data/sync, whole-app smoke, tap-everything and screenshots.
+- [x] Onboarding: welcome → *Get started* → 9 question steps → plan forged → Home. The profile, program and journey are saved.
+- [x] All 33 routes render with no exceptions or overflow. Covered cases:
+  - an empty profile
+  - 5 weeks of history
+  - light theme with reduced motion
+- [x] Guided player:
+  - swipe to start, play every set, rate, save
+  - the timer resumes correctly after an app kill (unit-tested with timestamps)
+  - duration stops at the finish
+- [x] Every button, card, chip and switch on 21 screens can be tapped without errors.
+- [x] Adaptive engine, recovery check, time fitting, environment filter, weakest link, PRs, achievements, the 12-week journey, calendar and weekly report (unit tests).
+- [x] Sync:
+  - offline queue, last-write-wins in both directions, union merge of logs, tombstones, earliest unlock (fake server)
+  - the SQL migration, RLS, triggers and `delete_my_account` validated on local Postgres 16
+- [x] Visual review of 15 screens in both themes (see screenshots above).
+
+## 7. Known limitations
+
+- **Not yet run on a physical phone or emulator.** The build container has no Android SDK or iOS toolchain. Everything above ran in Flutter's test engine. Please do a first run on a device. Worth checking by hand:
+  - notifications (they need real OS permission)
+  - haptics
+  - share/export
+  - performance of the animations
+- **Supabase sync has not been exercised against a live project.** It is tested against an in-memory fake that mirrors the server triggers, and the SQL was tested on local Postgres. Account sign-up, email confirmation and password reset need a live project.
+- **Food prices are rough GH₵ estimates** (Sep 2026) and vary by market and season. Users can edit them per food; the edits sync.
+- **Rest-over alerts** use exact alarms where Android allows. On Android 14+ the exact-alarm permission is off by default, so the alert may arrive up to a few minutes late while the app is in the background. The in-app timer is always exact.
+- **Images:**
+  - 7 foods use a drawn tile instead of a photo.
+  - The banana entry reuses the plantain photo.
+  - The large-space environment image is the weakest of the set.
+  - The journey phases use athlete shots.
+  - See `docs/IMAGE_ASSETS.md`.
+- Exercise demos are simplified animated figures, not video.
+- Fitness guidance only, not medical advice. The app includes a health check during onboarding and says so in Settings.
