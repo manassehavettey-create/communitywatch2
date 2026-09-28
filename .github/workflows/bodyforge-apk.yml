@@ -4,10 +4,11 @@ name: BODYFORGE APK
 # GitHub's servers and attaches it to a pre-release (Releases page) so it can
 # be downloaded and side-loaded straight from a phone.
 #
-# Cloud sync: add two repository secrets (Settings → Secrets and variables →
-# Actions): BODYFORGE_SUPABASE_URL and BODYFORGE_SUPABASE_KEY (the public
-# publishable/anon key — never the service_role key). Without them the APK is
-# built offline-only, which still has every feature except accounts & sync.
+# Cloud sync: the project URL and PUBLISHABLE key below are public by design
+# (they ship inside every APK; Row Level Security protects the data). The
+# owner chose to keep them here. Repository secrets BODYFORGE_SUPABASE_URL /
+# BODYFORGE_SUPABASE_KEY override them if set. NEVER put the service_role /
+# secret key here or anywhere in the app.
 
 on:
   push:
@@ -46,10 +47,10 @@ jobs:
       - name: Get packages
         run: flutter pub get
 
-      - name: Cloud config (from repository secrets, if set)
+      - name: Cloud config
         env:
-          URL: ${{ secrets.BODYFORGE_SUPABASE_URL }}
-          KEY: ${{ secrets.BODYFORGE_SUPABASE_KEY }}
+          URL: ${{ secrets.BODYFORGE_SUPABASE_URL || 'https://fausjejjuwzoofwsyasb.supabase.co' }}
+          KEY: ${{ secrets.BODYFORGE_SUPABASE_KEY || 'sb_publishable_NAFq_WzuzMtsZ1EW-XE6DA_e3R3Ldo4' }}
         run: |
           if [ -n "$URL" ] && [ -n "$KEY" ]; then
             printf '{"SUPABASE_URL":"%s","SUPABASE_ANON_KEY":"%s"}' "$URL" "$KEY" > env/bodyforge.env.json
