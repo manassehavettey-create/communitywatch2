@@ -132,8 +132,13 @@ class TrainingService {
     if (profile == null) throw StateError('No profile');
     final program = await profiles.getActiveProgram();
     final journeyBefore = await journeyState();
+    final custom = program != null && program.spec.custom;
     final params = TrainingParams.from(
-        goals: profile.goals, level: profile.level, phase: journeyBefore.phase, daysPerWeek: profile.daysPerWeek);
+      goals: custom ? program.spec.goals : profile.goals,
+      level: profile.level,
+      phase: journeyBefore.phase,
+      daysPerWeek: program?.spec.sessionsPerWeek ?? profile.daysPerWeek,
+    );
 
     // 1. Records.
     final history = await training.getRecordHistory();

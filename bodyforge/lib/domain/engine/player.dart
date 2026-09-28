@@ -305,6 +305,17 @@ class PlayerSnapshot {
     return resume(now)._moveTo(i, now, r);
   }
 
+  /// End the workout now: remaining sets are logged as skipped so the
+  /// adaptive engine only judges what was actually done.
+  PlayerSnapshot finishEarly(DateTime now) {
+    final all = steps;
+    final r = [...results];
+    for (var i = stepIndex; i < all.length; i++) {
+      if (all[i].isWork) r.add(_result(all[i], 0, now, skipped: true));
+    }
+    return resume(now)._moveTo(all.length, now, r);
+  }
+
   /// Add seconds to the current rest.
   PlayerSnapshot extendRest(int seconds, DateTime now) {
     final s = current;

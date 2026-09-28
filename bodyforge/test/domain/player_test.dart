@@ -148,6 +148,15 @@ void main() {
     expect(s.progress, 1);
   });
 
+  test('ending early logs the remaining sets as skipped and finishes', () {
+    var s = PlayerSnapshot.start('w1', plan, t0).catchUp(t0.add(const Duration(seconds: 61)));
+    s = s.completeWork(10, t0.add(const Duration(seconds: 90)));
+    s = s.finishEarly(t0.add(const Duration(seconds: 95)));
+    expect(s.isFinished, isTrue);
+    expect(s.results.where((r) => r.skipped), hasLength(3)); // push-up set 2 + 2 plank sets
+    expect(s.totalReps, 10);
+  });
+
   test('swap candidates respect the environment', () {
     const f = ExerciseFilter(TrainingEnvironment.bedroom, Limitations(noJumping: true));
     final c = swapCandidates('squat_jump', f.allowsId);

@@ -1,7 +1,6 @@
 import 'package:bodyforge/data/local/database.dart';
 import 'package:bodyforge/data/sync/remote_store.dart';
 import 'package:bodyforge/data/sync/sync_engine.dart';
-import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
