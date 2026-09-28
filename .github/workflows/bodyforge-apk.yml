@@ -1,0 +1,81 @@
+name: BODYFORGE APK
+
+# Builds an installable Android APK of the BODYFORGE app (bodyforge/) on
+# GitHub's servers. Download it from the run's "Artifacts" section.
+#
+# Cloud sync: add two repository secrets (Settings → Secrets and variables →
+# Actions): BODYFORGE_SUPABASE_URL and BODYFORGE_SUPABASE_KEY (the public
+# publishable/anon key — never the service_role key). Without them the APK is
+# built offline-only, which still has every feature except accounts & sync.
+
+on:
+  push:
+    branches: [claude/bodyforge-fitness-app-sgw8vq]
+    paths: ['bodyforge/**', '.github/workflows/bodyforge-apk.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bodyforge-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: bodyforge
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.5
+          cache: true
+
+      - name: Get packages
+        run: flutter pub get
+
+      - name: Cloud config (from repository secrets, if set)
+        env:
+          URL: ${{ secrets.BODYFORGE_SUPABASE_URL }}
+          KEY: ${{ secrets.BODYFORGE_SUPABASE_KEY }}
+        run: |
+          if [ -n "$URL" ] && [ -n "$KEY" ]; then
+            printf '{"SUPABASE_URL":"%s","SUPABASE_ANON_KEY":"%s"}' "$URL" "$KEY" > env/bodyforge.env.json
+            echo "DEFINES=--dart-define-from-file=env/bodyforge.env.json" >> "$GITHUB_ENV"
+            echo "APK_KIND=cloud" >> "$GITHUB_ENV"
+            echo "Cloud sync: ON"
+          else
+            echo "APK_KIND=offline" >> "$GITHUB_ENV"
+            echo "::warning::Supabase secrets not set, so this APK is offline-only (no accounts/sync)."
+          fi
+
+      - name: Tests
+        run: flutter test --exclude-tags monkey
+
+      - name: Build APK
+        run: flutter build apk --release $DEFINES
+
+      - name: Name the APK
+        run: |
+          short=$(git rev-parse --short HEAD)
+          cp build/app/outputs/flutter-apk/app-release.apk "build/bodyforge-${APK_KIND}-${short}.apk"
+          echo "APK_PATH=bodyforge/build/bodyforge-${APK_KIND}-${short}.apk" >> "$GITHUB_ENV"
+          ls -la build/*.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bodyforge-apk-${{ env.APK_KIND }}
+          path: ${{ env.APK_PATH }}
+          retention-days: 30
+          compression-level: 0
