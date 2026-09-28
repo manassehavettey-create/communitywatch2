@@ -114,8 +114,8 @@ verse count, and the `not_available` list.
 - Every other translation's chapter lengths equal KJV's, except WEB's
   documented Romans 14/16 difference. No verse is empty except the ones
   listed above.
-- No stray markup, doubled spaces or edge whitespace, and `[ ]` brackets are
-  balanced.
+- No stray markup, doubled spaces or edge whitespace. In translations with
+  supplied words, `[ ]` brackets are balanced within each verse.
 - Paragraph and heading anchors point at verses that exist.
 - Exact-text spot checks pass for Genesis 1:1, Psalm 23:1, John 3:16,
   John 11:35 and Revelation 22:21 in every translation.
