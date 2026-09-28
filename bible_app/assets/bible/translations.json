@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "default": "kjv",
+  "available": [
+    {
+      "id": "kjv",
+      "abbreviation": "KJV",
+      "name": "King James Version",
+      "edition": "1769 Oxford standard text",
+      "language": "en",
+      "license": "Public Domain",
+      "license_note": "Public domain worldwide except the United Kingdom, where the Crown's perpetual rights apply to printed editions.",
+      "asset": "assets/bible/kjv.json",
+      "sha256": "3f926f11b668eac6940fc769b9ca1abb718035e3b09281067aa5b2dc96250ba1",
+      "verses": 31102
+    },
+    {
+      "id": "web",
+      "abbreviation": "WEB",
+      "name": "World English Bible",
+      "edition": "eBible.org WEB (Protestant canon)",
+      "language": "en",
+      "license": "Public Domain",
+      "license_note": "Public domain. \"World English Bible\" is a trademark of eBible.org; the name may be used only for the unaltered text.",
+      "asset": "assets/bible/web.json",
+      "sha256": "9e642fbb3a218e62946ffc2404335d6a55028da1eabfce1834bd00fbc74d748a",
+      "verses": 31103
+    }
+  ],
+  "not_available": [
+    {
+      "abbreviation": "NIV",
+      "name": "New International Version",
+      "reason": "Requires a licence from Biblica"
+    },
+    {
+      "abbreviation": "ESV",
+      "name": "English Standard Version",
+      "reason": "Requires a licence from Crossway"
+    },
+    {
+      "abbreviation": "NKJV",
+      "name": "New King James Version",
+      "reason": "Requires a licence from Thomas Nelson"
+    },
+    {
+      "abbreviation": "NLT",
+      "name": "New Living Translation",
+      "reason": "Requires a licence from Tyndale House"
+    },
+    {
+      "abbreviation": "NASB",
+      "name": "New American Standard Bible",
+      "reason": "Requires a licence from The Lockman Foundation"
+    },
+    {
+      "abbreviation": "CSB",
+      "name": "Christian Standard Bible",
+      "reason": "Requires a licence from Holman Bible Publishers"
+    }
+  ]
+}
