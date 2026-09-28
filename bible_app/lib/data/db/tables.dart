@@ -31,14 +31,17 @@ class Preferences extends Table with SyncColumns {
   static const rowId = 'preferences';
 
   TextColumn get translationId => text().nullable()();
-  TextColumn get scriptureFont => text().withDefault(const Constant('literata'))();
+  TextColumn get scriptureFont =>
+      text().withDefault(const Constant('literata'))();
   RealColumn get fontSize => real().withDefault(const Constant(19))();
   RealColumn get lineHeight => real().withDefault(const Constant(1.65))();
   TextColumn get readerTheme => text().withDefault(const Constant('auto'))();
   TextColumn get appTheme => text().withDefault(const Constant('system'))();
-  BoolColumn get showVerseNumbers => boolean().withDefault(const Constant(true))();
+  BoolColumn get showVerseNumbers =>
+      boolean().withDefault(const Constant(true))();
   BoolColumn get paragraphMode => boolean().withDefault(const Constant(true))();
-  BoolColumn get suppliedItalics => boolean().withDefault(const Constant(true))();
+  BoolColumn get suppliedItalics =>
+      boolean().withDefault(const Constant(true))();
 
   /// Last reading position, for Continue Reading on every device.
   TextColumn get lastChapter => text().nullable()();

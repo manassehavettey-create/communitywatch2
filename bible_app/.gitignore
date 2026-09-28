@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Secrets: copy env/config.example.json to env/config.json
+/env/config.json

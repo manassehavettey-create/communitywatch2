@@ -99,18 +99,16 @@ class AppDatabase extends _$AppDatabase {
     return row?.value;
   }
 
-  Stream<String?> watchValue(String key) =>
-      (select(keyValues)..where((t) => t.key.equals(key)))
-          .watchSingleOrNull()
-          .map((r) => r?.value);
+  Stream<String?> watchValue(String key) => (select(
+    keyValues,
+  )..where((t) => t.key.equals(key))).watchSingleOrNull().map((r) => r?.value);
 
   Future<void> setValue(String key, String? value) async {
     if (value == null) {
       await (delete(keyValues)..where((t) => t.key.equals(key))).go();
     } else {
-      await into(
-        keyValues,
-      ).insertOnConflictUpdate(KeyValue(key: key, value: value));
+      await into(keyValues)
+          .insertOnConflictUpdate(KeyValue(key: key, value: value));
     }
   }
 }

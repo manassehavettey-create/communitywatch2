@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Writes lib/bible/canon.g.dart from canon.py so the app and the data
+"""Writes lib/bible/canon_data.dart from canon.py so the app and the data
 pipeline share one book list."""
 
 from pathlib import Path
 
 import canon
 
-OUT = Path(__file__).resolve().parent.parent.parent / "lib" / "bible" / "canon.g.dart"
+OUT = Path(__file__).resolve().parent.parent.parent / "lib" / "bible" / "canon_data.dart"
 
 
 def main() -> None:

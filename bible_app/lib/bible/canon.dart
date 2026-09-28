@@ -1,4 +1,4 @@
-part 'canon.g.dart';
+part 'canon_data.dart';
 
 enum Testament {
   old('Old Testament', 'OT'),
