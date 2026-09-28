@@ -42,7 +42,7 @@ class MemorySecretStore implements SecretStore {
 class LockService {
   LockService({SecretStore? store, LocalAuthentication? auth})
       : _store = store ?? SecureSecretStore(),
-        _auth = auth;
+        _localAuth = auth;
 
   static const pinLength = 4;
   static const maxAttempts = 5;
@@ -52,9 +52,9 @@ class LockService {
   static const _iterations = 20000;
 
   final SecretStore _store;
-  final LocalAuthentication? _auth;
+  final LocalAuthentication? _localAuth;
 
-  LocalAuthentication get _la => _auth ?? LocalAuthentication();
+  LocalAuthentication get _la => _localAuth ?? LocalAuthentication();
 
   Future<bool> hasPin() async => (await _store.read(_kHash)) != null;
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart' show Color;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
@@ -105,7 +106,7 @@ class NotificationService {
       // Fall back to any zone with the device's current UTC offset.
       final offset = DateTime.now().timeZoneOffset.inMilliseconds;
       final match = tz.timeZoneDatabase.locations.values.firstWhere(
-        (l) => l.currentTimeZone.offset == offset,
+        (l) => l.currentTimeZone.offset.inMilliseconds == offset,
         orElse: () => tz.UTC,
       );
       tz.setLocalLocation(match);
