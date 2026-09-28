@@ -67,7 +67,7 @@ class RecordsScreen extends ConsumerWidget {
                     const SizedBox(width: Space.xl),
                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('Current record', style: t.labelSmall),
-                      Text(formatRecord(best, latest.metric), style: BfType.number(30, color: c.primary)),
+                      Text(formatRecord(best, latest.metric), style: BfType.number(30, color: c.accentText)),
                     ]),
                     const Spacer(),
                     Text(fmt.format(latest.date.toLocalDateTime()), style: t.bodySmall),

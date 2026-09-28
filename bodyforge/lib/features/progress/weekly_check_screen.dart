@@ -76,16 +76,16 @@ class _WeeklyCheckScreenState extends ConsumerState<WeeklyCheckScreen> {
                 (
                   'Workouts',
                   '${report.completed} / ${report.planned}',
-                  report.completed >= report.planned && report.planned > 0 ? c.primary : c.text,
+                  report.completed >= report.planned && report.planned > 0 ? c.accentText : c.text,
                   report.modified > 0 ? '${report.modified} modified · ${report.recoverySessions} recovery' : null,
                 ),
-                ('Consistency', '${(report.consistency * 100).round()}%', c.primary, null),
+                ('Consistency', '${(report.consistency * 100).round()}%', c.accentText, null),
                 for (final d in report.prDeltas.take(3)) ('${d.name} record', d.deltaLabel, c.ember, null),
                 if (report.weightDelta != null)
                   ('Weight', Units.formatDelta(MeasurementType.weight, report.weightDelta!, units), c.secondary, null),
                 if (report.waistDelta != null)
                   ('Waist', Units.formatDelta(MeasurementType.waist, report.waistDelta!, units), c.secondary, null),
-                ('Recovery', report.recovery, c.tertiary, null),
+                ('Recovery', report.recovery, c.isDark ? c.tertiary : c.secondary, null),
                 ('Time trained', '${report.totalMinutes} min', c.text, '${report.totalReps} reps logged'),
               ].indexed)
                 _Row(label: row.$1, value: row.$2, color: row.$3, sub: row.$4, index: i),

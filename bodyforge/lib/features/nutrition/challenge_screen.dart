@@ -164,7 +164,7 @@ class _DayTrack extends StatelessWidget {
     return BfCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text('$successes', style: BfType.number(36, color: c.primary)),
+          Text('$successes', style: BfType.number(36, color: c.accentText)),
           Text(' / $req days', style: t.titleMedium?.copyWith(color: c.textMuted)),
         ]),
         const SizedBox(height: Space.sm),
@@ -256,7 +256,7 @@ class _MealBuilderState extends ConsumerState<_MealBuilder> {
       if (widget.done)
         Padding(
           padding: const EdgeInsets.only(bottom: Space.sm),
-          child: Text('Today\'s meal is logged ✓ — build another to replace it.', style: t.bodySmall?.copyWith(color: c.primary)),
+          child: Text('Today\'s meal is logged ✓ — build another to replace it.', style: t.bodySmall?.copyWith(color: c.accentText)),
         ),
       BfCard(
         color: okProtein && okPrice ? c.primary : c.surface,

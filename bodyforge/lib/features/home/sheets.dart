@@ -209,7 +209,7 @@ Future<void> showQuickMode(BuildContext context, WidgetRef ref) => showBfSheet(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('Not feeling it?', style: t.headlineMedium),
             const SizedBox(height: 4),
-            Text(kLowMotivationMessage, style: t.titleMedium?.copyWith(color: c.primary)),
+            Text(kLowMotivationMessage, style: t.titleMedium?.copyWith(color: c.accentText)),
             const SizedBox(height: Space.xl),
             for (var i = 0; i < QuickOption.values.length; i++)
               Padding(

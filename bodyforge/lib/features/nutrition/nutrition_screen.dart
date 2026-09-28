@@ -132,7 +132,7 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
                 ]),
               ),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('${foods[i].protein.toStringAsFixed(0)} g', style: BfType.number(18, color: context.bf.primary)),
+                Text('${foods[i].protein.toStringAsFixed(0)} g', style: BfType.number(18, color: context.bf.accentText)),
                 Text('${ghs(overrides[foods[i].id] ?? foods[i].priceGhs)} · ${foods[i].kcal} kcal', style: t.labelSmall),
               ]),
             ]),

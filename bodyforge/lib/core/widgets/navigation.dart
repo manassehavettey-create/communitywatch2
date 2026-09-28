@@ -87,7 +87,7 @@ class _NavButton extends StatelessWidget {
   final double labelRoom;
   final VoidCallback onTap;
 
-  static const _labelStyle = TextStyle(fontFamily: BfType.body, fontWeight: FontWeight.w800, fontSize: 13, color: BfPalette.ink);
+  static const _labelStyle = TextStyle(fontFamily: BfType.body, fontFamilyFallback: BfType.fallback, fontWeight: FontWeight.w800, fontSize: 13, color: BfPalette.ink);
 
   @override
   Widget build(BuildContext context) {
@@ -255,15 +255,19 @@ class _SwipeToStartState extends State<SwipeToStart> with SingleTickerProviderSt
           height: h,
           decoration: BoxDecoration(color: widget.color ?? BfPalette.ink, borderRadius: Radii.pillAll),
           child: Stack(alignment: Alignment.centerLeft, children: [
-            Center(
-              child: Opacity(
+            // Label centred in the track to the right of the thumb.
+            Padding(
+              padding: const EdgeInsets.only(left: h - 4),
+              child: Center(
+                child: Opacity(
                 opacity: 1 - frac,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Text(widget.label,
-                      style: const TextStyle(fontFamily: BfType.body, fontWeight: FontWeight.w800, fontSize: 15, color: Colors.white)),
+                      style: const TextStyle(fontFamily: BfType.body, fontFamilyFallback: BfType.fallback, fontWeight: FontWeight.w800, fontSize: 15, color: Colors.white)),
                   const SizedBox(width: 10),
                   _Chevrons(color: Colors.white.withValues(alpha: 0.8)),
                 ]),
+                ),
               ),
             ),
             Positioned(

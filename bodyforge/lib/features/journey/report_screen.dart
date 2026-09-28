@@ -105,7 +105,7 @@ class ReportScreen extends ConsumerWidget {
                       Text('${s.fromName} → ${s.toName}', style: t.titleSmall),
                     ]),
                   ),
-                  Text(s.levelsGained > 0 ? '+${s.levelsGained}' : '—', style: BfType.number(22, color: s.levelsGained > 0 ? c.primary : c.textFaint)),
+                  Text(s.levelsGained > 0 ? '+${s.levelsGained}' : '—', style: BfType.number(22, color: s.levelsGained > 0 ? c.accentText : c.textFaint)),
                 ]),
               ),
             )),

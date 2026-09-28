@@ -42,10 +42,13 @@ class FakeNotifications extends NotificationService {
 
 const kSmokeUser = 'smoke-user';
 
+/// Wraps the whole app so tests can capture screenshots.
+final kScreenKey = GlobalKey();
+
 Future<void> loadAppFonts() async {
-  for (final family in ['Sora', 'Manrope']) {
+  for (final (family, weights) in [('Sora', [400, 500, 600, 700, 800]), ('Manrope', [400, 500, 600, 700, 800]), ('BfSymbols', [400, 700])]) {
     final loader = FontLoader(family);
-    for (final w in [400, 500, 600, 700, 800]) {
+    for (final w in weights) {
       loader.addFont(rootBundle.load('assets/fonts/$family-$w.ttf'));
     }
     await loader.load();
@@ -87,7 +90,10 @@ class Harness {
         clockProvider.overrideWithValue(clock),
       ],
     );
-    await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const BodyforgeApp()));
+    await tester.pumpWidget(RepaintBoundary(
+      key: kScreenKey,
+      child: UncontrolledProviderScope(container: container, child: const BodyforgeApp()),
+    ));
     await settle(tester, 2500); // splash
     return Harness._(tester, db, clock, container);
   }

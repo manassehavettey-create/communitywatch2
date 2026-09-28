@@ -92,7 +92,7 @@ class MealGuidanceScreen extends ConsumerWidget {
                       ]),
                     ),
                     Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('${totals.protein.round()} g', style: BfType.number(20, color: c.primary)),
+                      Text('${totals.protein.round()} g', style: BfType.number(20, color: c.accentText)),
                       Text('${ghs(totals.priceGhs)} · ${totals.kcal.round()} kcal', style: t.labelSmall),
                     ]),
                   ]),

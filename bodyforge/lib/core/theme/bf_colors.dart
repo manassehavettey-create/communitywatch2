@@ -41,6 +41,10 @@ class BfColors extends ThemeExtension<BfColors> {
   final Color primary;
   final Color onPrimary;
 
+  /// Lime used *as text* on the canvas. Lime on white fails contrast, so the
+  /// light theme uses a deep olive (≈5:1 on white).
+  Color get accentText => isDark ? primary : const Color(0xFF5B7500);
+
   /// Lavender.
   final Color secondary;
   final Color onSecondary;

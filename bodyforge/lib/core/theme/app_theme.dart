@@ -37,6 +37,7 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: c.canvas,
       canvasColor: c.canvas,
       fontFamily: BfType.body,
+      fontFamilyFallback: BfType.fallback,
       textTheme: text,
       extensions: [c],
       splashFactory: InkSparkle.splashFactory,
@@ -93,6 +94,9 @@ abstract final class AppTheme {
         backgroundColor: c.isDark ? c.sheet : BfPalette.ink,
         contentTextStyle: text.bodyMedium?.copyWith(color: c.isDark ? BfPalette.ink : Colors.white),
         shape: const RoundedRectangleBorder(borderRadius: Radii.tile),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: c.accentText, textStyle: text.labelLarge),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? BfPalette.ink : c.textMuted),

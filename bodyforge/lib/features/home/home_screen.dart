@@ -215,12 +215,15 @@ class _MissionCard extends ConsumerWidget {
                     child: Text(type.label, style: t.headlineLarge?.copyWith(color: BfPalette.ink, height: 1.05)),
                   ),
                   const SizedBox(height: Space.sm),
-                  Wrap(spacing: 6, runSpacing: 6, children: [
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    child: Wrap(spacing: 6, runSpacing: 6, children: [
                     _Tag(icon: BfIcons.time, text: '$minutes min'),
                     _Tag(icon: BfIcons.flame, text: plan?.difficultyLabel ?? '—'),
                     if (adjusted) const _Tag(icon: BfIcons.leaf, text: 'Adjusted'),
                     if (day.doneToday) const _Tag(icon: BfIcons.check, text: 'Done'),
-                  ]),
+                    ]),
+                  ),
                   const Spacer(),
                   if (recovery != null && recovery.mode != RecoveryMode.full)
                     Padding(
@@ -251,11 +254,12 @@ class _Tag extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(color: BfPalette.ink.withValues(alpha: 0.08), borderRadius: Radii.pillAll),
+        // Solid ink pills stay legible where they cross the athlete photo.
+        decoration: BoxDecoration(color: BfPalette.ink.withValues(alpha: 0.88), borderRadius: Radii.pillAll),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, size: 14, color: BfPalette.ink),
+          Icon(icon, size: 14, color: BfPalette.lime),
           const SizedBox(width: 4),
-          Text(text, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: BfPalette.ink)),
+          Text(text, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white)),
         ]),
       );
 }
@@ -489,8 +493,8 @@ class _ProgressStrip extends ConsumerWidget {
                     child: Icon(BfIcons.forward, size: 16, color: c.textMuted),
                   ),
                   f.metric.name == 'maxHold'
-                      ? Text(f.format(f.best), style: BfType.number(30, color: c.primary))
-                      : CountUp(value: f.best.toDouble(), style: BfType.number(30, color: c.primary)),
+                      ? Text(f.format(f.best), style: BfType.number(30, color: c.accentText))
+                      : CountUp(value: f.best.toDouble(), style: BfType.number(30, color: c.accentText)),
                 ]),
                 const SizedBox(height: 2),
                 Text(f.exerciseName, maxLines: 1, overflow: TextOverflow.ellipsis, style: t.bodySmall),

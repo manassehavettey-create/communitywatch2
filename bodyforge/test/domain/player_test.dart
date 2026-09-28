@@ -157,6 +157,13 @@ void main() {
     expect(s.totalReps, 10);
   });
 
+  test('duration stops at the finish, not when the workout is rated later', () {
+    var s = PlayerSnapshot.start('w1', plan, t0).catchUp(t0.add(const Duration(seconds: 61)));
+    s = s.finishEarly(t0.add(const Duration(seconds: 95)));
+    expect(s.finishedAt, t0.add(const Duration(seconds: 95)));
+    expect(s.elapsed(t0.add(const Duration(hours: 20))), const Duration(seconds: 95));
+  });
+
   test('swap candidates respect the environment', () {
     const f = ExerciseFilter(TrainingEnvironment.bedroom, Limitations(noJumping: true));
     final c = swapCandidates('squat_jump', f.allowsId);

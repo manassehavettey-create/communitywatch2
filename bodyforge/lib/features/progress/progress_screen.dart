@@ -55,28 +55,33 @@ class ProgressScreen extends ConsumerWidget {
           children: [
             e(Text('Progress', style: t.displaySmall)),
             const SizedBox(height: Space.md),
-            e(Row(children: [
-              Expanded(child: StatTile(label: 'Workouts', value: CountUp(value: workouts.length.toDouble()))),
-              const SizedBox(width: Space.sm),
-              Expanded(
-                child: BfCard(
-                  padding: const EdgeInsets.all(Space.md),
-                  onTap: () => context.push('/calendar'),
-                  child: Row(children: [
-                    RingProgress(
-                      progress: c30,
-                      size: 54,
-                      stroke: 6,
-                      child: Text('${(c30 * 100).round()}', style: BfType.number(14, color: c.text)),
-                    ),
-                    const SizedBox(width: Space.sm),
-                    Expanded(child: Text('30-day\nconsistency', style: t.labelSmall)),
-                  ]),
+            e(IntrinsicHeight(
+              child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Expanded(child: StatTile(label: 'Workouts', value: CountUp(value: workouts.length.toDouble()))),
+                const SizedBox(width: Space.sm),
+                Expanded(
+                  child: BfCard(
+                    padding: const EdgeInsets.all(Space.md),
+                    onTap: () => context.push('/calendar'),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Overline('30 days', color: c.text.withValues(alpha: 0.7)),
+                      const SizedBox(height: Space.xs),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          RingProgress(progress: c30, size: 26, stroke: 5),
+                          const SizedBox(width: 6),
+                          Text('${(c30 * 100).round()}%', style: BfType.number(26, color: c.text)),
+                        ]),
+                      ),
+                    ]),
+                  ),
                 ),
-              ),
-              const SizedBox(width: Space.sm),
-              Expanded(child: StatTile(label: 'PRs', color: c.ember, value: CountUp(value: prs.toDouble()))),
-            ])),
+                const SizedBox(width: Space.sm),
+                Expanded(child: StatTile(label: 'PRs', color: c.ember, value: CountUp(value: prs.toDouble()))),
+              ]),
+            )),
             const SizedBox(height: Space.md),
             e(BfCard(
               color: c.surfaceRaised,
@@ -195,7 +200,7 @@ class _StrengthCard extends StatelessWidget {
           ),
           Text(record.format(record.first), style: BfType.number(16, color: c.textMuted)),
           Padding(padding: const EdgeInsets.symmetric(horizontal: 6), child: Icon(BfIcons.forward, size: 14, color: c.textMuted)),
-          Text(record.format(record.best), style: BfType.number(26, color: c.primary)),
+          Text(record.format(record.best), style: BfType.number(26, color: c.accentText)),
         ]),
         if (chart.length >= 2) ...[
           const SizedBox(height: Space.sm),

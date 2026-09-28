@@ -66,7 +66,7 @@ class AchievementsScreen extends ConsumerWidget {
                     Text(a.description, textAlign: TextAlign.center, style: Theme.of(ctx).textTheme.bodyMedium),
                     const SizedBox(height: Space.md),
                     if (at != null)
-                      Text('Unlocked ${fmt.format(at.toLocal())}', style: Theme.of(ctx).textTheme.labelMedium?.copyWith(color: ctx.bf.primary))
+                      Text('Unlocked ${fmt.format(at.toLocal())}', style: Theme.of(ctx).textTheme.labelMedium?.copyWith(color: ctx.bf.accentText))
                     else if (a.target > 1)
                       Text('${progress.clamp(0, a.target)} / ${a.target}', style: Theme.of(ctx).textTheme.labelMedium),
                   ]),

@@ -10,6 +10,12 @@ Workouts adapt to you after every session. Everything works offline, and an acco
 - **fl_chart**, **flutter_animate** and code-drawn exercise demos (`lib/features/exercise/figure_*.dart`)
 - **flutter_local_notifications** for training reminders, the weekly check and rest-over alerts
 
+| Dark (default) | Light |
+|---|---|
+| ![Dark theme screens](docs/screenshots/screens_dark.webp) | ![Light theme screens](docs/screenshots/screens_light.webp) |
+
+*Rendered by `test/widgets/screenshots_test.dart` on a 360×780 dp phone with 5 weeks of demo data.*
+
 ---
 
 ## 1. Run it (offline, no setup)
@@ -88,6 +94,7 @@ flutter test --tags monkey               # "tap everything" UI sweep (several mi
 | `test/data/*` | Sync queue: push/pull, last-write-wins both ways, union merge of workout logs, tombstones, earliest unlock, local → account re-keying. Training service end to end: onboarding, completing workouts, progression, records, export. |
 | `test/widgets/app_smoke_test.dart` | Boots the real app on a 360 dp phone and covers: welcome; full onboarding to a saved plan; all 33 routes with an empty profile, with 5 weeks of history, and in light theme with reduced motion; a quick session swiped to start, played to the end, rated and saved. |
 | `test/widgets/tap_everything_test.dart` | On each main screen, taps every button, card, chip and switch one at a time, and fails on any exception or error widget. |
+| `test/widgets/screenshots_test.dart` | Renders the main screens in both themes to PNG: `BF_SCREENSHOT_DIR=/tmp/shots flutter test test/widgets/screenshots_test.dart`. |
 | `test/widgets/exercise_figure_test.dart` | Every exercise demo renders and animates. Set `BF_RENDER_DIR` to get a contact sheet. |
 
 ## 4. Project layout

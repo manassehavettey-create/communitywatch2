@@ -12,6 +12,7 @@ import 'package:bodyforge/domain/catalog/skill_paths.dart';
 import 'package:bodyforge/core/widgets/components.dart';
 import 'package:bodyforge/core/widgets/navigation.dart';
 import 'package:bodyforge/domain/engine/quick_sessions.dart';
+import 'package:bodyforge/domain/engine/session_builder.dart';
 import 'package:bodyforge/domain/models/enums.dart';
 import 'package:bodyforge/domain/models/local_date.dart';
 import 'package:bodyforge/features/player/completion_screen.dart';
@@ -200,6 +201,11 @@ Future<void> visitAll(WidgetTester tester, ProviderContainer container) async {
     '/edit/preferences',
     '/edit/body',
   ];
+  final inputs = container.read(sessionInputsProvider(DayType.fullBody));
+  if (inputs != null) {
+    container.read(pendingSessionProvider.notifier).set(SessionBuilder(inputs).build());
+    routes.add('/session');
+  }
   final failures = <String>[];
   final original = FlutterError.onError;
   var current = '';

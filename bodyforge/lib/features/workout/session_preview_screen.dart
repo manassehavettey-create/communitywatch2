@@ -140,16 +140,14 @@ class _SessionPreviewScreenState extends ConsumerState<SessionPreviewScreen> {
                     const SizedBox(height: 4),
                     Text(plan.objective, style: t.titleLarge?.copyWith(color: BfPalette.ink)),
                     const SizedBox(height: Space.md),
-                    Row(children: [
+                    Wrap(spacing: Space.lg, runSpacing: Space.sm, crossAxisAlignment: WrapCrossAlignment.end, children: [
                       _Stat(value: '${plan.estimatedMinutes}', label: 'min'),
-                      const SizedBox(width: Space.lg),
                       _Stat(value: '${plan.workExercises.length}', label: 'exercises'),
-                      const SizedBox(width: Space.lg),
                       _Stat(value: plan.difficultyLabel, label: 'level', small: true),
                     ]),
                   ]),
                 ),
-                SizedBox(width: 90, height: 120, child: AppImage(Img.forDay(plan.dayType))),
+                SizedBox(width: 80, height: 120, child: AppImage(Img.forDay(plan.dayType))),
               ]),
             ),
           ),

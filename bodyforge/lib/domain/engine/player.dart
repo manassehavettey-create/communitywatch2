@@ -193,10 +193,16 @@ class PlayerSnapshot {
 
   int _pausedNow(DateTime now) => pausedAt == null ? 0 : now.difference(pausedAt!).inMilliseconds;
 
-  /// Active (unpaused) time since the start.
-  Duration elapsed(DateTime now) =>
-      Duration(milliseconds: now.difference(startedAt).inMilliseconds - pausedTotalMs - _pausedNow(now))
-          .clampNonNegative();
+  /// When the last step ended (the finished "step" starts at that moment).
+  DateTime? get finishedAt => isFinished ? stepStartedAt : null;
+
+  /// Active (unpaused) time since the start. Stops counting once finished, so
+  /// rating the workout later doesn't inflate its duration.
+  Duration elapsed(DateTime now) {
+    final end = finishedAt ?? now;
+    return Duration(milliseconds: end.difference(startedAt).inMilliseconds - pausedTotalMs - _pausedNow(end))
+        .clampNonNegative();
+  }
 
   /// Active time in the current step.
   Duration stepElapsed(DateTime now) =>

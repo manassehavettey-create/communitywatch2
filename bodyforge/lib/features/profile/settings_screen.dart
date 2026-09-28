@@ -139,10 +139,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             BfCard(padding: const EdgeInsets.symmetric(vertical: 4), child: Column(children: children)),
           ]),
         );
-    Widget tile(IconData icon, String title, {String? sub, Widget? trailing, VoidCallback? onTap, Color? color}) => ListTile(
+    Widget tile(IconData icon, String title, {String? sub, Widget? below, Widget? trailing, VoidCallback? onTap, Color? color}) => ListTile(
           leading: Icon(icon, color: color ?? c.text),
           title: Text(title, style: t.titleSmall?.copyWith(color: color)),
-          subtitle: sub == null ? null : Text(sub, style: t.bodySmall),
+          subtitle: below != null
+              ? Padding(padding: const EdgeInsets.only(top: Space.xs), child: Align(alignment: Alignment.centerLeft, child: below))
+              : (sub == null ? null : Text(sub, style: t.bodySmall)),
           trailing: trailing,
           onTap: onTap,
         );
@@ -152,7 +154,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       children: [
         group('Appearance', [
           tile(BfIcons.theme, 'Theme',
-              trailing: SegmentedButton<ThemeMode>(
+              below: SegmentedButton<ThemeMode>(
                 showSelectedIcon: false,
                 style: SegmentedButton.styleFrom(
                   selectedBackgroundColor: c.primary,
@@ -168,7 +170,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 onSelectionChanged: (v) => _s.update((x) => x.copyWith(themeMode: v.first)),
               )),
           tile(BfIcons.units, 'Units',
-              trailing: SegmentedButton<UnitSystem>(
+              below: SegmentedButton<UnitSystem>(
                 showSelectedIcon: false,
                 style: SegmentedButton.styleFrom(
                   selectedBackgroundColor: c.primary,

@@ -331,9 +331,17 @@ class StatTile extends StatelessWidget {
       color: bg,
       padding: const EdgeInsets.all(Space.md),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Overline(label, color: fg.withValues(alpha: 0.7)),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Overline(label, color: fg.withValues(alpha: 0.7)),
+        ),
         const SizedBox(height: Space.xs),
-        DefaultTextStyle.merge(style: BfType.number(26, color: fg), child: value),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: DefaultTextStyle.merge(style: BfType.number(26, color: fg), child: value),
+        ),
         if (caption != null) ...[
           const SizedBox(height: 2),
           Text(caption!, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: fg.withValues(alpha: 0.7))),

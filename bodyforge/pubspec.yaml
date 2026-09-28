@@ -60,6 +60,12 @@ flutter:
           weight: 700
         - asset: assets/fonts/Sora-800.ttf
           weight: 800
+    - family: BfSymbols
+      fonts:
+        - asset: assets/fonts/BfSymbols-400.ttf
+          weight: 400
+        - asset: assets/fonts/BfSymbols-700.ttf
+          weight: 700
     - family: Manrope
       fonts:
         - asset: assets/fonts/Manrope-400.ttf
