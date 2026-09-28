@@ -46,7 +46,7 @@ class _SessionPreviewScreenState extends ConsumerState<SessionPreviewScreen> {
       style: base.style,
       focus: base.focus,
       seed: base.seed,
-      recovery: plan.kind == SessionKind.lowMotivation ? base.recovery : base.recovery,
+      recovery: base.recovery,
       bestRecords: base.bestRecords,
       kind: plan.kind,
     ));

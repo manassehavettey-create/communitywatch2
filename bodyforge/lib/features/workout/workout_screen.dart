@@ -128,12 +128,20 @@ class _PlanTab extends ConsumerWidget {
                 onTap: () => openDay(context, ref, type),
                 padding: EdgeInsets.zero,
                 rings: isToday,
-                child: SizedBox(
-                  height: 108,
-                  child: Row(children: [
-                    Expanded(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 108),
+                  child: Stack(alignment: AlignmentDirectional.centerStart, children: [
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: 110,
+                      child: AppImage(Img.forDay(type), alignment: Alignment.bottomRight),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 104),
                       child: Padding(
-                        padding: const EdgeInsets.all(Space.lg),
+                        padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.md),
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
                           Overline(isToday ? 'Today · ${_dayNames[d]}' : _dayNames[d], color: BfPalette.ink.withValues(alpha: 0.6)),
                           const SizedBox(height: 4),
@@ -152,7 +160,6 @@ class _PlanTab extends ConsumerWidget {
                         ]),
                       ),
                     ),
-                    SizedBox(width: 110, child: AppImage(Img.forDay(type), alignment: Alignment.bottomRight)),
                   ]),
                 ),
               ),

@@ -39,6 +39,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   int? _repsForStep;
   bool _showCues = false;
 
+  /// Set once we've navigated to /complete, so rebuilds during the exit
+  /// transition don't push it again.
+  bool _handedOff = false;
+
+  void _handOff() {
+    if (_handedOff || !mounted) return;
+    _handedOff = true;
+    _ui?.cancel();
+    context.pushReplacement('/complete');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -82,7 +93,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     final ctl = ref.read(playerProvider.notifier);
     if (choice == 'save') {
       await ctl.finishEarly();
-      if (mounted) context.pushReplacement('/complete');
+      _handOff();
     } else if (choice == 'discard') {
       await ctl.discard();
       if (mounted) context.go('/home');
@@ -139,9 +150,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       );
     }
     if (s.isFinished) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && GoRouterState.of(context).matchedLocation == '/player') context.pushReplacement('/complete');
-      });
+      if (!_handedOff) WidgetsBinding.instance.addPostFrameCallback((_) => _handOff());
       return const Scaffold(body: SizedBox.shrink());
     }
 
@@ -303,9 +312,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                             label: 'Skip exercise',
                             onTap: () => ref.read(playerProvider.notifier).skipExercise()),
                       ]),
-                    AnimatedSize(
-                      duration: Motion.of(context, Motion.medium),
-                      curve: Motion.emphasized,
+                    MotionSize(
                       child: _showCues && step.isWork ? _Cues(exerciseId: step.exerciseId) : const SizedBox(width: double.infinity),
                     ),
                   ]),

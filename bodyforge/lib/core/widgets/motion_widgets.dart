@@ -473,3 +473,18 @@ class BigNumber extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(text, style: BfType.number(size, color: color ?? context.bf.text));
 }
+
+/// [AnimatedSize] that becomes a plain child under reduced motion (a
+/// zero-duration AnimatedSize trips a layout assertion).
+class MotionSize extends StatelessWidget {
+  const MotionSize({super.key, required this.child, this.duration = Motion.medium, this.curve = Motion.emphasized});
+  final Widget child;
+  final Duration duration;
+  final Curve curve;
+
+  @override
+  Widget build(BuildContext context) {
+    if (Motion.reduced(context)) return child;
+    return AnimatedSize(duration: duration, curve: curve, child: child);
+  }
+}

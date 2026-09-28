@@ -43,8 +43,6 @@ class SplashDone extends Notifier<bool> {
 
 final splashDoneProvider = NotifierProvider<SplashDone, bool>(SplashDone.new);
 
-final _rootKey = GlobalKey<NavigatorState>();
-
 /// Shared-axis style page transition (fade + slight rise); a plain fade when
 /// reduced motion is on.
 CustomTransitionPage<void> _page(GoRouterState state, Widget child, {bool modal = false}) => CustomTransitionPage(
@@ -66,6 +64,7 @@ CustomTransitionPage<void> _page(GoRouterState state, Widget child, {bool modal 
     );
 
 final routerProvider = Provider<GoRouter>((ref) {
+  final rootKey = GlobalKey<NavigatorState>();
   final refresh = ValueNotifier(0);
   ref.onDispose(refresh.dispose);
   ref.listen(authProvider, (_, _) => refresh.value++);
@@ -75,7 +74,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   const public = {'/welcome', '/auth'};
 
   return GoRouter(
-    navigatorKey: _rootKey,
+    navigatorKey: rootKey,
     initialLocation: '/splash',
     refreshListenable: refresh,
     redirect: (context, state) {
@@ -108,38 +107,38 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [GoRoute(path: '/profile', pageBuilder: (c, s) => _page(s, const ProfileScreen()))]),
         ],
       ),
-      GoRoute(path: '/session', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const SessionPreviewScreen())),
-      GoRoute(path: '/player', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const PlayerScreen(), modal: true)),
-      GoRoute(path: '/complete', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const CompletionScreen())),
+      GoRoute(path: '/session', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const SessionPreviewScreen())),
+      GoRoute(path: '/player', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const PlayerScreen(), modal: true)),
+      GoRoute(path: '/complete', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const CompletionScreen())),
       GoRoute(
           path: '/exercise/:id',
-          parentNavigatorKey: _rootKey,
+          parentNavigatorKey: rootKey,
           pageBuilder: (c, s) => _page(s, ExerciseDetailScreen(exerciseId: s.pathParameters['id']!))),
       GoRoute(
           path: '/skills/:pathId',
-          parentNavigatorKey: _rootKey,
+          parentNavigatorKey: rootKey,
           pageBuilder: (c, s) => _page(s, SkillPathScreen(pathId: s.pathParameters['pathId']!))),
-      GoRoute(path: '/build', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const BuildProgramScreen())),
-      GoRoute(path: '/records', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const RecordsScreen())),
-      GoRoute(path: '/measurements', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const MeasurementsScreen())),
-      GoRoute(path: '/calendar', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const CalendarScreen())),
-      GoRoute(path: '/weekly', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const WeeklyCheckScreen())),
-      GoRoute(path: '/journey', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const JourneyScreen())),
-      GoRoute(path: '/report', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const ReportScreen())),
-      GoRoute(path: '/achievements', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const AchievementsScreen())),
+      GoRoute(path: '/build', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const BuildProgramScreen())),
+      GoRoute(path: '/records', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const RecordsScreen())),
+      GoRoute(path: '/measurements', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const MeasurementsScreen())),
+      GoRoute(path: '/calendar', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const CalendarScreen())),
+      GoRoute(path: '/weekly', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const WeeklyCheckScreen())),
+      GoRoute(path: '/journey', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const JourneyScreen())),
+      GoRoute(path: '/report', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const ReportScreen())),
+      GoRoute(path: '/achievements', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const AchievementsScreen())),
       GoRoute(
           path: '/food/:id',
-          parentNavigatorKey: _rootKey,
+          parentNavigatorKey: rootKey,
           pageBuilder: (c, s) => _page(s, FoodDetailScreen(foodId: s.pathParameters['id']!))),
-      GoRoute(path: '/meals', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const MealGuidanceScreen())),
+      GoRoute(path: '/meals', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const MealGuidanceScreen())),
       GoRoute(
           path: '/challenge/:id',
-          parentNavigatorKey: _rootKey,
+          parentNavigatorKey: rootKey,
           pageBuilder: (c, s) => _page(s, ChallengeScreen(challengeId: s.pathParameters['id']!))),
-      GoRoute(path: '/settings', parentNavigatorKey: _rootKey, pageBuilder: (c, s) => _page(s, const SettingsScreen())),
+      GoRoute(path: '/settings', parentNavigatorKey: rootKey, pageBuilder: (c, s) => _page(s, const SettingsScreen())),
       GoRoute(
           path: '/edit/:section',
-          parentNavigatorKey: _rootKey,
+          parentNavigatorKey: rootKey,
           pageBuilder: (c, s) => _page(s, EditProfileScreen(section: s.pathParameters['section']!), modal: true)),
     ],
   );

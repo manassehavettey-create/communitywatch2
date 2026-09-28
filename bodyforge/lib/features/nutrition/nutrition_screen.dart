@@ -71,12 +71,9 @@ class _NutritionScreenState extends ConsumerState<NutritionScreen> {
               ),
             ]).enter(context, index: 2),
             const SizedBox(height: Space.lg),
-            Row(children: [
+            Wrap(spacing: Space.xs, runSpacing: Space.xs, children: [
               for (final (i, l) in ['Foods', 'Meal guidance', 'Challenges'].indexed)
-                Padding(
-                  padding: const EdgeInsets.only(right: Space.xs),
-                  child: PillChip(label: l, selected: _tab == i, onTap: () => i == 1 ? context.push('/meals') : setState(() => _tab = i)),
-                ),
+                PillChip(label: l, selected: _tab == i, onTap: () => i == 1 ? context.push('/meals') : setState(() => _tab = i)),
             ]),
             const SizedBox(height: Space.md),
             AnimatedSwitcher(

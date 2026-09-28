@@ -159,10 +159,15 @@ class BfCard extends StatelessWidget {
         inner,
       ]);
     }
-    final box = Container(
-      decoration: BoxDecoration(color: bg, borderRadius: radius, boxShadow: c.cardShadow),
-      clipBehavior: clip ? Clip.antiAlias : Clip.none,
-      child: inner,
+    // A Material surface so ListTiles / ink inside cards paint correctly.
+    final box = DecoratedBox(
+      decoration: BoxDecoration(borderRadius: radius, boxShadow: c.cardShadow),
+      child: Material(
+        color: bg,
+        shape: RoundedRectangleBorder(borderRadius: radius),
+        clipBehavior: clip ? Clip.antiAlias : Clip.none,
+        child: inner,
+      ),
     );
     if (onTap == null) return box;
     return Pressable(onTap: onTap, borderRadius: radius, scale: 0.98, child: box);

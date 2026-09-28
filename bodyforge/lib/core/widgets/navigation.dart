@@ -35,69 +35,108 @@ class ForgeNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.bf;
-    final d = Motion.of(context, Motion.medium);
     return SafeArea(
       top: false,
       minimum: const EdgeInsets.only(bottom: Space.sm),
-      child: Center(
-        heightFactor: 1,
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: Space.gutter),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: c.navBar,
-            borderRadius: Radii.pillAll,
-            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.35), blurRadius: 24, offset: const Offset(0, 10))],
-          ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            for (var i = 0; i < kNavItems.length; i++)
-              Padding(
-                padding: EdgeInsets.only(right: i == kNavItems.length - 1 ? 0 : 6),
-                child: Semantics(
-                  selected: i == index,
-                  button: true,
-                  label: kNavItems[i].label,
-                  child: Pressable(
+      child: Builder(builder: (context) {
+        // Fit narrow phones (320–360 dp): tighten the margins and only show
+        // the active label when there is room for it.
+        final width = MediaQuery.sizeOf(context).width;
+        final narrow = width < 380;
+        final margin = narrow ? Space.sm : Space.gutter;
+        final itemPad = narrow ? 11.0 : 14.0;
+        final gap = narrow ? 4.0 : 6.0;
+        const icon = 22.0;
+        final fixed = 2 * margin + 16 + (kNavItems.length - 1) * (2 * itemPad + icon + gap) + 2 * (itemPad + 4) + icon + 6;
+        final labelRoom = (width - fixed).clamp(0.0, 120.0);
+        return Center(
+          heightFactor: 1,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: margin),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: c.navBar,
+              borderRadius: Radii.pillAll,
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.35), blurRadius: 24, offset: const Offset(0, 10))],
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              for (var i = 0; i < kNavItems.length; i++)
+                Padding(
+                  padding: EdgeInsets.only(right: i == kNavItems.length - 1 ? 0 : gap),
+                  child: _NavButton(
+                    item: kNavItems[i],
+                    active: i == index,
+                    pad: itemPad,
+                    labelRoom: labelRoom,
                     onTap: () => onTap(i),
-                    borderRadius: Radii.pillAll,
-                    scale: 0.88,
-                    child: AnimatedContainer(
-                      duration: d,
-                      curve: Motion.emphasized,
-                      height: 52,
-                      padding: EdgeInsets.symmetric(horizontal: i == index ? 18 : 14),
-                      decoration: BoxDecoration(
-                        color: i == index ? c.secondary : Colors.white.withValues(alpha: c.isDark ? 0.06 : 0.10),
-                        borderRadius: Radii.pillAll,
-                      ),
-                      child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        AnimatedSwitcher(
-                          duration: d,
-                          transitionBuilder: (w, a) => ScaleTransition(scale: a, child: FadeTransition(opacity: a, child: w)),
-                          child: Icon(
-                            i == index ? kNavItems[i].activeIcon : kNavItems[i].icon,
-                            key: ValueKey('$i${i == index}'),
-                            size: 22,
-                            color: i == index ? BfPalette.ink : Colors.white.withValues(alpha: 0.82),
-                          ),
-                        ),
-                        AnimatedSize(
-                          duration: d,
-                          curve: Motion.emphasized,
-                          child: i == index
-                              ? Padding(
-                                  padding: const EdgeInsets.only(left: 6),
-                                  child: Text(kNavItems[i].label,
-                                      style: const TextStyle(
-                                          fontFamily: BfType.body, fontWeight: FontWeight.w800, fontSize: 13, color: BfPalette.ink)),
-                                )
-                              : const SizedBox.shrink(),
-                        ),
-                      ]),
-                    ),
                   ),
                 ),
+            ]),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class _NavButton extends StatelessWidget {
+  const _NavButton({required this.item, required this.active, required this.pad, required this.labelRoom, required this.onTap});
+  final NavItem item;
+  final bool active;
+  final double pad;
+  final double labelRoom;
+  final VoidCallback onTap;
+
+  static const _labelStyle = TextStyle(fontFamily: BfType.body, fontWeight: FontWeight.w800, fontSize: 13, color: BfPalette.ink);
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.bf;
+    final d = Motion.of(context, Motion.medium);
+    final painter = TextPainter(
+      text: TextSpan(text: item.label, style: _labelStyle),
+      textDirection: TextDirection.ltr,
+      textScaler: MediaQuery.textScalerOf(context),
+      maxLines: 1,
+    )..layout();
+    final showLabel = active && painter.width <= labelRoom;
+    painter.dispose();
+    return Semantics(
+      selected: active,
+      button: true,
+      label: item.label,
+      child: Pressable(
+        onTap: onTap,
+        borderRadius: Radii.pillAll,
+        scale: 0.88,
+        child: AnimatedContainer(
+          duration: d,
+          curve: Motion.emphasized,
+          height: 52,
+          padding: EdgeInsets.symmetric(horizontal: active ? pad + 4 : pad),
+          decoration: BoxDecoration(
+            color: active ? c.secondary : Colors.white.withValues(alpha: c.isDark ? 0.06 : 0.10),
+            borderRadius: Radii.pillAll,
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            AnimatedSwitcher(
+              duration: d,
+              transitionBuilder: (w, a) => ScaleTransition(scale: a, child: FadeTransition(opacity: a, child: w)),
+              child: Icon(
+                active ? item.activeIcon : item.icon,
+                key: ValueKey(active),
+                size: 22,
+                color: active ? BfPalette.ink : Colors.white.withValues(alpha: 0.82),
               ),
+            ),
+            MotionSize(
+              child: showLabel
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 6),
+                      child: Text(item.label, maxLines: 1, softWrap: false, style: _labelStyle),
+                    )
+                  : const SizedBox.shrink(),
+            ),
           ]),
         ),
       ),
