@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../core/icons.dart';
 
 import '../../app/providers.dart';
 import '../../core/motion/reveal.dart';
@@ -162,6 +163,9 @@ class _PlansScreenState extends ConsumerState<PlansScreen> {
                           Space.x3,
                         ),
                         child: SurfaceCard(
+                          semanticLabel:
+                              '${pl.title}, ${durationLabel(pl.totalDays)}, about ${pl.minutesPerDay} minutes a day'
+                              '${started.contains(pl.id) ? ', started' : ''}',
                           onTap: () => context.push('/plans/${pl.id}'),
                           child: Row(
                             children: [

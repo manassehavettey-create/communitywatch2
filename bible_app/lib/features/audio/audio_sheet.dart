@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../core/icons.dart';
 
 import '../../app/providers.dart';
 import '../../bible/references.dart';

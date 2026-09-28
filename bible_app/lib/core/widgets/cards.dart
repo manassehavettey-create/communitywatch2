@@ -63,9 +63,13 @@ class SurfaceCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.padding = const EdgeInsets.all(Space.x4),
+    this.semanticLabel,
   });
 
   final Widget child;
+
+  /// Replaces the card's content in the accessibility tree when given.
+  final String? semanticLabel;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final EdgeInsetsGeometry padding;
@@ -83,11 +87,16 @@ class SurfaceCard extends StatelessWidget {
       child: child,
     );
     if (onTap == null && onLongPress == null) return card;
-    return Pressable(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      scale: 0.98,
-      child: card,
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      excludeSemantics: semanticLabel != null,
+      child: Pressable(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        scale: 0.98,
+        child: card,
+      ),
     );
   }
 }

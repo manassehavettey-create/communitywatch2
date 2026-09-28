@@ -153,6 +153,22 @@ abstract final class AppTheme {
         linearTrackColor: p.line,
         circularTrackColor: p.line,
       ),
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: SegmentedButton.styleFrom(
+          selectedBackgroundColor: p.ink,
+          selectedForegroundColor: p.paper,
+          foregroundColor: p.ink,
+          side: BorderSide(color: p.line),
+          textStyle: AppType.label,
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: p.paperDeep,
+        selectedColor: p.ink,
+        labelStyle: AppType.label.copyWith(color: p.ink),
+        side: BorderSide.none,
+        shape: const StadiumBorder(),
+      ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: p.ink,

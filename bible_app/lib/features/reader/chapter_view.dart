@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../core/icons.dart';
 
 import '../../bible/references.dart';
 import '../../bible/translation.dart';
@@ -133,6 +135,15 @@ class ChapterViewState extends State<ChapterView>
   Map<int, Color?> _from = const {};
   Map<int, Color?> _to = const {};
 
+  /// One tap recogniser per verse. Putting it on the verse's text spans
+  /// makes each verse an actionable node for screen readers too.
+  final _recognizers = <int, TapGestureRecognizer>{};
+
+  TapGestureRecognizer _recognizer(int verse) => _recognizers.putIfAbsent(
+    verse,
+    () => TapGestureRecognizer()..onTap = () => widget.onVerseTap(verse),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -169,6 +180,9 @@ class ChapterViewState extends State<ChapterView>
   @override
   void dispose() {
     _fade.dispose();
+    for (final r in _recognizers.values) {
+      r.dispose();
+    }
     super.dispose();
   }
 
@@ -346,12 +360,15 @@ class ChapterViewState extends State<ChapterView>
           final vref = VerseRef(ref.bookId, ref.chapter, v);
           final bg = _colorAt(v);
           final selected = widget.selected.contains(v);
+          final tap = _recognizer(v);
           // Verse number (verse 1 is implied by the chapter heading).
           if (s.showVerseNumbers && v != 1) {
             final label = '$v ';
             spans.add(
               TextSpan(
                 text: label,
+                recognizer: tap,
+                semanticsLabel: selected ? 'Verse $v, selected.' : 'Verse $v.',
                 style: fontStyle(
                   Fonts.ui,
                   size: s.fontSize * 0.62,
@@ -388,6 +405,7 @@ class ChapterViewState extends State<ChapterView>
             spans.add(
               TextSpan(
                 text: run,
+                recognizer: tap,
                 style: TextStyle(
                   backgroundColor: bg,
                   fontStyle: supplied && s.suppliedItalics
@@ -419,31 +437,19 @@ class ChapterViewState extends State<ChapterView>
             );
             cursor += 1;
           }
-          spans.add(const TextSpan(text: ' '));
+          spans.add(TextSpan(text: ' ', recognizer: tap));
           cursor += 1;
           ranges.add((v, start, cursor));
         }
         _ranges[i] = ranges;
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTapUp: (d) {
-            final para =
-                _blockKeys[i].currentContext?.findRenderObject()
-                    as RenderParagraph?;
-            if (para == null) return;
-            final pos = para.getPositionForOffset(d.localPosition);
-            final v = _verseAtOffset(i, pos.offset);
-            if (v != null) widget.onVerseTap(v);
-          },
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: s.fontSize * (s.paragraphMode ? 0.7 : 0.35),
-            ),
-            child: RichText(
-              key: _blockKeys[i],
-              textScaler: MediaQuery.textScalerOf(context),
-              text: TextSpan(style: s.body, children: spans),
-            ),
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: s.fontSize * (s.paragraphMode ? 0.7 : 0.35),
+          ),
+          child: RichText(
+            key: _blockKeys[i],
+            textScaler: MediaQuery.textScalerOf(context),
+            text: TextSpan(style: s.body, children: spans),
           ),
         );
     }

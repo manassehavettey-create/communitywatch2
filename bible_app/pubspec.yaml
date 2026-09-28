@@ -38,7 +38,6 @@ dependencies:
   share_plus: ^13.3.0
 
   # Utilities
-  phosphor_flutter: ^2.1.0
   intl: any
   uuid: any
   crypto: any
@@ -97,3 +96,12 @@ flutter:
     - family: Caveat
       fonts:
         - asset: assets/fonts/Caveat.ttf
+    - family: PhosphorRegular
+      fonts:
+        - asset: assets/fonts/phosphor/Phosphor.ttf
+    - family: PhosphorBold
+      fonts:
+        - asset: assets/fonts/phosphor/Phosphor-Bold.ttf
+    - family: PhosphorFill
+      fonts:
+        - asset: assets/fonts/phosphor/Phosphor-Fill.ttf

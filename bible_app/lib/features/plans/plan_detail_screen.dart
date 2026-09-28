@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../core/icons.dart';
 
 import '../../app/providers.dart';
 import '../../bible/references.dart';
@@ -340,60 +341,65 @@ class _DayCard extends ConsumerWidget {
           for (final pass in passages)
             Padding(
               padding: const EdgeInsets.only(bottom: Space.x2),
-              child: Pressable(
-                onTap: () async {
-                  final completed = await context.push<bool>(
-                    ReaderArgs.location(
-                      VerseRef(
-                        pass.bookId,
-                        pass.startChapter,
-                        pass.startVerse ?? 1,
-                      ),
-                      plan: user.progressId,
-                      day: day,
-                    ),
-                  );
-                  if (completed == true && context.mounted) {
-                    final plans = await ref.read(userPlansProvider.future);
-                    final now = plans
-                        .where((u) => u.progressId == user.progressId)
-                        .firstOrNull;
-                    if (now != null &&
-                        now.state.isFinished &&
-                        context.mounted) {
-                      await showPlanComplete(context, user.plan.title);
-                    }
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: Space.x4,
-                    vertical: Space.x3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: p.onPastel.withValues(alpha: 0.08),
-                    borderRadius: Radii.smAll,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        PhosphorIconsRegular.bookOpen,
-                        color: p.onPastel,
-                        size: 20,
-                      ),
-                      const SizedBox(width: Space.x3),
-                      Expanded(
-                        child: Text(
-                          pass.label,
-                          style: AppType.titleS.copyWith(color: p.onPastel),
+              child: Semantics(
+                button: true,
+                label: 'Read ${pass.label}',
+                excludeSemantics: true,
+                child: Pressable(
+                  onTap: () async {
+                    final completed = await context.push<bool>(
+                      ReaderArgs.location(
+                        VerseRef(
+                          pass.bookId,
+                          pass.startChapter,
+                          pass.startVerse ?? 1,
                         ),
+                        plan: user.progressId,
+                        day: day,
                       ),
-                      Icon(
-                        PhosphorIconsBold.arrowRight,
-                        color: p.onPastel,
-                        size: 18,
-                      ),
-                    ],
+                    );
+                    if (completed == true && context.mounted) {
+                      final plans = await ref.read(userPlansProvider.future);
+                      final now = plans
+                          .where((u) => u.progressId == user.progressId)
+                          .firstOrNull;
+                      if (now != null &&
+                          now.state.isFinished &&
+                          context.mounted) {
+                        await showPlanComplete(context, user.plan.title);
+                      }
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Space.x4,
+                      vertical: Space.x3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: p.onPastel.withValues(alpha: 0.08),
+                      borderRadius: Radii.smAll,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          PhosphorIconsRegular.bookOpen,
+                          color: p.onPastel,
+                          size: 20,
+                        ),
+                        const SizedBox(width: Space.x3),
+                        Expanded(
+                          child: Text(
+                            pass.label,
+                            style: AppType.titleS.copyWith(color: p.onPastel),
+                          ),
+                        ),
+                        Icon(
+                          PhosphorIconsBold.arrowRight,
+                          color: p.onPastel,
+                          size: 18,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

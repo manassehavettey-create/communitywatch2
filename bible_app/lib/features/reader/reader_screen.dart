@@ -5,7 +5,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../core/icons.dart';
+
 import 'package:share_plus/share_plus.dart';
 
 import '../../app/providers.dart';
@@ -427,7 +429,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen>
             curve: m.standard,
             child: _TopBar(
               theme: style.theme,
-              title: _top.chapterRef.label,
+              // Short book names keep the title readable on phones.
+              title: width < 430
+                  ? '${_top.chapterRef.book.abbr} ${_top.chapterRef.chapter}'
+                  : _top.chapterRef.label,
               translation: bible.info.abbreviation,
               onBack: () =>
                   context.canPop() ? context.pop() : context.go('/bible'),
@@ -685,7 +690,7 @@ class _TopBar extends StatelessWidget {
       onPressed: onTap,
     );
     return Container(
-      color: theme.background.withValues(alpha: 0.96),
+      color: theme.background,
       padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
       child: SizedBox(
         height: 64,

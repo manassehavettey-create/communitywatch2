@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../core/icons.dart';
+
 import 'package:share_plus/share_plus.dart';
 
 import '../../app/providers.dart';
@@ -74,9 +76,10 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
         : ref.watch(bibleTextProvider(catalog?.resolve(id).id ?? id)).value;
 
     final verses = bible?.versesIn(widget.range) ?? const [];
+    // Cards read as one passage, without verse numbers.
     final text = [
-      for (final (ref, t) in verses)
-        '${verses.length > 1 ? '${ref.verse} ' : ''}${VerseText.plain(t, suppliedWords: bible!.info.suppliedWords)}',
+      for (final (_, t) in verses)
+        VerseText.plain(t, suppliedWords: bible!.info.suppliedWords),
     ].join(' ');
     final label =
         '${widget.range.label}${bible == null ? '' : ' ${bible.info.abbreviation}'}';

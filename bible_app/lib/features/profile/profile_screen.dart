@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../core/icons.dart';
 
 import '../../app/providers.dart';
 import '../../core/motion/reveal.dart';
@@ -39,7 +40,9 @@ class ProfileScreen extends ConsumerWidget {
       prayers: ref.watch(prayersProvider).value?.length ?? 0,
     );
     final name = user?.displayName ?? user?.email?.split('@').first;
-    final initials = (name ?? '·').trim().characters.first.toUpperCase();
+    final initial = name == null || name.trim().isEmpty
+        ? null
+        : name.trim().characters.first.toUpperCase();
 
     final headerBg = p.isDark ? p.surface : p.ink;
     final headerFg = p.isDark ? p.ink : p.paper;
@@ -70,10 +73,16 @@ class ProfileScreen extends ConsumerWidget {
                     Sticker(
                       color: p.butter,
                       size: 64,
-                      child: Text(
-                        initials,
-                        style: AppType.titleL.copyWith(color: p.onPastel),
-                      ),
+                      child: initial == null
+                          ? Icon(
+                              PhosphorIconsRegular.user,
+                              size: 28,
+                              color: p.onPastel,
+                            )
+                          : Text(
+                              initial,
+                              style: AppType.titleL.copyWith(color: p.onPastel),
+                            ),
                     ),
                     const Spacer(),
                     CircleIconButton(

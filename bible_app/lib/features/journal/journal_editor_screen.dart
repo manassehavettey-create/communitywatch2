@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../core/icons.dart';
 
 import '../../app/providers.dart';
 import '../../core/theme/tokens.dart';
@@ -168,29 +169,35 @@ class _JournalEditorScreenState extends ConsumerState<JournalEditorScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(Space.gutter),
                 children: [
-                  Pressable(
-                    onTap: () async {
-                      final d = await showDatePicker(
-                        context: context,
-                        initialDate: _date,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now().add(const Duration(days: 1)),
-                      );
-                      if (d != null) setState(() => _date = d);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(
-                          PhosphorIconsRegular.calendarBlank,
-                          size: 18,
-                          color: p.inkSoft,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          DateFormat('EEEE d MMMM y').format(_date),
-                          style: AppType.label.copyWith(color: p.inkSoft),
-                        ),
-                      ],
+                  Semantics(
+                    button: true,
+                    label:
+                        'Entry date, ${DateFormat('EEEE d MMMM y').format(_date)}',
+                    excludeSemantics: true,
+                    child: Pressable(
+                      onTap: () async {
+                        final d = await showDatePicker(
+                          context: context,
+                          initialDate: _date,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime.now().add(const Duration(days: 1)),
+                        );
+                        if (d != null) setState(() => _date = d);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            PhosphorIconsRegular.calendarBlank,
+                            size: 18,
+                            color: p.inkSoft,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            DateFormat('EEEE d MMMM y').format(_date),
+                            style: AppType.label.copyWith(color: p.inkSoft),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   TextField(

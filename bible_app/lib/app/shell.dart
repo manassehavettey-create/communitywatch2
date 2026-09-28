@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../core/icons.dart';
 
 import '../core/haptics.dart';
 import '../core/motion/motion.dart';
