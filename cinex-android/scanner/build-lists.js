@@ -20,10 +20,12 @@ const allow = new Set([own]);
 const why = {};
 const note = (d, r) => { (why[d] ||= new Set()).add(r); };
 
+const mainD = new Set(); // every domain the site itself (not a popup) loaded
 const iframeD = new Set(), mediaD = new Set(), scriptD = new Set(), popupD = new Set(), redirD = new Set(), otherD = new Set();
 for (const r of log.requests) {
   const d = root(r.domain); if (!d) continue;
   if (r.origin === 'popup') { popupD.add(d); continue; }
+  mainD.add(d);
   if (r.type === 'iframe') iframeD.add(d);
   else if (r.type === 'media') mediaD.add(d);
   else if (r.type === 'script') scriptD.add(d);
@@ -44,10 +46,12 @@ for (const d of prev.allow || []) if (!allow.has(d)) { allow.add(d); note(d, 'ke
 for (const d of prev.manualAllow || []) { allow.add(d); note(d, 'manual/retest'); }
 
 const block = new Set();
-for (const d of [...popupD, ...redirD]) if (!allow.has(d)) { block.add(d); note(d, popupD.has(d) ? 'popup' : 'redirect'); }
-for (const d of scriptD) if (!allow.has(d) && (isAd(d) || popupD.has(d) || redirD.has(d))) { block.add(d); note(d, 'ad script'); }
+// Popup / redirect domains are blocked only if the site's own pages never needed them
+// (so shared CDNs a popup happened to load, like gstatic or jsdelivr, stay usable).
+for (const d of [...popupD, ...redirD]) if (!allow.has(d) && (!mainD.has(d) || redirD.has(d))) { block.add(d); note(d, redirD.has(d) ? 'redirect' : 'popup'); }
+for (const d of scriptD) if (!allow.has(d) && isAd(d)) { block.add(d); note(d, 'ad script'); }
 for (const d of otherD) if (!allow.has(d) && isAd(d)) { block.add(d); note(d, 'ad/tracker'); }
-for (const d of prev.block || []) if (!allow.has(d)) block.add(d);
+for (const d of prev.block || []) if (!allow.has(d) && !mainD.has(d)) block.add(d);
 
 const neutral = [...new Set([...scriptD, ...otherD])].filter((d) => !allow.has(d) && !block.has(d)).sort();
 const cfg = {
