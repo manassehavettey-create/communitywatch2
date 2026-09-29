@@ -107,6 +107,7 @@ async function main() {
       await clickPlay(page);
       await sleep(3000);
       await page.screenshot({ path: `video${i}.png` }).catch(() => {});
+      if (i < 2 || process.env.DIAG) console.log('DIAG', url, JSON.stringify(await diag(page)));
       const servers = await findServers(page);
       info.serverCount = servers.length;
       console.log(`${url}: ${servers.length} server options`);
@@ -135,6 +136,21 @@ async function main() {
   fs.writeFileSync(OUT, JSON.stringify(log, null, 1));
   console.log(`requests=${log.requests.length} popups=${log.popups.length} redirects=${log.redirects.length}`);
   await browser.close();
+}
+
+// Dump what is clickable on a page so selectors can be tuned from the CI log.
+async function diag(page) {
+  return page.evaluate(() => {
+    const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 2 && r.height > 2; };
+    const d = (el) => `${el.tagName.toLowerCase()}.${(el.className && el.className.baseVal === undefined ? el.className : '').toString().slice(0, 60)}|${(el.innerText || el.getAttribute('aria-label') || '').trim().replace(/\s+/g, ' ').slice(0, 40)}|${el.getAttribute('href') || ''}`;
+    return {
+      url: location.href,
+      buttons: [...document.querySelectorAll('button,[role=button],[onclick],select,option,li[data-id],[data-server],[data-id]')].filter(vis).slice(0, 60).map(d),
+      links: [...new Set([...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')))].filter((h) => !/^(https?:)?\/\/(?!cinex)/.test(h)).slice(0, 60),
+      iframes: [...document.querySelectorAll('iframe')].map((f) => f.src.slice(0, 150)),
+      videos: document.querySelectorAll('video').length,
+    };
+  }).catch((e) => ({ error: e.message }));
 }
 
 main().catch((e) => { console.error(e); log.errors.push(String(e)); fs.writeFileSync(OUT, JSON.stringify(log, null, 1)); process.exit(1); });

@@ -164,7 +164,7 @@ public class MainActivity extends Activity {
                 root.addView(view, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 web.setVisibility(View.GONE);
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-                setImmersive(true);
+                setFullscreenUi(true);
                 Log.i(TAG, "FULLSCREEN_ON");
             }
 
@@ -195,12 +195,12 @@ public class MainActivity extends Activity {
         if (customViewCallback != null) customViewCallback.onCustomViewHidden();
         customViewCallback = null;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-        setImmersive(false);
+        setFullscreenUi(false);
         Log.i(TAG, "FULLSCREEN_OFF");
     }
 
     @SuppressWarnings("deprecation")
-    private void setImmersive(boolean on) {
+    private void setFullscreenUi(boolean on) {
         if (android.os.Build.VERSION.SDK_INT >= 30) {
             WindowInsetsController c = getWindow().getInsetsController();
             if (c == null) return;
