@@ -52,11 +52,11 @@ function attach(page, origin) {
 }
 
 async function main() {
-  const browser = await chromium.launch({ headless: process.env.HEADLESS === '1', args: ['--autoplay-policy=no-user-gesture-required'] });
+  const browser = await chromium.launch({ headless: process.env.HEADLESS === '1', args: ['--autoplay-policy=no-user-gesture-required', '--disable-blink-features=AutomationControlled'] });
   const ctx = await browser.newContext({
     viewport: { width: 1366, height: 800 },
-    userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36',
   });
+  await ctx.addInitScript(() => Object.defineProperty(navigator, 'webdriver', { get: () => undefined }));
   const page = await ctx.newPage();
   attach(page, 'main');
 
@@ -84,7 +84,8 @@ async function main() {
   // Homepage
   current = 'home';
   await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 60000 }).catch((e) => log.errors.push('home: ' + e.message));
-  await sleep(6000);
+  await waitContent(page);
+  console.log('DIAG home', JSON.stringify(await diag(page)).slice(0, 3000));
   await page.mouse.wheel(0, 3000); await sleep(2000);
   const links = await page.$$eval('a[href]', (as) => as.map((a) => a.href)).catch(() => []);
   const home = host(BASE).replace(/^www\./, '');
@@ -102,7 +103,7 @@ async function main() {
     log.pages.push(info);
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await sleep(5000);
+      await waitContent(page);
       // Some sites need a "Watch now"/play click before servers render.
       await clickPlay(page);
       await sleep(3000);
@@ -138,6 +139,17 @@ async function main() {
   await browser.close();
 }
 
+// Wait (up to 30s) until the page has real content: gets past Cloudflare checks and SPA hydration.
+async function waitContent(page) {
+  for (let t = 0; t < 15; t++) {
+    await sleep(2000);
+    const n = await page.evaluate(() => document.querySelectorAll('a[href],button').length).catch(() => 0);
+    const title = await page.title().catch(() => '');
+    if (n > 5 && !/just a moment|attention required|checking/i.test(title)) { await sleep(2000); return true; }
+  }
+  return false;
+}
+
 // Dump what is clickable on a page so selectors can be tuned from the CI log.
 async function diag(page) {
   return page.evaluate(() => {
@@ -149,6 +161,7 @@ async function diag(page) {
       links: [...new Set([...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')))].filter((h) => !/^(https?:)?\/\/(?!cinex)/.test(h)).slice(0, 60),
       iframes: [...document.querySelectorAll('iframe')].map((f) => f.src.slice(0, 150)),
       videos: document.querySelectorAll('video').length,
+      title: document.title, text: document.body ? document.body.innerText.replace(/\s+/g, ' ').slice(0, 600) : '',
     };
   }).catch((e) => ({ error: e.message }));
 }
