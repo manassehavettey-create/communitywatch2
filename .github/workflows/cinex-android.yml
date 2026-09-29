@@ -28,25 +28,31 @@ jobs:
             cinex-android/scanner/*.png
             cinex-android/scanner/*.html
 
+  # Builds from the committed, emulator-verified domains.json so a Cloudflare-challenged
+  # scan can never ship a worse list; publishes the APK as a GitHub Release.
   build:
-    needs: scan
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions: { contents: write }
     defaults: { run: { working-directory: cinex-android } }
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with: { name: scan, path: scan }
-      - run: cp ../scan/domains.json app/src/main/assets/domains.json
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 17 }
       - name: Step 3 - build APK
         run: ./gradlew --no-daemon assembleDebug
       - uses: actions/upload-artifact@v4
         with: { name: cinex-apk, path: cinex-android/app/build/outputs/apk/debug/app-debug.apk }
+      - name: Publish release
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk Cinex.apk
+          gh release create "cinex-build-${{ github.run_number }}" Cinex.apk \
+            --target "${{ github.sha }}" --title "Cinex Android build ${{ github.run_number }}" \
+            --notes "Cinex WebView app: popups blocked, off-allowlist redirects cancelled, fullscreen video, back button. Download Cinex.apk and install (allow installs from unknown sources)."
 
   emulator-test:
-    needs: build
+    needs: [scan, build]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
