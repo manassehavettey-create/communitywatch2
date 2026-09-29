@@ -52,7 +52,14 @@ void main() {
     test('ordered by page within a book', () async {
       for (final p in [30, 5, 18]) {
         await repo.addHighlight(
-            bookId: book, page: p, content: 'x', color: 0, startIndex: 0, endIndex: 1, rects: const []);
+          bookId: book,
+          page: p,
+          content: 'x',
+          color: 0,
+          startIndex: 0,
+          endIndex: 1,
+          rects: const [],
+        );
       }
       final list = await repo.watchHighlightsForBook(book).first;
       expect(list.map((h) => h.page), [5, 18, 30]);
@@ -93,7 +100,14 @@ void main() {
 
     test('note survives deleting its highlight', () async {
       final h = await repo.addHighlight(
-          bookId: book, page: 1, content: 'x', color: 0, startIndex: 0, endIndex: 1, rects: const []);
+        bookId: book,
+        page: 1,
+        content: 'x',
+        color: 0,
+        startIndex: 0,
+        endIndex: 1,
+        rects: const [],
+      );
       final n = await repo.addNote(bookId: book, page: 1, passage: 'x', body: 'y', highlightId: h);
       await repo.deleteHighlight(h);
       final note = (await repo.getNote(n))!;
@@ -112,8 +126,7 @@ void main() {
     });
 
     test('passage bookmarks are separate from the page bookmark', () async {
-      await repo.addBookmark(
-          bookId: book, page: 7, title: 'Great line', previewText: 'text', isPassage: true);
+      await repo.addBookmark(bookId: book, page: 7, title: 'Great line', previewText: 'text', isPassage: true);
       expect(await repo.pageBookmark(book, 7), isNull);
       final id = (await repo.watchBookmarksForBook(book).first).single.id;
       await repo.renameBookmark(id, 'Renamed');
@@ -124,8 +137,7 @@ void main() {
   });
 
   test('counts and cascade delete with the book', () async {
-    await repo.addHighlight(
-        bookId: book, page: 1, content: 'x', color: 0, startIndex: 0, endIndex: 1, rects: const []);
+    await repo.addHighlight(bookId: book, page: 1, content: 'x', color: 0, startIndex: 0, endIndex: 1, rects: const []);
     await repo.addNote(bookId: book, page: 1, passage: 'x', body: 'y');
     await repo.addBookmark(bookId: book, page: 1, title: 't', previewText: 'p');
     final books = BooksRepository(db);

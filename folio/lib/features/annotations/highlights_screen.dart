@@ -41,7 +41,12 @@ class _HighlightsScreenState extends ConsumerState<HighlightsScreen> {
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: Space.gutter, vertical: Space.x1),
           children: [
-            PillChip(label: 'All colours', selected: _color == null, dense: true, onTap: () => setState(() => _color = null)),
+            PillChip(
+              label: 'All colours',
+              selected: _color == null,
+              dense: true,
+              onTap: () => setState(() => _color = null),
+            ),
             for (final c in ShelfColor.highlightColors) ...[
               const SizedBox(width: Space.x2),
               Semantics(
@@ -57,7 +62,10 @@ class _HighlightsScreenState extends ConsumerState<HighlightsScreen> {
                     decoration: BoxDecoration(
                       color: c.strong,
                       shape: BoxShape.circle,
-                      border: Border.all(color: _color == c.index ? context.colors.ink : Colors.transparent, width: 2.5),
+                      border: Border.all(
+                        color: _color == c.index ? context.colors.ink : Colors.transparent,
+                        width: 2.5,
+                      ),
                     ),
                   ),
                 ),
@@ -76,7 +84,8 @@ class _HighlightsScreenState extends ConsumerState<HighlightsScreen> {
               child: EmptyState(
                 art: Art.emptyHighlights,
                 title: _color != null || _book != null ? 'No highlights match' : 'No highlights yet',
-                message: 'While reading, select a passage and tap a colour. Your highlights from every '
+                message:
+                    'While reading, select a passage and tap a colour. Your highlights from every '
                     'book collect here.',
               ),
             );

@@ -9,8 +9,16 @@ import 'package:folio/data/repositories/settings_repository.dart';
 import 'package:folio/features/reader/reader_selection.dart';
 import 'package:folio/features/reader/text_reader_view.dart';
 
-Book _book(int id, String title, {String? author, BookStatus status = BookStatus.unread, int furthest = 0,
-    bool fav = false, DateTime? opened, DateTime? added}) {
+Book _book(
+  int id,
+  String title, {
+  String? author,
+  BookStatus status = BookStatus.unread,
+  int furthest = 0,
+  bool fav = false,
+  DateTime? opened,
+  DateTime? added,
+}) {
   return Book(
     id: id,
     title: title,
@@ -92,19 +100,38 @@ void main() {
     });
 
     test('sorts', () {
-      expect(ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.title, filter: LibraryFilter.all)), [2, 3, 4, 1]);
-      expect(ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.author, filter: LibraryFilter.all)), [3, 1, 2, 4]);
+      expect(ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.title, filter: LibraryFilter.all)), [
+        2,
+        3,
+        4,
+        1,
+      ]);
+      expect(ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.author, filter: LibraryFilter.all)), [
+        3,
+        1,
+        2,
+        4,
+      ]);
       expect(ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.progress, filter: LibraryFilter.all)).first, 2);
-      expect(ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.recentlyOpened, filter: LibraryFilter.all)).take(2),
-          [3, 1]);
-      expect(ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.recentlyAdded, filter: LibraryFilter.all)).first, 4);
+      expect(
+        ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.recentlyOpened, filter: LibraryFilter.all)).take(2),
+        [3, 1],
+      );
+      expect(
+        ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.recentlyAdded, filter: LibraryFilter.all)).first,
+        4,
+      );
     });
 
     test('search matches title, author and file name, case-insensitively', () {
-      expect(ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.title, filter: LibraryFilter.all, query: 'TOLST')),
-          [2]);
-      expect(ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.title, filter: LibraryFilter.all, query: 'walden')),
-          [1]);
+      expect(
+        ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.title, filter: LibraryFilter.all, query: 'TOLST')),
+        [2],
+      );
+      expect(
+        ids(BooksRepository.sortAndFilter(books, sort: LibrarySort.title, filter: LibraryFilter.all, query: 'walden')),
+        [1],
+      );
     });
   });
 
@@ -134,9 +161,9 @@ void main() {
   test('night page filter dims white pages and keeps hue (not a plain inversion)', () {
     final m = ReaderTheme.nightMatrix();
     List<int> apply(int r, int g, int b) => [
-          for (var row = 0; row < 3; row++)
-            (m[row * 5] * r + m[row * 5 + 1] * g + m[row * 5 + 2] * b + m[row * 5 + 4]).round().clamp(0, 255),
-        ];
+      for (var row = 0; row < 3; row++)
+        (m[row * 5] * r + m[row * 5 + 1] * g + m[row * 5 + 2] * b + m[row * 5 + 4]).round().clamp(0, 255),
+    ];
     expect(apply(255, 255, 255), [30, 28, 25]); // white page -> warm dark
     expect(apply(0, 0, 0), [217, 208, 191]); // black text -> warm light
     final red = apply(220, 40, 40);

@@ -71,11 +71,7 @@ class BookCover extends StatelessWidget {
               bottom: 0,
               width: width * 0.07,
               child: const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0x33000000), Color(0x00000000)],
-                  ),
-                ),
+                decoration: BoxDecoration(gradient: LinearGradient(colors: [Color(0x33000000), Color(0x00000000)])),
               ),
             ),
             Positioned(
@@ -91,11 +87,7 @@ class BookCover extends StatelessWidget {
     );
 
     if (!hero) return cover;
-    return Hero(
-      tag: heroTag(book.id),
-      transitionOnUserGestures: true,
-      child: cover,
-    );
+    return Hero(tag: heroTag(book.id), transitionOnUserGestures: true, child: cover);
   }
 }
 
@@ -139,11 +131,7 @@ class _TypeCover extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: withWeight(
-                  TextStyle(
-                    fontFamily: Fonts.ui,
-                    fontSize: 9 * scale,
-                    color: const Color(0xCC161514),
-                  ),
+                  TextStyle(fontFamily: Fonts.ui, fontSize: 9 * scale, color: const Color(0xCC161514)),
                   700,
                 ),
               ),

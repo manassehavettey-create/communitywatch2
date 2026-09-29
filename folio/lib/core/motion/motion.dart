@@ -7,8 +7,7 @@ class Motion {
 
   final bool reduced;
 
-  static Motion of(BuildContext context) =>
-      Motion._(MediaQuery.maybeDisableAnimationsOf(context) ?? false);
+  static Motion of(BuildContext context) => Motion._(MediaQuery.maybeDisableAnimationsOf(context) ?? false);
 
   static const Duration _fast = Duration(milliseconds: 160);
   static const Duration _base = Duration(milliseconds: 240);
@@ -20,8 +19,7 @@ class Motion {
   Duration get slow => reduced ? Duration.zero : _slow;
 
   /// Entrance delay for the [index]th item in a list (capped at 8 items).
-  Duration stagger(int index) =>
-      reduced ? Duration.zero : _stagger * (index.clamp(0, 8));
+  Duration stagger(int index) => reduced ? Duration.zero : _stagger * (index.clamp(0, 8));
 
   static const Curve curve = Curves.easeOutCubic;
   static const Curve emphasized = Curves.easeInOutCubic;

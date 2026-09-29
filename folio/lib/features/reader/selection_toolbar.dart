@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../core/theme/tokens.dart';
@@ -9,12 +10,7 @@ enum SelectionAction { bookmark, note, copy, share, askAi, explain }
 /// Floating toolbar shown when text is selected: highlight colours on top,
 /// actions below. Slides up like a mini bottom sheet.
 class SelectionToolbar extends StatelessWidget {
-  const SelectionToolbar({
-    super.key,
-    required this.onHighlight,
-    required this.onAction,
-    required this.dark,
-  });
+  const SelectionToolbar({super.key, required this.onHighlight, required this.onAction, required this.dark});
 
   final ValueChanged<ShelfColor> onHighlight;
   final ValueChanged<SelectionAction> onAction;
@@ -25,34 +21,36 @@ class SelectionToolbar extends StatelessWidget {
     final bg = dark ? const Color(0xFF262320) : const Color(0xFF161514);
     const fg = Color(0xFFF6F1E7);
     Widget action(IconData icon, String label, SelectionAction a) => Expanded(
-          child: Semantics(
-            button: true,
-            label: label,
-            excludeSemantics: true,
-            child: InkResponse(
-              onTap: () {
-                HapticFeedback.selectionClick();
-                onAction(a);
-              },
-              radius: 28,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(icon, size: 20, color: fg),
-                    const SizedBox(height: 4),
-                    Text(label,
-                        maxLines: 1,
-                        overflow: TextOverflow.fade,
-                        softWrap: false,
-                        style: context.text.labelSmall?.copyWith(color: fg.withValues(alpha: 0.8), letterSpacing: 0)),
-                  ],
+      child: Semantics(
+        button: true,
+        label: label,
+        excludeSemantics: true,
+        child: InkResponse(
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onAction(a);
+          },
+          radius: 28,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 20, color: fg),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                  style: context.text.labelSmall?.copyWith(color: fg.withValues(alpha: 0.8), letterSpacing: 0),
                 ),
-              ),
+              ],
             ),
           ),
-        );
+        ),
+      ),
+    );
 
     return Material(
       color: bg,

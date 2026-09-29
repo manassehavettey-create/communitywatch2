@@ -98,14 +98,8 @@ class PillChip extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (icon != null) ...[
-                Icon(icon, size: 16, color: selected ? c.onInk : c.ink),
-                const SizedBox(width: 6),
-              ],
-              Text(
-                label,
-                style: context.text.labelMedium?.copyWith(color: selected ? c.onInk : c.ink),
-              ),
+              if (icon != null) ...[Icon(icon, size: 16, color: selected ? c.onInk : c.ink), const SizedBox(width: 6)],
+              Text(label, style: context.text.labelMedium?.copyWith(color: selected ? c.onInk : c.ink)),
             ],
           ),
         ),
@@ -128,8 +122,7 @@ class SectionHeader extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: Text(title, style: context.text.titleLarge)),
-          if (action != null)
-            TextButton(onPressed: onAction, child: Text(action!)),
+          if (action != null) TextButton(onPressed: onAction, child: Text(action!)),
         ],
       ),
     );
@@ -187,10 +180,7 @@ class ScreenTitle extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Semantics(header: true, child: Text(title, style: context.text.displayLarge)),
-                if (subtitle != null) ...[
-                  const SizedBox(height: 4),
-                  Text(subtitle!, style: context.text.bodySmall),
-                ],
+                if (subtitle != null) ...[const SizedBox(height: 4), Text(subtitle!, style: context.text.bodySmall)],
               ],
             ),
           ),
@@ -231,9 +221,7 @@ Future<bool> confirmDialog(
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
         FilledButton(
-          style: destructive
-              ? FilledButton.styleFrom(backgroundColor: c.danger, foregroundColor: Colors.white)
-              : null,
+          style: destructive ? FilledButton.styleFrom(backgroundColor: c.danger, foregroundColor: Colors.white) : null,
           onPressed: () => Navigator.pop(ctx, true),
           child: Text(confirmLabel),
         ),

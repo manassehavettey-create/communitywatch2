@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -42,18 +43,30 @@ Future<void> showBookActionsSheet(BuildContext context, WidgetRef ref, Book book
               book.favorite ? 'Remove from favorites' : 'Add to favorites',
               () => repo.setFavorite(book.id, !book.favorite),
             ),
-            item(PhosphorIconsRegular.folderSimple, 'Add to collection',
-                () => showCollectionsPicker(context, ref, book.id)),
-            item(PhosphorIconsRegular.pencilSimple, 'Edit title and author',
-                () => editBookInfo(context, ref, book)),
+            item(
+              PhosphorIconsRegular.folderSimple,
+              'Add to collection',
+              () => showCollectionsPicker(context, ref, book.id),
+            ),
+            item(PhosphorIconsRegular.pencilSimple, 'Edit title and author', () => editBookInfo(context, ref, book)),
             if (book.status != BookStatus.finished)
-              item(PhosphorIconsRegular.checkCircle, 'Mark as finished',
-                  () => repo.setStatus(book.id, BookStatus.finished))
+              item(
+                PhosphorIconsRegular.checkCircle,
+                'Mark as finished',
+                () => repo.setStatus(book.id, BookStatus.finished),
+              )
             else
-              item(PhosphorIconsRegular.arrowCounterClockwise, 'Mark as unread',
-                  () => repo.setStatus(book.id, BookStatus.unread)),
-            item(PhosphorIconsRegular.trash, 'Remove from library', () => deleteBookFlow(context, ref, book),
-                danger: true),
+              item(
+                PhosphorIconsRegular.arrowCounterClockwise,
+                'Mark as unread',
+                () => repo.setStatus(book.id, BookStatus.unread),
+              ),
+            item(
+              PhosphorIconsRegular.trash,
+              'Remove from library',
+              () => deleteBookFlow(context, ref, book),
+              danger: true,
+            ),
             const SizedBox(height: Space.x2),
           ],
         ),

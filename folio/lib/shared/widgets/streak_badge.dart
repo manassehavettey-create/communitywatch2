@@ -20,8 +20,7 @@ class StreakBadge extends StatefulWidget {
 }
 
 class _StreakBadgeState extends State<StreakBadge> with SingleTickerProviderStateMixin {
-  late final AnimationController _spin =
-      AnimationController(vsync: this, duration: const Duration(seconds: 24));
+  late final AnimationController _spin = AnimationController(vsync: this, duration: const Duration(seconds: 24));
 
   @override
   void didChangeDependencies() {
@@ -53,13 +52,12 @@ class _StreakBadgeState extends State<StreakBadge> with SingleTickerProviderStat
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Container(decoration: BoxDecoration(color: fill, shape: BoxShape.circle)),
+            Container(
+              decoration: BoxDecoration(color: fill, shape: BoxShape.circle),
+            ),
             RotationTransition(
               turns: _spin,
-              child: CustomPaint(
-                size: Size.square(widget.size),
-                painter: _CircleTextPainter(label, ink, widget.size),
-              ),
+              child: CustomPaint(size: Size.square(widget.size), painter: _CircleTextPainter(label, ink, widget.size)),
             ),
             TweenAnimationBuilder<double>(
               tween: Tween(begin: 0, end: widget.days.toDouble()),
@@ -67,10 +65,7 @@ class _StreakBadgeState extends State<StreakBadge> with SingleTickerProviderStat
               curve: Motion.curve,
               builder: (context, v, _) => Text(
                 '${v.round()}',
-                style: context.text.displayMedium?.copyWith(
-                  color: ink,
-                  fontSize: widget.size * 0.34,
-                ),
+                style: context.text.displayMedium?.copyWith(color: ink, fontSize: widget.size * 0.34),
               ),
             ),
           ],
@@ -96,15 +91,19 @@ class _CircleTextPainter extends CustomPainter {
     );
     // Repeat the label to fill the circumference.
     final circumference = 2 * math.pi * radius;
-    final one = TextPainter(text: TextSpan(text: text, style: style), textDirection: TextDirection.ltr)
-      ..layout();
+    final one = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+    )..layout();
     final reps = math.max(1, (circumference / one.width).floor());
     final full = List.filled(reps, text).join();
     final charAngle = 2 * math.pi / full.length;
     var angle = -math.pi / 2;
     for (final ch in full.characters) {
-      final tp = TextPainter(text: TextSpan(text: ch, style: style), textDirection: TextDirection.ltr)
-        ..layout();
+      final tp = TextPainter(
+        text: TextSpan(text: ch, style: style),
+        textDirection: TextDirection.ltr,
+      )..layout();
       canvas.save();
       canvas.translate(center.dx + radius * math.cos(angle), center.dy + radius * math.sin(angle));
       canvas.rotate(angle + math.pi / 2);

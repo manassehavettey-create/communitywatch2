@@ -13,7 +13,9 @@ Future<int> seedBook(
   int pages = 100,
   DateTime? addedAt,
 }) {
-  return db.into(db.books).insert(
+  return db
+      .into(db.books)
+      .insert(
         BooksCompanion.insert(
           title: title,
           originalFileName: '$title.pdf',

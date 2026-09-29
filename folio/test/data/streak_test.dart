@@ -49,17 +49,17 @@ void main() {
     });
 
     test('duplicate timestamps on the same day count once', () {
-      final r = computeStreak(
-        [DateTime(2026, 3, 10, 8), DateTime(2026, 3, 10, 22), DateTime(2026, 3, 9, 1)],
-        now,
-      );
+      final r = computeStreak([DateTime(2026, 3, 10, 8), DateTime(2026, 3, 10, 22), DateTime(2026, 3, 9, 1)], now);
       expect(r.current, 2);
     });
 
     test('works across a DST change', () {
       // Days are compared as calendar dates, not 24h spans.
-      final r = computeStreak([DateTime(2026, 3, 28), DateTime(2026, 3, 29), DateTime(2026, 3, 30)],
-          DateTime(2026, 3, 30, 12));
+      final r = computeStreak([
+        DateTime(2026, 3, 28),
+        DateTime(2026, 3, 29),
+        DateTime(2026, 3, 30),
+      ], DateTime(2026, 3, 30, 12));
       expect(r.current, 3);
     });
   });
@@ -90,8 +90,7 @@ void main() {
       expect(s.totalSeconds, 620);
       expect(s.streak.current, 2);
       expect(s.streak.readToday, isTrue);
-      expect(s.lastDays(7, DateTime(2026, 3, 10)).map((e) => e.pages).toList(),
-          [0, 0, 0, 0, 0, 3, 6]);
+      expect(s.lastDays(7, DateTime(2026, 3, 10)).map((e) => e.pages).toList(), [0, 0, 0, 0, 0, 3, 6]);
     });
 
     test('history survives deleting the book', () async {

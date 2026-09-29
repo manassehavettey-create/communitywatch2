@@ -17,10 +17,10 @@ class PdfInfo {
 /// PDFium worker isolate, because PDFium is not thread-safe.
 Future<PdfInfo> readPdfInfo(String path) async {
   await PdfrxEntryFunctions.instance.init();
-  final result = await PdfrxEntryFunctions.instance.compute(
-    _readInfo,
-    (path: path, modulePath: Pdfrx.pdfiumModulePath),
-  );
+  final result = await PdfrxEntryFunctions.instance.compute(_readInfo, (
+    path: path,
+    modulePath: Pdfrx.pdfiumModulePath,
+  ));
   return PdfInfo(title: result.$1, author: result.$2);
 }
 
@@ -60,7 +60,8 @@ Future<PdfInfo> readPdfInfo(String path) async {
 String chooseTitle(String? embedded, String fileName) {
   final t = embedded?.trim() ?? '';
   final lower = t.toLowerCase();
-  final junk = t.isEmpty ||
+  final junk =
+      t.isEmpty ||
       t.length < 2 ||
       lower == 'untitled' ||
       lower.startsWith('microsoft word') ||

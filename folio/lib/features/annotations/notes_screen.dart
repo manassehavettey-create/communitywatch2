@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -100,7 +101,7 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                 message: _query.isNotEmpty
                     ? 'Nothing matches “$_query”.'
                     : 'Select a passage while reading and tap Note to write down a thought. '
-                        'It’s saved with the book, page and passage.',
+                          'It’s saved with the book, page and passage.',
               ),
             );
           }
@@ -120,7 +121,10 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(Space.x3),
-                        decoration: BoxDecoration(color: ShelfColor.butter.cardBackground(b), borderRadius: Radii.mdAll),
+                        decoration: BoxDecoration(
+                          color: ShelfColor.butter.cardBackground(b),
+                          borderRadius: Radii.mdAll,
+                        ),
                         child: Text(
                           '“${n.passage}”',
                           maxLines: 4,

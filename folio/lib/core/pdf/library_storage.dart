@@ -50,14 +50,14 @@ class LibraryStorage {
 /// SHA-256 of a file, streamed in a background isolate so large PDFs are
 /// never loaded into memory and the UI stays responsive.
 Future<String> sha256OfFile(String path) => Isolate.run(() async {
-      final sink = _DigestSink();
-      final input = sha256.startChunkedConversion(sink);
-      await for (final chunk in File(path).openRead()) {
-        input.add(chunk);
-      }
-      input.close();
-      return sink.value.toString();
-    });
+  final sink = _DigestSink();
+  final input = sha256.startChunkedConversion(sink);
+  await for (final chunk in File(path).openRead()) {
+    input.add(chunk);
+  }
+  input.close();
+  return sink.value.toString();
+});
 
 class _DigestSink implements Sink<Digest> {
   late Digest value;

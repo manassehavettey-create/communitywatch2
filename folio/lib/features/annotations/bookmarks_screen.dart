@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -63,7 +64,8 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
               child: EmptyState(
                 art: Art.emptyBookmarks,
                 title: 'No bookmarks yet',
-                message: 'Tap the bookmark at the top of the reader to save a page, or select a '
+                message:
+                    'Tap the bookmark at the top of the reader to save a page, or select a '
                     'passage and tap Bookmark.',
               ),
             );
@@ -86,7 +88,12 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
                 onDismissed: (_) async {
                   await repo.deleteBookmark(bm.id);
                   if (context.mounted) {
-                    showFolioSnack(context, 'Bookmark removed', action: 'Undo', onAction: () => repo.restoreBookmark(bm));
+                    showFolioSnack(
+                      context,
+                      'Bookmark removed',
+                      action: 'Undo',
+                      onAction: () => repo.restoreBookmark(bm),
+                    );
                   }
                 },
                 child: BlockCard(
@@ -102,9 +109,12 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
                           borderRadius: Radii.smAll,
                         ),
                         alignment: Alignment.center,
-                        child: Text('${bm.page}', style: context.text.titleSmall?.copyWith(
-                          color: ShelfColor.mint.cardForeground(context.brightness),
-                        )),
+                        child: Text(
+                          '${bm.page}',
+                          style: context.text.titleSmall?.copyWith(
+                            color: ShelfColor.mint.cardForeground(context.brightness),
+                          ),
+                        ),
                       ),
                       const SizedBox(width: Space.x4),
                       Expanded(
@@ -114,7 +124,12 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
                             Text(bm.title, style: context.text.titleMedium),
                             if (bm.previewText.isNotEmpty) ...[
                               const SizedBox(height: 4),
-                              Text(bm.previewText, maxLines: 3, overflow: TextOverflow.ellipsis, style: context.text.bodyMedium),
+                              Text(
+                                bm.previewText,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: context.text.bodyMedium,
+                              ),
                             ],
                             const SizedBox(height: Space.x2),
                             Text('${list[i].bookTitle} · ${relativeDay(bm.createdAt)}', style: context.text.bodySmall),

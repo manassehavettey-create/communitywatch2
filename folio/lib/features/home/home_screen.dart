@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -103,11 +104,7 @@ class HomeScreen extends ConsumerWidget {
                   child: _TodayRow(stats: stats, goalMinutes: settings.dailyGoalMinutes),
                 ),
               ],
-              SectionHeader(
-                'Recently added',
-                action: 'See all',
-                onAction: () => context.go('/library'),
-              ),
+              SectionHeader('Recently added', action: 'See all', onAction: () => context.go('/library')),
               SizedBox(
                 height: 236,
                 child: ListView.separated(
@@ -181,16 +178,27 @@ class _ContinueCard extends ConsumerWidget {
                     children: [
                       Text('CONTINUE READING', style: context.text.labelSmall?.copyWith(color: c.lime)),
                       const SizedBox(height: Space.x2),
-                      Text(book.title,
-                          maxLines: 2, overflow: TextOverflow.ellipsis, style: context.text.titleLarge?.copyWith(color: fg)),
+                      Text(
+                        book.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.text.titleLarge?.copyWith(color: fg),
+                      ),
                       if (book.author != null)
-                        Text(book.author!, maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: context.text.bodySmall?.copyWith(color: muted)),
+                        Text(
+                          book.author!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.text.bodySmall?.copyWith(color: muted),
+                        ),
                       const SizedBox(height: Space.x4),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text('${book.progressPercent}', style: context.text.displayMedium?.copyWith(color: fg, fontSize: 36)),
+                          Text(
+                            '${book.progressPercent}',
+                            style: context.text.displayMedium?.copyWith(color: fg, fontSize: 36),
+                          ),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 5, left: 2),
                             child: Text('%', style: context.text.titleMedium?.copyWith(color: fg)),
@@ -198,7 +206,10 @@ class _ContinueCard extends ConsumerWidget {
                           const Spacer(),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 6),
-                            child: Text('p. $page / ${book.pageCount}', style: context.text.labelMedium?.copyWith(color: muted)),
+                            child: Text(
+                              'p. $page / ${book.pageCount}',
+                              style: context.text.labelMedium?.copyWith(color: muted),
+                            ),
                           ),
                         ],
                       ),
@@ -235,12 +246,22 @@ class _StartCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('START SOMETHING NEW', style: context.text.labelSmall?.copyWith(color: ShelfColor.lilac.cardForeground(b))),
+                Text(
+                  'START SOMETHING NEW',
+                  style: context.text.labelSmall?.copyWith(color: ShelfColor.lilac.cardForeground(b)),
+                ),
                 const SizedBox(height: 6),
-                Text(book.title, maxLines: 2, overflow: TextOverflow.ellipsis,
-                    style: context.text.titleLarge?.copyWith(color: ShelfColor.lilac.cardForeground(b))),
+                Text(
+                  book.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.text.titleLarge?.copyWith(color: ShelfColor.lilac.cardForeground(b)),
+                ),
                 const SizedBox(height: 4),
-                Text('${book.pageCount} pages', style: context.text.bodySmall?.copyWith(color: ShelfColor.lilac.cardForeground(b))),
+                Text(
+                  '${book.pageCount} pages',
+                  style: context.text.bodySmall?.copyWith(color: ShelfColor.lilac.cardForeground(b)),
+                ),
               ],
             ),
           ),
@@ -263,32 +284,30 @@ class _TodayRow extends StatelessWidget {
     final minutes = stats.secondsToday ~/ 60;
     final goalProgress = goalMinutes <= 0 ? 0.0 : minutes / goalMinutes;
     Widget tile(ShelfColor color, String value, String label, {IconData? icon}) => Expanded(
-          child: Container(
-            height: 96,
-            padding: const EdgeInsets.all(Space.x3),
-            decoration: BoxDecoration(color: color.cardBackground(b), borderRadius: Radii.lgAll),
-            child: Column(
+      child: Container(
+        height: 96,
+        padding: const EdgeInsets.all(Space.x3),
+        decoration: BoxDecoration(color: color.cardBackground(b), borderRadius: Radii.lgAll),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(children: [if (icon != null) Icon(icon, size: 16, color: color.cardForeground(b))]),
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    if (icon != null) Icon(icon, size: 16, color: color.cardForeground(b)),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(value,
-                        style: context.text.headlineMedium?.copyWith(color: color.cardForeground(b), height: 1)),
-                    const SizedBox(height: 2),
-                    Text(label, style: context.text.bodySmall?.copyWith(color: color.cardForeground(b).withValues(alpha: 0.7))),
-                  ],
+                Text(value, style: context.text.headlineMedium?.copyWith(color: color.cardForeground(b), height: 1)),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: context.text.bodySmall?.copyWith(color: color.cardForeground(b).withValues(alpha: 0.7)),
                 ),
               ],
             ),
-          ),
-        );
+          ],
+        ),
+      ),
+    );
 
     return Column(
       children: [
@@ -313,10 +332,7 @@ class _TodayRow extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        goalProgress >= 1 ? 'Daily goal reached' : 'Today’s goal',
-                        style: context.text.titleMedium,
-                      ),
+                      Text(goalProgress >= 1 ? 'Daily goal reached' : 'Today’s goal', style: context.text.titleMedium),
                       Text('$minutes of $goalMinutes min read', style: context.text.bodySmall),
                     ],
                   ),
@@ -343,8 +359,12 @@ class _TodayRow extends StatelessWidget {
           children: [
             tile(ShelfColor.butter, '${stats.pagesToday}', 'pages today', icon: PhosphorIconsRegular.bookOpen),
             const SizedBox(width: Space.x3),
-            tile(ShelfColor.sky, formatDuration(Duration(seconds: stats.secondsToday), short: true), 'read today',
-                icon: PhosphorIconsRegular.clock),
+            tile(
+              ShelfColor.sky,
+              formatDuration(Duration(seconds: stats.secondsToday), short: true),
+              'read today',
+              icon: PhosphorIconsRegular.clock,
+            ),
             const SizedBox(width: Space.x3),
             tile(ShelfColor.mint, '${stats.booksFinished}', 'finished', icon: PhosphorIconsRegular.checkCircle),
           ],

@@ -31,10 +31,11 @@ class EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Illustration(art, width: illustrationWidth, fallbackIcon: fallbackIcon)
-              .animate()
-              .fadeIn(duration: m.slow)
-              .scaleXY(begin: 0.96, end: 1, duration: m.slow, curve: Motion.curve),
+          Illustration(
+            art,
+            width: illustrationWidth,
+            fallbackIcon: fallbackIcon,
+          ).animate().fadeIn(duration: m.slow).scaleXY(begin: 0.96, end: 1, duration: m.slow, curve: Motion.curve),
           const SizedBox(height: Space.x6),
           Text(title, style: context.text.headlineSmall, textAlign: TextAlign.center),
           const SizedBox(height: Space.x2),

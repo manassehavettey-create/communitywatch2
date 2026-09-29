@@ -109,8 +109,7 @@ class Highlights extends Table {
 class Notes extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get bookId => integer().references(Books, #id, onDelete: KeyAction.cascade)();
-  IntColumn get highlightId =>
-      integer().nullable().references(Highlights, #id, onDelete: KeyAction.setNull)();
+  IntColumn get highlightId => integer().nullable().references(Highlights, #id, onDelete: KeyAction.setNull)();
   IntColumn get page => integer()();
   TextColumn get passage => text()();
   TextColumn get body => text()();
@@ -141,8 +140,7 @@ class Collections extends Table {
 
 @DataClassName('CollectionBook')
 class CollectionBooks extends Table {
-  IntColumn get collectionId =>
-      integer().references(Collections, #id, onDelete: KeyAction.cascade)();
+  IntColumn get collectionId => integer().references(Collections, #id, onDelete: KeyAction.cascade)();
   IntColumn get bookId => integer().references(Books, #id, onDelete: KeyAction.cascade)();
   DateTimeColumn get addedAt => dateTime()();
 

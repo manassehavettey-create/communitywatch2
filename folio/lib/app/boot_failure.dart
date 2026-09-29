@@ -74,8 +74,8 @@ class _BootFailureState extends State<_BootFailure> {
                 _reset
                     ? 'Done. Close and reopen Folio to start with a fresh library.'
                     : 'Your library is encrypted with a key stored in this device’s secure '
-                        'storage, and that key couldn’t be read. This can happen after restoring '
-                        'a backup onto a new device.',
+                          'storage, and that key couldn’t be read. This can happen after restoring '
+                          'a backup onto a new device.',
                 style: context.text.bodyMedium,
               ),
               const SizedBox(height: Space.x6),

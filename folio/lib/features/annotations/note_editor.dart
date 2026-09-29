@@ -4,12 +4,7 @@ import '../../core/theme/tokens.dart';
 
 /// Bottom sheet for writing / editing a note. Returns the text, or null if
 /// cancelled.
-Future<String?> editNoteText(
-  BuildContext context, {
-  required String passage,
-  String initial = '',
-  String? subtitle,
-}) {
+Future<String?> editNoteText(BuildContext context, {required String passage, String initial = '', String? subtitle}) {
   return showModalBottomSheet<String>(
     context: context,
     isScrollControlled: true,

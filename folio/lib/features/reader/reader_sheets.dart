@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -42,9 +43,9 @@ class _AppearanceSheet extends ConsumerWidget {
     final isText = s.viewMode == ReaderViewMode.text;
 
     Widget label(String t) => Padding(
-          padding: const EdgeInsets.only(top: Space.x5, bottom: Space.x2),
-          child: Text(t.toUpperCase(), style: context.text.labelSmall),
-        );
+      padding: const EdgeInsets.only(top: Space.x5, bottom: Space.x2),
+      child: Text(t.toUpperCase(), style: context.text.labelSmall),
+    );
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -128,8 +129,10 @@ class _AppearanceSheet extends ConsumerWidget {
               if (s.viewMode == ReaderViewMode.page)
                 Padding(
                   padding: const EdgeInsets.only(top: Space.x2),
-                  child: Text('Page by page always fits the whole page. Pinch to zoom in.',
-                      style: context.text.bodySmall),
+                  child: Text(
+                    'Page by page always fits the whole page. Pinch to zoom in.',
+                    style: context.text.bodySmall,
+                  ),
                 ),
             ],
             label('Text view'),
@@ -167,7 +170,11 @@ class _AppearanceSheet extends ConsumerWidget {
                 min: 420,
                 max: 900,
                 divisions: 8,
-                display: s.textWidth < 560 ? 'Narrow' : s.textWidth < 760 ? 'Medium' : 'Wide',
+                display: s.textWidth < 560
+                    ? 'Narrow'
+                    : s.textWidth < 760
+                    ? 'Medium'
+                    : 'Wide',
                 onChanged: (v) => n.update((x) => x.copyWith(textWidth: v)),
               ),
             ],
@@ -201,7 +208,10 @@ class _ThemeSwatch extends StatelessWidget {
           decoration: BoxDecoration(
             color: theme.page,
             borderRadius: Radii.mdAll,
-            border: Border.all(color: selected ? context.colors.lavender : context.colors.hairline, width: selected ? 2.5 : 1),
+            border: Border.all(
+              color: selected ? context.colors.lavender : context.colors.hairline,
+              width: selected ? 2.5 : 1,
+            ),
           ),
           alignment: Alignment.center,
           child: Column(
@@ -239,23 +249,26 @@ class _SliderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        children: [
-          Icon(icon, size: 18),
-          const SizedBox(width: Space.x2),
-          SizedBox(width: 64, child: Text(label, style: context.text.labelMedium)),
-          Expanded(
-            child: Slider(
-              value: value.clamp(min, max),
-              min: min,
-              max: max,
-              divisions: divisions,
-              label: display,
-              onChanged: onChanged,
-            ),
-          ),
-          SizedBox(width: 56, child: Text(display, textAlign: TextAlign.end, style: context.text.bodySmall)),
-        ],
-      );
+    children: [
+      Icon(icon, size: 18),
+      const SizedBox(width: Space.x2),
+      SizedBox(width: 64, child: Text(label, style: context.text.labelMedium)),
+      Expanded(
+        child: Slider(
+          value: value.clamp(min, max),
+          min: min,
+          max: max,
+          divisions: divisions,
+          label: display,
+          onChanged: onChanged,
+        ),
+      ),
+      SizedBox(
+        width: 56,
+        child: Text(display, textAlign: TextAlign.end, style: context.text.bodySmall),
+      ),
+    ],
+  );
 }
 
 // ------------------------------------------------------------------ contents
@@ -325,10 +338,7 @@ class _ContentsSheetState extends ConsumerState<_ContentsSheet> {
                       final p = int.tryParse(v);
                       if (p != null) _jump(p);
                     },
-                    decoration: InputDecoration(
-                      isDense: true,
-                      hintText: 'Page (1–${widget.book.pageCount})',
-                    ),
+                    decoration: InputDecoration(isDense: true, hintText: 'Page (1–${widget.book.pageCount})'),
                   ),
                 ),
               ],
@@ -340,7 +350,11 @@ class _ContentsSheetState extends ConsumerState<_ContentsSheet> {
             unselectedLabelColor: context.colors.inkMuted,
             indicatorColor: context.colors.ink,
             dividerColor: context.colors.hairline,
-            tabs: const [Tab(text: 'Contents'), Tab(text: 'Bookmarks'), Tab(text: 'Highlights')],
+            tabs: const [
+              Tab(text: 'Contents'),
+              Tab(text: 'Bookmarks'),
+              Tab(text: 'Highlights'),
+            ],
           ),
           Expanded(
             child: TabBarView(
@@ -354,14 +368,17 @@ class _ContentsSheetState extends ConsumerState<_ContentsSheet> {
                         itemCount: outline.length,
                         itemBuilder: (context, i) {
                           final o = outline[i];
-                          final isCurrent = o.page <= widget.currentPage &&
+                          final isCurrent =
+                              o.page <= widget.currentPage &&
                               (i == outline.length - 1 || outline[i + 1].page > widget.currentPage);
                           return ListTile(
                             contentPadding: EdgeInsets.only(left: Space.gutter + o.level * 16.0, right: Space.gutter),
-                            title: Text(o.title,
-                                style: (o.level == 0 ? context.text.titleSmall : context.text.bodyMedium)?.copyWith(
-                                  color: isCurrent ? context.colors.lavender : null,
-                                )),
+                            title: Text(
+                              o.title,
+                              style: (o.level == 0 ? context.text.titleSmall : context.text.bodyMedium)?.copyWith(
+                                color: isCurrent ? context.colors.lavender : null,
+                              ),
+                            ),
                             trailing: Text('${o.page}', style: context.text.bodySmall),
                             onTap: () => _jump(o.page),
                           );
@@ -372,13 +389,19 @@ class _ContentsSheetState extends ConsumerState<_ContentsSheet> {
                   builder: (context, snap) {
                     final list = snap.data ?? const <Bookmark>[];
                     if (list.isEmpty) {
-                      return _Hint('No bookmarks yet', 'Tap the bookmark icon at the top of the reader to save a page.');
+                      return _Hint(
+                        'No bookmarks yet',
+                        'Tap the bookmark icon at the top of the reader to save a page.',
+                      );
                     }
                     return ListView(
                       children: [
                         for (final b in list)
                           ListTile(
-                            leading: Icon(b.isPassage ? PhosphorIconsRegular.quotes : PhosphorIconsFill.bookmarkSimple, size: 20),
+                            leading: Icon(
+                              b.isPassage ? PhosphorIconsRegular.quotes : PhosphorIconsFill.bookmarkSimple,
+                              size: 20,
+                            ),
                             title: Text(b.title, style: context.text.titleSmall),
                             subtitle: Text(b.previewText, maxLines: 2, overflow: TextOverflow.ellipsis),
                             trailing: Text('p. ${b.page}', style: context.text.bodySmall),
@@ -407,7 +430,12 @@ class _ContentsSheetState extends ConsumerState<_ContentsSheet> {
                                 borderRadius: Radii.pillAll,
                               ),
                             ),
-                            title: Text(h.content, maxLines: 3, overflow: TextOverflow.ellipsis, style: context.text.bodyMedium),
+                            title: Text(
+                              h.content,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.text.bodyMedium,
+                            ),
                             trailing: Text('p. ${h.page}', style: context.text.bodySmall),
                             onTap: () => _jump(h.page),
                           ),
@@ -431,18 +459,18 @@ class _Hint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(Space.x8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(title, style: context.text.titleMedium, textAlign: TextAlign.center),
-              const SizedBox(height: 4),
-              Text(body, style: context.text.bodySmall, textAlign: TextAlign.center),
-            ],
-          ),
-        ),
-      );
+    child: Padding(
+      padding: const EdgeInsets.all(Space.x8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(title, style: context.text.titleMedium, textAlign: TextAlign.center),
+          const SizedBox(height: 4),
+          Text(body, style: context.text.bodySmall, textAlign: TextAlign.center),
+        ],
+      ),
+    ),
+  );
 }
 
 // ------------------------------------------------------------------ search
@@ -656,7 +684,13 @@ Future<void> showHighlightSheet(BuildContext context, WidgetRef ref, Highlight h
                   Navigator.pop(ctx);
                   final text = await editNoteText(context, passage: h.content, subtitle: 'Page ${h.page}');
                   if (text != null) {
-                    await repo.addNote(bookId: h.bookId, page: h.page, passage: h.content, body: text, highlightId: h.id);
+                    await repo.addNote(
+                      bookId: h.bookId,
+                      page: h.page,
+                      passage: h.content,
+                      body: text,
+                      highlightId: h.id,
+                    );
                     if (context.mounted) showFolioSnack(context, 'Note saved');
                   }
                 },
@@ -679,8 +713,12 @@ Future<void> showHighlightSheet(BuildContext context, WidgetRef ref, Highlight h
                   Navigator.pop(ctx);
                   await repo.deleteHighlight(h.id);
                   if (context.mounted) {
-                    showFolioSnack(context, 'Highlight removed',
-                        action: 'Undo', onAction: () => repo.restoreHighlight(h));
+                    showFolioSnack(
+                      context,
+                      'Highlight removed',
+                      action: 'Undo',
+                      onAction: () => repo.restoreHighlight(h),
+                    );
                   }
                 },
               ),

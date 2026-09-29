@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' show InsertMode, Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -74,9 +75,9 @@ class _Label extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: Space.x5, bottom: Space.x2),
-        child: Text(text.toUpperCase(), style: context.text.labelSmall),
-      );
+    padding: const EdgeInsets.only(top: Space.x5, bottom: Space.x2),
+    child: Text(text.toUpperCase(), style: context.text.labelSmall),
+  );
 }
 
 class _Card extends StatelessWidget {
@@ -85,10 +86,10 @@ class _Card extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        decoration: BoxDecoration(color: context.colors.surface, borderRadius: Radii.lgAll),
-        padding: const EdgeInsets.symmetric(vertical: Space.x2),
-        child: Column(children: children),
-      );
+    decoration: BoxDecoration(color: context.colors.surface, borderRadius: Radii.lgAll),
+    padding: const EdgeInsets.symmetric(vertical: Space.x2),
+    child: Column(children: children),
+  );
 }
 
 // --------------------------------------------------------------- appearance
@@ -112,7 +113,11 @@ class _Appearance extends ConsumerWidget {
               (ThemeMode.light, 'Light'),
               (ThemeMode.dark, 'Dark'),
             ])
-              PillChip(label: label, selected: s.themeMode == mode, onTap: () => n.update((x) => x.copyWith(themeMode: mode))),
+              PillChip(
+                label: label,
+                selected: s.themeMode == mode,
+                onTap: () => n.update((x) => x.copyWith(themeMode: mode)),
+              ),
           ],
         ),
         const SizedBox(height: Space.x2),
@@ -186,7 +191,11 @@ class _Reading extends ConsumerWidget {
           runSpacing: Space.x2,
           children: [
             for (final m in ReaderViewMode.values)
-              PillChip(label: m.label, selected: s.viewMode == m, onTap: () => n.update((x) => x.copyWith(viewMode: m))),
+              PillChip(
+                label: m.label,
+                selected: s.viewMode == m,
+                onTap: () => n.update((x) => x.copyWith(viewMode: m)),
+              ),
           ],
         ),
         const SizedBox(height: Space.x2),
@@ -200,37 +209,64 @@ class _Reading extends ConsumerWidget {
           spacing: Space.x2,
           children: [
             for (final f in FitMode.values)
-              PillChip(label: f.label, selected: s.fitMode == f, onTap: () => n.update((x) => x.copyWith(fitMode: f))),
+              PillChip(
+                label: f.label,
+                selected: s.fitMode == f,
+                onTap: () => n.update((x) => x.copyWith(fitMode: f)),
+              ),
           ],
         ),
         const _Label('Text view'),
         _Card(
           children: [
-            _Slider('Text size', s.textScale, 14, 28, 14, '${s.textScale.round()}',
-                (v) => n.update((x) => x.copyWith(textScale: v))),
-            _Slider('Line spacing', s.lineHeight, 1.3, 2.0, 7, s.lineHeight.toStringAsFixed(1),
-                (v) => n.update((x) => x.copyWith(lineHeight: v))),
-            _Slider('Reading width', s.textWidth, 420, 900, 8,
-                s.textWidth < 560 ? 'Narrow' : s.textWidth < 760 ? 'Medium' : 'Wide',
-                (v) => n.update((x) => x.copyWith(textWidth: v))),
+            _Slider(
+              'Text size',
+              s.textScale,
+              14,
+              28,
+              14,
+              '${s.textScale.round()}',
+              (v) => n.update((x) => x.copyWith(textScale: v)),
+            ),
+            _Slider(
+              'Line spacing',
+              s.lineHeight,
+              1.3,
+              2.0,
+              7,
+              s.lineHeight.toStringAsFixed(1),
+              (v) => n.update((x) => x.copyWith(lineHeight: v)),
+            ),
+            _Slider(
+              'Reading width',
+              s.textWidth,
+              420,
+              900,
+              8,
+              s.textWidth < 560
+                  ? 'Narrow'
+                  : s.textWidth < 760
+                  ? 'Medium'
+                  : 'Wide',
+              (v) => n.update((x) => x.copyWith(textWidth: v)),
+            ),
           ],
         ),
         const SizedBox(height: Space.x4),
         Container(
           padding: const EdgeInsets.all(Space.x5),
-          decoration: BoxDecoration(color: t.page, borderRadius: Radii.lgAll, border: Border.all(color: context.colors.hairline)),
+          decoration: BoxDecoration(
+            color: t.page,
+            borderRadius: Radii.lgAll,
+            border: Border.all(color: context.colors.hairline),
+          ),
           child: Center(
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: s.textWidth * 0.5),
               child: Text(
                 'It was a bright cold day in April, and the reading lamp was already on. '
                 'She opened the book where the ribbon lay and began again.',
-                style: TextStyle(
-                  fontFamily: 'Literata',
-                  fontSize: s.textScale,
-                  height: s.lineHeight,
-                  color: t.text,
-                ),
+                style: TextStyle(fontFamily: 'Literata', fontSize: s.textScale, height: s.lineHeight, color: t.text),
               ),
             ),
           ),
@@ -252,24 +288,27 @@ class _Slider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Space.x4),
-        child: Row(
-          children: [
-            SizedBox(width: 104, child: Text(label, style: context.text.labelLarge)),
-            Expanded(
-              child: Slider(
-                value: value.clamp(min, max),
-                min: min,
-                max: max,
-                divisions: divisions,
-                label: display,
-                onChanged: onChanged,
-              ),
-            ),
-            SizedBox(width: 56, child: Text(display, textAlign: TextAlign.end, style: context.text.bodySmall)),
-          ],
+    padding: const EdgeInsets.symmetric(horizontal: Space.x4),
+    child: Row(
+      children: [
+        SizedBox(width: 104, child: Text(label, style: context.text.labelLarge)),
+        Expanded(
+          child: Slider(
+            value: value.clamp(min, max),
+            min: min,
+            max: max,
+            divisions: divisions,
+            label: display,
+            onChanged: onChanged,
+          ),
         ),
-      );
+        SizedBox(
+          width: 56,
+          child: Text(display, textAlign: TextAlign.end, style: context.text.bodySmall),
+        ),
+      ],
+    ),
+  );
 }
 
 // --------------------------------------------------------------- notifications
@@ -296,9 +335,9 @@ class _Notifications extends ConsumerWidget {
           children: [
             SwitchListTile(
               title: const Text('Daily reading reminder'),
-              subtitle: Text(supported
-                  ? 'A gentle nudge at the time you choose'
-                  : 'Reminders are available on Android and iOS'),
+              subtitle: Text(
+                supported ? 'A gentle nudge at the time you choose' : 'Reminders are available on Android and iOS',
+              ),
               value: s.reminderEnabled && supported,
               onChanged: !supported
                   ? null
@@ -358,14 +397,25 @@ class _Goals extends ConsumerWidget {
           runSpacing: Space.x2,
           children: [
             for (final m in const [10, 15, 20, 30, 45, 60])
-              PillChip(label: '$m min', selected: s.dailyGoalMinutes == m, onTap: () => n.update((x) => x.copyWith(dailyGoalMinutes: m))),
+              PillChip(
+                label: '$m min',
+                selected: s.dailyGoalMinutes == m,
+                onTap: () => n.update((x) => x.copyWith(dailyGoalMinutes: m)),
+              ),
           ],
         ),
         const SizedBox(height: Space.x3),
         _Card(
           children: [
-            _Slider('Custom', s.dailyGoalMinutes.toDouble(), 5, 120, 23, '${s.dailyGoalMinutes} min',
-                (v) => n.update((x) => x.copyWith(dailyGoalMinutes: v.round()))),
+            _Slider(
+              'Custom',
+              s.dailyGoalMinutes.toDouble(),
+              5,
+              120,
+              23,
+              '${s.dailyGoalMinutes} min',
+              (v) => n.update((x) => x.copyWith(dailyGoalMinutes: v.round())),
+            ),
           ],
         ),
         const SizedBox(height: Space.x4),
@@ -376,10 +426,7 @@ class _Goals extends ConsumerWidget {
           style: context.text.bodyMedium,
         ),
         const SizedBox(height: Space.x2),
-        Text(
-          'Goals are just for you. There are no points, badges or leaderboards.',
-          style: context.text.bodySmall,
-        ),
+        Text('Goals are just for you. There are no points, badges or leaderboards.', style: context.text.bodySmall),
       ],
     );
   }
@@ -397,7 +444,8 @@ class _Storage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final books = [...ref.watch(booksProvider).value ?? const <Book>[]]..sort((a, b) => b.fileSize.compareTo(a.fileSize));
+    final books = [...ref.watch(booksProvider).value ?? const <Book>[]]
+      ..sort((a, b) => b.fileSize.compareTo(a.fileSize));
     final used = ref.watch(_storageUsageProvider).value;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,14 +453,21 @@ class _Storage extends ConsumerWidget {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(Space.x5),
-          decoration: BoxDecoration(color: ShelfColor.sky.cardBackground(context.brightness), borderRadius: Radii.lgAll),
+          decoration: BoxDecoration(
+            color: ShelfColor.sky.cardBackground(context.brightness),
+            borderRadius: Radii.lgAll,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(used == null ? '…' : formatBytes(used),
-                  style: context.text.displayMedium?.copyWith(color: ShelfColor.sky.cardForeground(context.brightness))),
-              Text('used by ${plural(books.length, 'book')} and their covers',
-                  style: context.text.bodySmall?.copyWith(color: ShelfColor.sky.cardForeground(context.brightness))),
+              Text(
+                used == null ? '…' : formatBytes(used),
+                style: context.text.displayMedium?.copyWith(color: ShelfColor.sky.cardForeground(context.brightness)),
+              ),
+              Text(
+                'used by ${plural(books.length, 'book')} and their covers',
+                style: context.text.bodySmall?.copyWith(color: ShelfColor.sky.cardForeground(context.brightness)),
+              ),
             ],
           ),
         ),
@@ -462,7 +517,10 @@ class _Ai extends StatelessWidget {
                 children: [
                   Icon(PhosphorIconsRegular.sparkle, color: ShelfColor.lilac.cardForeground(b)),
                   const SizedBox(width: Space.x2),
-                  Text('AI is off', style: context.text.titleLarge?.copyWith(color: ShelfColor.lilac.cardForeground(b))),
+                  Text(
+                    'AI is off',
+                    style: context.text.titleLarge?.copyWith(color: ShelfColor.lilac.cardForeground(b)),
+                  ),
                 ],
               ),
               const SizedBox(height: Space.x2),
@@ -488,27 +546,36 @@ class _PrivacyAiNote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget row(IconData icon, String text) => Padding(
-          padding: const EdgeInsets.only(bottom: Space.x3),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, size: 18),
-              const SizedBox(width: Space.x3),
-              Expanded(child: Text(text, style: context.text.bodyMedium)),
-            ],
-          ),
-        );
+      padding: const EdgeInsets.only(bottom: Space.x3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: Space.x3),
+          Expanded(child: Text(text, style: context.text.bodyMedium)),
+        ],
+      ),
+    );
     return Column(
       children: [
-        row(PhosphorIconsRegular.quotes, 'Explain / Define / Simplify: only the passage you selected, plus the book title.'),
+        row(
+          PhosphorIconsRegular.quotes,
+          'Explain / Define / Simplify: only the passage you selected, plus the book title.',
+        ),
         row(PhosphorIconsRegular.file, 'Ask This Page and page summaries: only that page’s text.'),
-        row(PhosphorIconsRegular.listNumbers,
-            'Chapter summaries: only the pages of that chapter (or the page range you pick).'),
-        row(PhosphorIconsRegular.chatCircleText,
-            'Ask This Book: your question plus the few pages Folio finds most relevant on your phone, '
-            'never the whole book.'),
-        row(PhosphorIconsRegular.shieldCheck,
-            'Requests are sent only when you tap an AI action. Answers are saved on this device only.'),
+        row(
+          PhosphorIconsRegular.listNumbers,
+          'Chapter summaries: only the pages of that chapter (or the page range you pick).',
+        ),
+        row(
+          PhosphorIconsRegular.chatCircleText,
+          'Ask This Book: your question plus the few pages Folio finds most relevant on your phone, '
+          'never the whole book.',
+        ),
+        row(
+          PhosphorIconsRegular.shieldCheck,
+          'Requests are sent only when you tap an AI action. Answers are saved on this device only.',
+        ),
       ],
     );
   }
@@ -523,7 +590,8 @@ class _Privacy extends ConsumerWidget {
     final ok = await confirmDialog(
       context,
       title: 'Erase everything in Folio?',
-      message: 'This removes every book copy, highlight, note, bookmark, collection and your reading '
+      message:
+          'This removes every book copy, highlight, note, bookmark, collection and your reading '
           'history from this phone. Your original PDF files outside Folio are not touched. '
           'This can’t be undone.',
       confirmLabel: 'Erase everything',
@@ -548,31 +616,35 @@ class _Privacy extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Widget point(String title, String body) => Padding(
-          padding: const EdgeInsets.only(bottom: Space.x4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: context.text.titleMedium),
-              const SizedBox(height: 2),
-              Text(body, style: context.text.bodyMedium?.copyWith(color: context.colors.inkMuted)),
-            ],
-          ),
-        );
+      padding: const EdgeInsets.only(bottom: Space.x4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: context.text.titleMedium),
+          const SizedBox(height: 2),
+          Text(body, style: context.text.bodyMedium?.copyWith(color: context.colors.inkMuted)),
+        ],
+      ),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        point('Everything stays on this phone',
-            'Your books, highlights, notes, bookmarks, collections and reading history are stored only on '
-                'this device. There is no account, no cloud library and no sync.'),
-        point('Encrypted at rest',
-            'Folio’s database is encrypted. Its key is kept in your phone’s secure keystore.'),
-        point('No tracking',
-            'Folio has no analytics, ads or crash reporting that phones home.'),
-        point('Importing',
-            'Imported PDFs are copied into Folio’s private storage and read on-device. Nothing is uploaded.'),
-        point('AI (optional)',
-            'AI features are off until you add a provider. When on, only the selected passage, page or '
-            'chapter is sent with each request. See Settings → AI for exactly what is sent.'),
+        point(
+          'Everything stays on this phone',
+          'Your books, highlights, notes, bookmarks, collections and reading history are stored only on '
+              'this device. There is no account, no cloud library and no sync.',
+        ),
+        point('Encrypted at rest', 'Folio’s database is encrypted. Its key is kept in your phone’s secure keystore.'),
+        point('No tracking', 'Folio has no analytics, ads or crash reporting that phones home.'),
+        point(
+          'Importing',
+          'Imported PDFs are copied into Folio’s private storage and read on-device. Nothing is uploaded.',
+        ),
+        point(
+          'AI (optional)',
+          'AI features are off until you add a provider. When on, only the selected passage, page or '
+              'chapter is sent with each request. See Settings → AI for exactly what is sent.',
+        ),
         const SizedBox(height: Space.x3),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(foregroundColor: context.colors.danger),
@@ -580,10 +652,7 @@ class _Privacy extends ConsumerWidget {
           icon: const Icon(PhosphorIconsRegular.trash, size: 18),
           label: const Text('Erase all Folio data'),
         ),
-        if (kAllowDemoData) ...[
-          const _Label('Debug build only'),
-          _DemoData(),
-        ],
+        if (kAllowDemoData) ...[const _Label('Debug build only'), _DemoData()],
       ],
     );
   }
@@ -658,8 +727,11 @@ class _About extends StatelessWidget {
           style: context.text.bodyMedium,
         ),
         const SizedBox(height: Space.x5),
-        Text('PDF rendering by PDFium via pdfrx. Fonts: Bricolage Grotesque, Manrope and Literata '
-            '(SIL Open Font License).', style: context.text.bodySmall),
+        Text(
+          'PDF rendering by PDFium via pdfrx. Fonts: Bricolage Grotesque, Manrope and Literata '
+          '(SIL Open Font License).',
+          style: context.text.bodySmall,
+        ),
         const SizedBox(height: Space.x4),
         OutlinedButton(
           onPressed: () => showLicensePage(context: context, applicationName: 'Folio', applicationVersion: '1.0.0'),

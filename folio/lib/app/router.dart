@@ -26,19 +26,19 @@ int? _intParam(GoRouterState s, String name) => int.tryParse(s.uri.queryParamete
 
 /// Fade + slight rise, used for the reader and focus screens.
 CustomTransitionPage<void> _fadePage(GoRouterState state, Widget child) => CustomTransitionPage(
-      key: state.pageKey,
-      child: child,
-      transitionDuration: const Duration(milliseconds: 360),
-      reverseTransitionDuration: const Duration(milliseconds: 260),
-      transitionsBuilder: (context, animation, _, child) {
-        if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) return child;
-        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
-        return FadeTransition(
-          opacity: curved,
-          child: ScaleTransition(scale: Tween(begin: 0.98, end: 1.0).animate(curved), child: child),
-        );
-      },
+  key: state.pageKey,
+  child: child,
+  transitionDuration: const Duration(milliseconds: 360),
+  reverseTransitionDuration: const Duration(milliseconds: 260),
+  transitionsBuilder: (context, animation, _, child) {
+    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) return child;
+    final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+    return FadeTransition(
+      opacity: curved,
+      child: ScaleTransition(scale: Tween(begin: 0.98, end: 1.0).animate(curved), child: child),
     );
+  },
+);
 
 final routerProvider = Provider<GoRouter>((ref) {
   final onboarded = ValueNotifier(ref.read(settingsProvider).onboardingDone);
@@ -61,32 +61,34 @@ final routerProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(shell: shell),
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/library', builder: (_, _) => const LibraryScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/search', builder: (_, _) => const SearchScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/stats', builder: (_, _) => const StatsScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/profile',
-              builder: (_, _) => const ProfileScreen(),
-              routes: [
-                for (final page in SettingsPage.values)
-                  GoRoute(
-                    path: page.path,
-                    parentNavigatorKey: rootNavigatorKey,
-                    builder: (_, _) => SettingsPageScreen(page: page),
-                  ),
-              ],
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/home', builder: (_, _) => const HomeScreen())],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/library', builder: (_, _) => const LibraryScreen())],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/search', builder: (_, _) => const SearchScreen())],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/stats', builder: (_, _) => const StatsScreen())],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (_, _) => const ProfileScreen(),
+                routes: [
+                  for (final page in SettingsPage.values)
+                    GoRoute(
+                      path: page.path,
+                      parentNavigatorKey: rootNavigatorKey,
+                      builder: (_, _) => SettingsPageScreen(page: page),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
       GoRoute(
@@ -111,10 +113,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/ask/:id',
         parentNavigatorKey: rootNavigatorKey,
-        builder: (_, s) => AskBookScreen(
-          bookId: int.parse(s.pathParameters['id']!),
-          initialPage: _intParam(s, 'page'),
-        ),
+        builder: (_, s) => AskBookScreen(bookId: int.parse(s.pathParameters['id']!), initialPage: _intParam(s, 'page')),
       ),
       GoRoute(
         path: '/highlights',

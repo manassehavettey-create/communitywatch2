@@ -7,13 +7,7 @@ import '../../core/theme/tokens.dart';
 
 /// Rounded progress bar that animates to its value.
 class FolioProgressBar extends StatelessWidget {
-  const FolioProgressBar({
-    super.key,
-    required this.value,
-    this.height = 8,
-    this.color,
-    this.track,
-  });
+  const FolioProgressBar({super.key, required this.value, this.height = 8, this.color, this.track});
 
   final double value;
   final double height;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -94,7 +95,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               const SizedBox(height: Space.x4),
               _Notice(
                 icon: PhosphorIconsRegular.hourglassMedium,
-                text: '$indexing ${indexing == 1 ? 'book is' : 'books are'} still being indexed. '
+                text:
+                    '$indexing ${indexing == 1 ? 'book is' : 'books are'} still being indexed. '
                     'Results will include them as pages finish.',
               ),
             ],
@@ -102,8 +104,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               const SizedBox(height: Space.x3),
               _Notice(
                 icon: PhosphorIconsRegular.scan,
-                text: '$scanned scanned ${scanned == 1 ? 'book has' : 'books have'} no text layer, '
-                    'so only their titles can be searched.',
+                text: scanned == 1
+                    ? '1 scanned book has no text layer, so only its title can be searched.'
+                    : '$scanned scanned books have no text layer, so only their titles can be searched.',
               ),
             ],
           ],
@@ -132,7 +135,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
           ],
           if (grouped.isNotEmpty) ...[
-            SectionHeader('In your books · ${_hits.length}'),
+            SectionHeader('In your books · ${_hits.length >= 80 ? '80+' : _hits.length} pages'),
             for (final entry in grouped.entries) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(Space.gutter, Space.x2, Space.gutter, Space.x2),
@@ -144,9 +147,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   child: BlockCard(
                     radius: Radii.md,
                     padding: const EdgeInsets.all(Space.x4),
-                    onTap: () => context.push(
-                      '/read/${h.bookId}?page=${h.page}&q=${Uri.encodeQueryComponent(q)}',
-                    ),
+                    onTap: () => context.push('/read/${h.bookId}?page=${h.page}&q=${Uri.encodeQueryComponent(q)}'),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -160,8 +161,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               if (entry.value.length > 6)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(Space.gutter, 0, Space.gutter, Space.x2),
-                  child: Text('+ ${entry.value.length - 6} more pages. Open the book and search inside it.',
-                      style: context.text.bodySmall),
+                  child: Text(
+                    '+ ${entry.value.length - 6} more pages. Open the book and search inside it.',
+                    style: context.text.bodySmall,
+                  ),
                 ),
             ],
           ],
@@ -191,15 +194,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
                         )
                       : q.isEmpty
-                          ? null
-                          : IconButton(
-                              tooltip: 'Clear',
-                              icon: const Icon(PhosphorIconsRegular.x, size: 18),
-                              onPressed: () {
-                                _q.clear();
-                                _run('');
-                              },
-                            ),
+                      ? null
+                      : IconButton(
+                          tooltip: 'Clear',
+                          icon: const Icon(PhosphorIconsRegular.x, size: 18),
+                          onPressed: () {
+                            _q.clear();
+                            _run('');
+                          },
+                        ),
                 ),
               ),
             ),

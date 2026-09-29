@@ -89,44 +89,43 @@ class AppSettings {
     LibraryLayout? libraryLayout,
     LibrarySort? librarySort,
     bool? showDemoData,
-  }) =>
-      AppSettings(
-        themeMode: themeMode ?? this.themeMode,
-        readerTheme: readerTheme ?? this.readerTheme,
-        followSystemForReader: followSystemForReader ?? this.followSystemForReader,
-        viewMode: viewMode ?? this.viewMode,
-        fitMode: fitMode ?? this.fitMode,
-        textScale: textScale ?? this.textScale,
-        lineHeight: lineHeight ?? this.lineHeight,
-        textWidth: textWidth ?? this.textWidth,
-        dailyGoalMinutes: dailyGoalMinutes ?? this.dailyGoalMinutes,
-        reminderEnabled: reminderEnabled ?? this.reminderEnabled,
-        reminderMinutes: reminderMinutes ?? this.reminderMinutes,
-        onboardingDone: onboardingDone ?? this.onboardingDone,
-        name: name ?? this.name,
-        libraryLayout: libraryLayout ?? this.libraryLayout,
-        librarySort: librarySort ?? this.librarySort,
-        showDemoData: showDemoData ?? this.showDemoData,
-      );
+  }) => AppSettings(
+    themeMode: themeMode ?? this.themeMode,
+    readerTheme: readerTheme ?? this.readerTheme,
+    followSystemForReader: followSystemForReader ?? this.followSystemForReader,
+    viewMode: viewMode ?? this.viewMode,
+    fitMode: fitMode ?? this.fitMode,
+    textScale: textScale ?? this.textScale,
+    lineHeight: lineHeight ?? this.lineHeight,
+    textWidth: textWidth ?? this.textWidth,
+    dailyGoalMinutes: dailyGoalMinutes ?? this.dailyGoalMinutes,
+    reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+    reminderMinutes: reminderMinutes ?? this.reminderMinutes,
+    onboardingDone: onboardingDone ?? this.onboardingDone,
+    name: name ?? this.name,
+    libraryLayout: libraryLayout ?? this.libraryLayout,
+    librarySort: librarySort ?? this.librarySort,
+    showDemoData: showDemoData ?? this.showDemoData,
+  );
 
   Map<String, Object?> toJson() => {
-        'themeMode': themeMode.index,
-        'readerTheme': readerTheme.index,
-        'followSystemForReader': followSystemForReader,
-        'viewMode': viewMode.index,
-        'fitMode': fitMode.index,
-        'textScale': textScale,
-        'lineHeight': lineHeight,
-        'textWidth': textWidth,
-        'dailyGoalMinutes': dailyGoalMinutes,
-        'reminderEnabled': reminderEnabled,
-        'reminderMinutes': reminderMinutes,
-        'onboardingDone': onboardingDone,
-        'name': name,
-        'libraryLayout': libraryLayout.index,
-        'librarySort': librarySort.index,
-        'showDemoData': showDemoData,
-      };
+    'themeMode': themeMode.index,
+    'readerTheme': readerTheme.index,
+    'followSystemForReader': followSystemForReader,
+    'viewMode': viewMode.index,
+    'fitMode': fitMode.index,
+    'textScale': textScale,
+    'lineHeight': lineHeight,
+    'textWidth': textWidth,
+    'dailyGoalMinutes': dailyGoalMinutes,
+    'reminderEnabled': reminderEnabled,
+    'reminderMinutes': reminderMinutes,
+    'onboardingDone': onboardingDone,
+    'name': name,
+    'libraryLayout': libraryLayout.index,
+    'librarySort': librarySort.index,
+    'showDemoData': showDemoData,
+  };
 
   factory AppSettings.fromJson(Map<String, Object?> j) {
     const d = AppSettings();
@@ -172,9 +171,8 @@ class SettingsRepository {
     }
   }
 
-  Future<void> save(AppSettings s) => db.into(db.settings).insertOnConflictUpdate(
-        SettingsCompanion.insert(key: _key, value: jsonEncode(s.toJson())),
-      );
+  Future<void> save(AppSettings s) =>
+      db.into(db.settings).insertOnConflictUpdate(SettingsCompanion.insert(key: _key, value: jsonEncode(s.toJson())));
 
   Future<String?> getRaw(String key) async =>
       (await (db.select(db.settings)..where((s) => s.key.equals(key))).getSingleOrNull())?.value;
@@ -183,9 +181,7 @@ class SettingsRepository {
     if (value == null) {
       await (db.delete(db.settings)..where((s) => s.key.equals(key))).go();
     } else {
-      await db.into(db.settings).insertOnConflictUpdate(
-            SettingsCompanion(key: Value(key), value: Value(value)),
-          );
+      await db.into(db.settings).insertOnConflictUpdate(SettingsCompanion(key: Value(key), value: Value(value)));
     }
   }
 }

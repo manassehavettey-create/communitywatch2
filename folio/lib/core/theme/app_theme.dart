@@ -62,9 +62,7 @@ abstract final class AppTheme {
         modalBackgroundColor: c.surface,
         showDragHandle: true,
         dragHandleColor: c.hairline,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
-        ),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl))),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: c.surface,
@@ -86,10 +84,7 @@ abstract final class AppTheme {
         fillColor: c.surfaceMuted,
         hintStyle: text.bodyMedium?.copyWith(color: c.inkMuted),
         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-        border: const OutlineInputBorder(
-          borderRadius: Radii.pillAll,
-          borderSide: BorderSide.none,
-        ),
+        border: const OutlineInputBorder(borderRadius: Radii.pillAll, borderSide: BorderSide.none),
         focusedBorder: OutlineInputBorder(
           borderRadius: Radii.pillAll,
           borderSide: BorderSide(color: c.lavender, width: 1.5),
@@ -116,19 +111,11 @@ abstract final class AppTheme {
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: c.ink,
-          shape: const StadiumBorder(),
-          textStyle: text.labelLarge,
-        ),
+        style: TextButton.styleFrom(foregroundColor: c.ink, shape: const StadiumBorder(), textStyle: text.labelLarge),
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected) ? c.onInk : c.inkMuted,
-        ),
-        trackColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected) ? c.ink : c.surfaceMuted,
-        ),
+        thumbColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? c.onInk : c.inkMuted),
+        trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? c.ink : c.surfaceMuted),
         trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
       ),
       sliderTheme: SliderThemeData(

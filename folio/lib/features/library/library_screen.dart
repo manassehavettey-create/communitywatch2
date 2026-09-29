@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -70,12 +71,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
     final booksAsync = ref.watch(booksProvider);
     final jobs = ref.watch(importControllerProvider).where((j) => !j.isDone).toList();
     final all = booksAsync.value ?? const [];
-    final books = BooksRepository.sortAndFilter(
-      all,
-      sort: settings.librarySort,
-      filter: _filter,
-      query: _search.text,
-    );
+    final books = BooksRepository.sortAndFilter(all, sort: settings.librarySort, filter: _filter, query: _search.text);
     final grid = settings.libraryLayout == LibraryLayout.grid;
 
     return Scaffold(
@@ -109,7 +105,8 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                   child: EmptyState(
                     art: Art.emptyLibrary,
                     title: 'No books yet',
-                    message: 'Add PDFs from your phone. Folio keeps a private copy, makes a cover and '
+                    message:
+                        'Add PDFs from your phone. Folio keeps a private copy, makes a cover and '
                         'indexes the text so you can search it.',
                     action: FilledButton.icon(
                       onPressed: () => pickAndImportBooks(context, ref),
@@ -243,9 +240,9 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
           CircleIconButton(
             icon: grid ? PhosphorIconsRegular.listBullets : PhosphorIconsRegular.squaresFour,
             tooltip: grid ? 'Show as list' : 'Show as grid',
-            onPressed: () => ref.read(settingsProvider.notifier).update(
-                  (s) => s.copyWith(libraryLayout: grid ? LibraryLayout.list : LibraryLayout.grid),
-                ),
+            onPressed: () => ref
+                .read(settingsProvider.notifier)
+                .update((s) => s.copyWith(libraryLayout: grid ? LibraryLayout.list : LibraryLayout.grid)),
           ),
         ],
       ),
@@ -253,23 +250,23 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
   }
 
   Widget _filters() => SizedBox(
-        height: 56,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(Space.gutter, Space.x3, Space.gutter, 0),
-          itemCount: LibraryFilter.values.length,
-          separatorBuilder: (_, _) => const SizedBox(width: Space.x2),
-          itemBuilder: (context, i) {
-            final f = LibraryFilter.values[i];
-            return PillChip(
-              label: f.label,
-              icon: f == LibraryFilter.favorites ? PhosphorIconsRegular.heart : null,
-              selected: f == _filter,
-              onTap: () => setState(() => _filter = f),
-            );
-          },
-        ),
-      );
+    height: 56,
+    child: ListView.separated(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(Space.gutter, Space.x3, Space.gutter, 0),
+      itemCount: LibraryFilter.values.length,
+      separatorBuilder: (_, _) => const SizedBox(width: Space.x2),
+      itemBuilder: (context, i) {
+        final f = LibraryFilter.values[i];
+        return PillChip(
+          label: f.label,
+          icon: f == LibraryFilter.favorites ? PhosphorIconsRegular.heart : null,
+          selected: f == _filter,
+          onTap: () => setState(() => _filter = f),
+        );
+      },
+    ),
+  );
 }
 
 class _Grid extends ConsumerWidget {
@@ -281,7 +278,11 @@ class _Grid extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final m = Motion.of(context);
     final width = MediaQuery.sizeOf(context).width;
-    final cols = width > 900 ? 5 : width > 600 ? 4 : 2;
+    final cols = width > 900
+        ? 5
+        : width > 600
+        ? 4
+        : 2;
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),

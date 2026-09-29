@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -54,7 +55,12 @@ class CollectionDetailScreen extends ConsumerWidget {
                           activeColor: ctx.colors.ink,
                           checkColor: ctx.colors.onInk,
                           secondary: BookCover(book: b, width: 36, hero: false, shadow: false),
-                          title: Text(b.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: ctx.text.titleSmall),
+                          title: Text(
+                            b.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: ctx.text.titleSmall,
+                          ),
                           subtitle: b.author == null ? null : Text(b.author!),
                           onChanged: (v) => setState(() => v == true ? picked.add(b.id) : picked.remove(b.id)),
                         ),
@@ -133,8 +139,10 @@ class CollectionDetailScreen extends ConsumerWidget {
               children: [
                 Text(cw.collection.name, style: context.text.displaySmall?.copyWith(color: const Color(0xFF161514))),
                 const SizedBox(height: 4),
-                Text('${books.length} ${books.length == 1 ? 'book' : 'books'}',
-                    style: context.text.bodyMedium?.copyWith(color: const Color(0xB3161514))),
+                Text(
+                  '${books.length} ${books.length == 1 ? 'book' : 'books'}',
+                  style: context.text.bodyMedium?.copyWith(color: const Color(0xB3161514)),
+                ),
               ],
             ),
           ),
@@ -168,8 +176,12 @@ class CollectionDetailScreen extends ConsumerWidget {
               onDismissed: (_) async {
                 await repo.removeBook(collectionId, b.id);
                 if (context.mounted) {
-                  showFolioSnack(context, 'Removed from ${cw.collection.name}',
-                      action: 'Undo', onAction: () => repo.addBook(collectionId, b.id));
+                  showFolioSnack(
+                    context,
+                    'Removed from ${cw.collection.name}',
+                    action: 'Undo',
+                    onAction: () => repo.addBook(collectionId, b.id),
+                  );
                 }
               },
               child: BookListTile(book: b, onTap: () => context.push('/book/${b.id}')),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -46,7 +47,12 @@ class _CollectionsScreenState extends ConsumerState<CollectionsScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: Space.x3),
-            child: CircleIconButton(icon: PhosphorIconsRegular.plus, tooltip: 'New collection', filled: true, onPressed: _create),
+            child: CircleIconButton(
+              icon: PhosphorIconsRegular.plus,
+              tooltip: 'New collection',
+              filled: true,
+              onPressed: _create,
+            ),
           ),
         ],
       ),
@@ -66,7 +72,8 @@ class _CollectionsScreenState extends ConsumerState<CollectionsScreen> {
                     child: EmptyState(
                       art: Art.emptyCollections,
                       title: 'No collections yet',
-                      message: 'Group books however you like: a course, a project, summer reads. '
+                      message:
+                          'Group books however you like: a course, a project, summer reads. '
                           'A book can be in as many collections as you want.',
                       action: FilledButton.icon(
                         onPressed: _create,
@@ -165,12 +172,16 @@ class CollectionCard extends StatelessWidget {
                       ),
               ),
               const SizedBox(height: Space.x3),
-              Text(collection.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.text.titleMedium?.copyWith(color: const Color(0xFF161514))),
-              Text('${books.length} ${books.length == 1 ? 'book' : 'books'}',
-                  style: context.text.bodySmall?.copyWith(color: const Color(0xB3161514))),
+              Text(
+                collection.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.text.titleMedium?.copyWith(color: const Color(0xFF161514)),
+              ),
+              Text(
+                '${books.length} ${books.length == 1 ? 'book' : 'books'}',
+                style: context.text.bodySmall?.copyWith(color: const Color(0xB3161514)),
+              ),
             ],
           ),
         ),

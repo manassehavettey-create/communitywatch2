@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../core/theme/illustration_colors.g.dart';
@@ -30,13 +31,7 @@ enum Art {
 /// sampled background colour, so its edges disappear. Falls back to a calm
 /// icon tile if the asset isn't bundled.
 class Illustration extends StatelessWidget {
-  const Illustration(
-    this.art, {
-    super.key,
-    this.width,
-    this.radius = Radii.xl,
-    this.fallbackIcon,
-  });
+  const Illustration(this.art, {super.key, this.width, this.radius = Radii.xl, this.fallbackIcon});
 
   final Art art;
   final double? width;
@@ -60,11 +55,7 @@ class Illustration extends StatelessWidget {
             color: dark ? const Color(0xFFE6E0D6) : null,
             colorBlendMode: dark ? BlendMode.modulate : null,
             errorBuilder: (_, _, _) => Center(
-              child: Icon(
-                fallbackIcon ?? PhosphorIconsRegular.bookOpen,
-                size: 56,
-                color: const Color(0x99161514),
-              ),
+              child: Icon(fallbackIcon ?? PhosphorIconsRegular.bookOpen, size: 56, color: const Color(0x99161514)),
             ),
           ),
         ),
@@ -75,7 +66,8 @@ class Illustration extends StatelessWidget {
 }
 
 /// Collection cover art per colour, if bundled.
-String collectionArtPath(ShelfColor color) => 'assets/images/collections/collection_${switch (color) {
+String collectionArtPath(ShelfColor color) =>
+    'assets/images/collections/collection_${switch (color) {
       ShelfColor.lavender || ShelfColor.lilac => 'lavender',
       ShelfColor.lime => 'lime',
       ShelfColor.butter => 'butter',

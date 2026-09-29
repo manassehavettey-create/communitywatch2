@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../core/motion/motion.dart';
@@ -70,7 +71,11 @@ class _FloatingNav extends StatelessWidget {
             color: barColor,
             borderRadius: Radii.pillAll,
             boxShadow: [
-              BoxShadow(color: const Color(0xFF161514).withValues(alpha: dark ? 0.4 : 0.18), blurRadius: 24, offset: const Offset(0, 10)),
+              BoxShadow(
+                color: const Color(0xFF161514).withValues(alpha: dark ? 0.4 : 0.18),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
+              ),
             ],
             border: dark ? Border.all(color: c.hairline) : null,
           ),

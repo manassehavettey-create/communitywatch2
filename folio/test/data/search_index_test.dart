@@ -39,9 +39,7 @@ void main() {
         PageExcerpt(2, 'Photosynthesis converts light energy into chemical energy.'),
         PageExcerpt(3, 'The light reaction happens in the thylakoid membrane.'),
       ]);
-      await search.savePageTexts(bookB, const [
-        PageExcerpt(1, 'Light behaves as both a particle and a wave.'),
-      ]);
+      await search.savePageTexts(bookB, const [PageExcerpt(1, 'Light behaves as both a particle and a wave.')]);
     });
     tearDown(() => db.close());
 

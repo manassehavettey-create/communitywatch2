@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -72,8 +73,10 @@ class _Details extends ConsumerWidget {
         actions: [
           IconButton(
             tooltip: book.favorite ? 'Remove from favorites' : 'Add to favorites',
-            icon: Icon(book.favorite ? PhosphorIconsFill.heart : PhosphorIconsRegular.heart,
-                color: book.favorite ? ShelfColor.rose.strong : null),
+            icon: Icon(
+              book.favorite ? PhosphorIconsFill.heart : PhosphorIconsRegular.heart,
+              color: book.favorite ? ShelfColor.rose.strong : null,
+            ),
             onPressed: () {
               HapticFeedback.lightImpact();
               ref.read(booksRepositoryProvider).setFavorite(book.id, !book.favorite);
@@ -150,7 +153,9 @@ class _Details extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: Space.x3),
-              Expanded(child: _BookmarkButton(book: book, page: currentPage)),
+              Expanded(
+                child: _BookmarkButton(book: book, page: currentPage),
+              ),
             ],
           ),
           const SizedBox(height: Space.x3),
@@ -209,11 +214,15 @@ class _Details extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Ask this book',
-                          style: context.text.titleMedium?.copyWith(color: ShelfColor.lilac.cardForeground(b))),
+                      Text(
+                        'Ask this book',
+                        style: context.text.titleMedium?.copyWith(color: ShelfColor.lilac.cardForeground(b)),
+                      ),
                       Text(
                         'Questions, chapter summaries and explanations, grounded in its pages.',
-                        style: context.text.bodySmall?.copyWith(color: ShelfColor.lilac.cardForeground(b).withValues(alpha: 0.75)),
+                        style: context.text.bodySmall?.copyWith(
+                          color: ShelfColor.lilac.cardForeground(b).withValues(alpha: 0.75),
+                        ),
                       ),
                     ],
                   ),
@@ -263,10 +272,12 @@ class _Details extends ConsumerWidget {
                   child: Row(
                     children: [
                       Expanded(
-                        child: Text(o.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: o.level == 0 ? context.text.titleSmall : context.text.bodyMedium),
+                        child: Text(
+                          o.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: o.level == 0 ? context.text.titleSmall : context.text.bodyMedium,
+                        ),
                       ),
                       Text('${o.page}', style: context.text.bodySmall),
                     ],
@@ -306,13 +317,13 @@ class _Meta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: context.colors.inkMuted),
-          const SizedBox(width: 4),
-          Text(text, style: context.text.bodySmall),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon, size: 14, color: context.colors.inkMuted),
+      const SizedBox(width: 4),
+      Text(text, style: context.text.bodySmall),
+    ],
+  );
 }
 
 class _CountTile extends StatelessWidget {

@@ -48,12 +48,10 @@ class NotificationService {
     if (!isSupported) return false;
     await init();
     if (Platform.isAndroid) {
-      final android = _plugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
       return await android?.requestNotificationsPermission() ?? false;
     }
-    final ios =
-        _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+    final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
     return await ios?.requestPermissions(alert: true, sound: true) ?? false;
   }
 
@@ -65,14 +63,7 @@ class NotificationService {
     if (!s.reminderEnabled) return;
 
     final now = tz.TZDateTime.now(tz.local);
-    var at = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      s.reminderMinutes ~/ 60,
-      s.reminderMinutes % 60,
-    );
+    var at = tz.TZDateTime(tz.local, now.year, now.month, now.day, s.reminderMinutes ~/ 60, s.reminderMinutes % 60);
     if (!at.isAfter(now)) at = at.add(const Duration(days: 1));
 
     await _plugin.zonedSchedule(

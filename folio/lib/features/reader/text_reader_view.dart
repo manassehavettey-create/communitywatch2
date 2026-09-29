@@ -25,9 +25,8 @@ String reflowPreservingIndices(String text) {
     final next = lines[i + 1];
     final trimmed = line.trimRight();
     final endsSentence = trimmed.isEmpty || RegExp(r'[.!?:;"”’)\]]$').hasMatch(trimmed);
-    final nextStartsBlock = next.trim().isEmpty ||
-        RegExp(r'^\s{2,}').hasMatch(next) ||
-        RegExp(r'^\s*([•\-–—*]|\d+[.)])\s').hasMatch(next);
+    final nextStartsBlock =
+        next.trim().isEmpty || RegExp(r'^\s{2,}').hasMatch(next) || RegExp(r'^\s*([•\-–—*]|\d+[.)])\s').hasMatch(next);
     final shortLine = trimmed.length < 45;
     // Keep a real line break at paragraph ends, otherwise join with a space.
     b.write((endsSentence && (shortLine || nextStartsBlock)) || nextStartsBlock ? '\n' : ' ');
@@ -157,10 +156,12 @@ class TextReaderViewState extends ConsumerState<TextReaderView> {
     var start = 0;
     for (var i = 1; i <= text.length; i++) {
       if (i == text.length || marks[i] != marks[start]) {
-        spans.add(TextSpan(
-          text: text.substring(start, i),
-          style: marks[start] == null ? null : base.copyWith(backgroundColor: marks[start]),
-        ));
+        spans.add(
+          TextSpan(
+            text: text.substring(start, i),
+            style: marks[start] == null ? null : base.copyWith(backgroundColor: marks[start]),
+          ),
+        );
         start = i;
       }
     }

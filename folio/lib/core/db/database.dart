@@ -31,26 +31,18 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async {
-          await m.createAll();
-          await _createSearchIndex();
-          await customStatement(
-            'CREATE INDEX IF NOT EXISTS idx_highlights_book_page ON highlights(book_id, page)',
-          );
-          await customStatement(
-            'CREATE INDEX IF NOT EXISTS idx_notes_book ON notes(book_id)',
-          );
-          await customStatement(
-            'CREATE INDEX IF NOT EXISTS idx_bookmarks_book ON bookmarks(book_id, page)',
-          );
-          await customStatement(
-            'CREATE INDEX IF NOT EXISTS idx_sessions_book ON reading_sessions(book_id)',
-          );
-        },
-        beforeOpen: (details) async {
-          await customStatement('PRAGMA foreign_keys = ON');
-        },
-      );
+    onCreate: (m) async {
+      await m.createAll();
+      await _createSearchIndex();
+      await customStatement('CREATE INDEX IF NOT EXISTS idx_highlights_book_page ON highlights(book_id, page)');
+      await customStatement('CREATE INDEX IF NOT EXISTS idx_notes_book ON notes(book_id)');
+      await customStatement('CREATE INDEX IF NOT EXISTS idx_bookmarks_book ON bookmarks(book_id, page)');
+      await customStatement('CREATE INDEX IF NOT EXISTS idx_sessions_book ON reading_sessions(book_id)');
+    },
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
 
   /// External-content FTS5 index over `page_texts`, kept in sync by triggers.
   /// Built once per book at import; searches never touch the PDF.

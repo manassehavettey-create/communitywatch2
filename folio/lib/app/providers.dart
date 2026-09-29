@@ -23,16 +23,12 @@ final libraryStorageProvider = Provider<LibraryStorage>((ref) => throw Unimpleme
 final initialSettingsProvider = Provider<AppSettings>((ref) => const AppSettings());
 
 final booksRepositoryProvider = Provider((ref) => BooksRepository(ref.watch(databaseProvider)));
-final annotationsRepositoryProvider =
-    Provider((ref) => AnnotationsRepository(ref.watch(databaseProvider)));
+final annotationsRepositoryProvider = Provider((ref) => AnnotationsRepository(ref.watch(databaseProvider)));
 final searchRepositoryProvider = Provider((ref) => SearchRepository(ref.watch(databaseProvider)));
-final positionRepositoryProvider =
-    Provider((ref) => PositionRepository(ref.watch(databaseProvider)));
-final collectionsRepositoryProvider =
-    Provider((ref) => CollectionsRepository(ref.watch(databaseProvider)));
+final positionRepositoryProvider = Provider((ref) => PositionRepository(ref.watch(databaseProvider)));
+final collectionsRepositoryProvider = Provider((ref) => CollectionsRepository(ref.watch(databaseProvider)));
 final statsRepositoryProvider = Provider((ref) => StatsRepository(ref.watch(databaseProvider)));
-final settingsRepositoryProvider =
-    Provider((ref) => SettingsRepository(ref.watch(databaseProvider)));
+final settingsRepositoryProvider = Provider((ref) => SettingsRepository(ref.watch(databaseProvider)));
 
 final indexingServiceProvider = Provider((ref) {
   final s = IndexingService(
@@ -68,9 +64,7 @@ final settingsProvider = NotifierProvider<SettingsNotifier, AppSettings>(Setting
 
 // ------------------------------------------------------------------- books
 
-final booksProvider = StreamProvider<List<Book>>(
-  (ref) => ref.watch(booksRepositoryProvider).watchAll(),
-);
+final booksProvider = StreamProvider<List<Book>>((ref) => ref.watch(booksRepositoryProvider).watchAll());
 
 final bookProvider = StreamProvider.autoDispose.family<Book?, int>(
   (ref, id) => ref.watch(booksRepositoryProvider).watchBook(id),
@@ -84,9 +78,7 @@ final positionProvider = StreamProvider.autoDispose.family<ReadingPosition?, int
   (ref, id) => ref.watch(positionRepositoryProvider).watch(id),
 );
 
-final statsProvider = StreamProvider<StatsSummary>(
-  (ref) => ref.watch(statsRepositoryProvider).watchSummary(),
-);
+final statsProvider = StreamProvider<StatsSummary>((ref) => ref.watch(statsRepositoryProvider).watchSummary());
 
 final collectionsProvider = StreamProvider<List<CollectionWithBooks>>(
   (ref) => ref.watch(collectionsRepositoryProvider).watchAll(),
@@ -131,12 +123,8 @@ class ImportController extends Notifier<List<ImportJob>> {
   bool get isImporting => state.any((j) => !j.isDone);
 
   /// Imports files one after another (keeps memory flat for big batches).
-  Future<List<ImportResult>> importAll(
-    List<({String path, String name, bool temporary})> files,
-  ) async {
-    final jobs = [
-      for (final f in files) ImportJob(id: _nextId++, fileName: f.name),
-    ];
+  Future<List<ImportResult>> importAll(List<({String path, String name, bool temporary})> files) async {
+    final jobs = [for (final f in files) ImportJob(id: _nextId++, fileName: f.name)];
     state = [...state.where((j) => !j.isDone), ...jobs];
     final results = <ImportResult>[];
     final service = ref.read(importServiceProvider);
@@ -161,8 +149,7 @@ class ImportController extends Notifier<List<ImportJob>> {
   void clearFinished() => state = state.where((j) => !j.isDone).toList();
 }
 
-final importControllerProvider =
-    NotifierProvider<ImportController, List<ImportJob>>(ImportController.new);
+final importControllerProvider = NotifierProvider<ImportController, List<ImportJob>>(ImportController.new);
 
 /// True in debug builds only; gates the demo-data toggle.
 const bool kAllowDemoData = kDebugMode;

@@ -7,7 +7,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pdfrx/pdfrx.dart';
+
 import '../../core/theme/icons.dart';
+
 import 'package:share_plus/share_plus.dart';
 
 import '../../app/providers.dart';
@@ -120,6 +122,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
       anchor = ReaderAnchor(page: pos.page.clamp(1, book.pageCount), offset: pos.pageOffset, zoom: pos.zoom);
     }
     await books.markOpened(book.id);
+    // Opening on a page counts as reaching it (drives progress %).
+    await books.recordPageReached(book.id, anchor.page);
 
     final now = DateTime.now();
     _tracker = ReadingTracker(startPage: anchor.page, now: now);
@@ -182,20 +186,14 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
     }
   }
 
-  Duration get _focusRemaining =>
-      Duration(minutes: _focusMinutes ?? 0) - _tracker.activeTime;
+  Duration get _focusRemaining => Duration(minutes: _focusMinutes ?? 0) - _tracker.activeTime;
 
   Future<void> _flushActivity() async {
     final book = _book;
     if (book == null) return;
     final now = DateTime.now();
     final d = _tracker.takeUnflushed(now);
-    await _statsRepo.addActivity(
-          bookId: book.id,
-          pages: d.pages,
-          seconds: d.active.inSeconds,
-          at: now,
-        );
+    await _statsRepo.addActivity(bookId: book.id, pages: d.pages, seconds: d.active.inSeconds, at: now);
     final stats = _statsRepo;
     final row = ReadingSessionsCompanion(
       bookId: Value(book.id),
@@ -255,12 +253,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
     if (book == null) return;
     final anchor = a ?? _currentAnchor();
     _anchor = anchor;
-    _positions.save(
-          book.id,
-          page: anchor.page,
-          pageOffset: anchor.offset,
-          zoom: anchor.zoom,
-        );
+    _positions.save(book.id, page: anchor.page, pageOffset: anchor.offset, zoom: anchor.zoom);
   }
 
   Future<void> _refreshBookmark() async {
@@ -312,9 +305,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
   }
 
   void _clearSearch() => setState(() {
-        _searchMarks = const {};
-        _searchQuery = null;
-      });
+    _searchMarks = const {};
+    _searchQuery = null;
+  });
 
   // --------------------------------------------------------------- selection
 
@@ -334,15 +327,17 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
     final ids = <int>[];
     for (final s in sel.segments) {
       if (s.text.trim().isEmpty) continue;
-      ids.add(await repo.addHighlight(
-        bookId: _book!.id,
-        page: s.page,
-        content: s.text.replaceAll(RegExp(r'\s+'), ' '),
-        color: color.index,
-        startIndex: s.start,
-        endIndex: s.end,
-        rects: s.rects,
-      ));
+      ids.add(
+        await repo.addHighlight(
+          bookId: _book!.id,
+          page: s.page,
+          content: s.text.replaceAll(RegExp(r'\s+'), ' '),
+          color: color.index,
+          startIndex: s.start,
+          endIndex: s.end,
+          rects: s.rects,
+        ),
+      );
     }
     return ids;
   }
@@ -367,12 +362,16 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
         if (mounted) showFolioSnack(context, 'Copied');
       case SelectionAction.share:
         await _clearSelection();
-        await SharePlus.instance.share(ShareParams(
-          text: '“$text”\n— ${book.title}${book.author != null ? ', ${book.author}' : ''}, p. ${sel.firstPage}',
-        ));
+        await SharePlus.instance.share(
+          ShareParams(
+            text: '“$text”\n— ${book.title}${book.author != null ? ', ${book.author}' : ''}, p. ${sel.firstPage}',
+          ),
+        );
       case SelectionAction.bookmark:
         final title = text.split(' ').take(6).join(' ');
-        await ref.read(annotationsRepositoryProvider).addBookmark(
+        await ref
+            .read(annotationsRepositoryProvider)
+            .addBookmark(
               bookId: book.id,
               page: sel.firstPage,
               title: title.length < text.length ? '$title…' : title,
@@ -386,7 +385,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
         final body = await editNoteText(context, passage: text, subtitle: 'Page ${sel.firstPage}');
         if (body == null) return;
         final ids = await _saveHighlights(sel, ShelfColor.butter);
-        await ref.read(annotationsRepositoryProvider).addNote(
+        await ref
+            .read(annotationsRepositoryProvider)
+            .addNote(
               bookId: book.id,
               page: sel.firstPage,
               passage: text,
@@ -416,11 +417,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
     HapticFeedback.lightImpact();
     final text = await ref.read(searchRepositoryProvider).pageText(book.id, _page);
     final t = (text ?? '').replaceAll(RegExp(r'\s+'), ' ').trim();
-    final now = await ref.read(annotationsRepositoryProvider).togglePageBookmark(
-          bookId: book.id,
-          page: _page,
-          previewText: t.length > 160 ? '${t.substring(0, 160)}…' : t,
-        );
+    final now = await ref
+        .read(annotationsRepositoryProvider)
+        .togglePageBookmark(bookId: book.id, page: _page, previewText: t.length > 160 ? '${t.substring(0, 160)}…' : t);
     setState(() => _pageBookmarked = now);
     if (mounted) showFolioSnack(context, now ? 'Bookmarked page $_page' : 'Bookmark removed');
   }
@@ -430,12 +429,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
     if (book == null) return;
     final body = await editNoteText(context, passage: '', subtitle: 'Note on page $_page');
     if (body == null) return;
-    await ref.read(annotationsRepositoryProvider).addNote(
-          bookId: book.id,
-          page: _page,
-          passage: 'Page $_page',
-          body: body,
-        );
+    await ref
+        .read(annotationsRepositoryProvider)
+        .addNote(bookId: book.id, page: _page, passage: 'Page $_page', body: body);
     if (mounted) showFolioSnack(context, 'Note saved');
   }
 
@@ -529,46 +525,46 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
     final content = (book == null || anchor == null)
         ? const SizedBox.expand()
         : mode == ReaderViewMode.text
-            ? TextReaderView(
-                key: _textKey,
-                book: book,
-                theme: theme,
-                fontSize: settings.textScale,
-                lineHeight: settings.lineHeight,
-                maxWidth: settings.textWidth,
-                initialPage: _page,
-                highlights: _highlights,
-                searchQuery: _searchQuery,
-                onPageChanged: _onPage,
-                onTap: () => setState(() => _chrome = !_chrome),
-                onSelectionChanged: _setSelection,
-                onInteraction: _interaction,
-              )
-            : PdfReaderView(
-                key: _pdfKey,
-                book: book,
-                controller: _pdf,
-                mode: mode,
-                fit: settings.fitMode,
-                theme: theme,
-                anchor: _anchorForMode(),
-                highlights: _highlights,
-                searchMarks: _searchMarks,
-                onTap: () => setState(() => _chrome = !_chrome),
-                onPageChanged: _onPage,
-                onPositionChanged: (a) {
-                  _anchor = a;
-                  _scheduleSave();
-                },
-                onSelectionChanged: _setSelection,
-                onHighlightTap: (h) => showHighlightSheet(context, ref, h),
-                onInteraction: _interaction,
-                onReady: () {
-                  setState(() => _docReady = true);
-                  final marks = _searchMarks[_page];
-                  if (marks != null) _pdfKey.currentState?.revealRects(_page, marks);
-                },
-              );
+        ? TextReaderView(
+            key: _textKey,
+            book: book,
+            theme: theme,
+            fontSize: settings.textScale,
+            lineHeight: settings.lineHeight,
+            maxWidth: settings.textWidth,
+            initialPage: _page,
+            highlights: _highlights,
+            searchQuery: _searchQuery,
+            onPageChanged: _onPage,
+            onTap: () => setState(() => _chrome = !_chrome),
+            onSelectionChanged: _setSelection,
+            onInteraction: _interaction,
+          )
+        : PdfReaderView(
+            key: _pdfKey,
+            book: book,
+            controller: _pdf,
+            mode: mode,
+            fit: settings.fitMode,
+            theme: theme,
+            anchor: _anchorForMode(),
+            highlights: _highlights,
+            searchMarks: _searchMarks,
+            onTap: () => setState(() => _chrome = !_chrome),
+            onPageChanged: _onPage,
+            onPositionChanged: (a) {
+              _anchor = a;
+              _scheduleSave();
+            },
+            onSelectionChanged: _setSelection,
+            onHighlightTap: (h) => showHighlightSheet(context, ref, h),
+            onInteraction: _interaction,
+            onReady: () {
+              setState(() => _docReady = true);
+              final marks = _searchMarks[_page];
+              if (marks != null) _pdfKey.currentState?.revealRects(_page, marks);
+            },
+          );
 
     final chromeTheme = darkChrome ? AppTheme.dark() : AppTheme.light();
 
@@ -699,13 +695,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
       context: context,
       builder: (ctx) {
         Widget item(IconData icon, String label, VoidCallback onTap) => ListTile(
-              leading: Icon(icon),
-              title: Text(label, style: ctx.text.titleSmall),
-              onTap: () {
-                Navigator.pop(ctx);
-                onTap();
-              },
-            );
+          leading: Icon(icon),
+          title: Text(label, style: ctx.text.titleSmall),
+          onTap: () {
+            Navigator.pop(ctx);
+            onTap();
+          },
+        );
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -713,11 +709,18 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with WidgetsBinding
               item(PhosphorIconsRegular.sparkle, 'Ask about this page', () {
                 showAssistantSheet(context, ref, bookId: book.id, page: _page);
               }),
-              item(PhosphorIconsRegular.chatCircleText, 'Ask this book', () => context.push('/ask/${book.id}?page=$_page')),
+              item(
+                PhosphorIconsRegular.chatCircleText,
+                'Ask this book',
+                () => context.push('/ask/${book.id}?page=$_page'),
+              ),
               item(PhosphorIconsRegular.notePencil, 'Add a note to this page', _addPageNote),
               item(PhosphorIconsRegular.timer, 'Start a focused session', _startFocus),
-              item(PhosphorIconsRegular.highlighter, 'Highlights in this book',
-                  () => context.push('/highlights?book=${book.id}')),
+              item(
+                PhosphorIconsRegular.highlighter,
+                'Highlights in this book',
+                () => context.push('/highlights?book=${book.id}'),
+              ),
               item(PhosphorIconsRegular.info, 'Book details', () => context.push('/book/${book.id}')),
               const SizedBox(height: Space.x2),
             ],
@@ -779,7 +782,12 @@ class _TopBar extends StatelessWidget {
                   CircleIconButton(icon: PhosphorIconsRegular.arrowLeft, tooltip: 'Back', onPressed: onBack),
                   const SizedBox(width: Space.x3),
                   Expanded(
-                    child: Text(book.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.titleSmall),
+                    child: Text(
+                      book.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.text.titleSmall,
+                    ),
                   ),
                   IconButton(
                     tooltip: 'Search in book',
@@ -789,17 +797,19 @@ class _TopBar extends StatelessWidget {
                   IconButton(
                     tooltip: bookmarked ? 'Remove bookmark' : 'Bookmark this page',
                     onPressed: onBookmark,
-                    icon: Icon(
-                      bookmarked ? PhosphorIconsFill.bookmarkSimple : PhosphorIconsRegular.bookmarkSimple,
-                      color: bookmarked ? c.lavender : null,
-                    ).animate(key: ValueKey(bookmarked), target: bookmarked ? 1 : 0).moveY(
-                          begin: bookmarked ? -6 : 0,
-                          end: 0,
-                          duration: m.base,
-                          curve: Curves.easeOutBack,
-                        ),
+                    icon:
+                        Icon(
+                              bookmarked ? PhosphorIconsFill.bookmarkSimple : PhosphorIconsRegular.bookmarkSimple,
+                              color: bookmarked ? c.lavender : null,
+                            )
+                            .animate(key: ValueKey(bookmarked), target: bookmarked ? 1 : 0)
+                            .moveY(begin: bookmarked ? -6 : 0, end: 0, duration: m.base, curve: Curves.easeOutBack),
                   ),
-                  IconButton(tooltip: 'Appearance', onPressed: onAppearance, icon: const Icon(PhosphorIconsRegular.textAa)),
+                  IconButton(
+                    tooltip: 'Appearance',
+                    onPressed: onAppearance,
+                    icon: const Icon(PhosphorIconsRegular.textAa),
+                  ),
                   IconButton(tooltip: 'More', onPressed: onMenu, icon: const Icon(PhosphorIconsRegular.dotsThree)),
                 ],
               ),
@@ -844,11 +854,7 @@ class _BottomBarState extends State<_BottomBar> {
     final m = Motion.of(context);
     final c = context.colors;
     final shown = (_drag ?? widget.page.toDouble()).round();
-    final modes = [
-      ReaderViewMode.scroll,
-      ReaderViewMode.page,
-      if (widget.textAvailable) ReaderViewMode.text,
-    ];
+    final modes = [ReaderViewMode.scroll, ReaderViewMode.page, if (widget.textAvailable) ReaderViewMode.text];
     return Positioned(
       left: 0,
       right: 0,
@@ -863,7 +869,12 @@ class _BottomBarState extends State<_BottomBar> {
             duration: m.base,
             opacity: widget.visible ? 1 : 0,
             child: Container(
-              padding: EdgeInsets.fromLTRB(Space.gutter, Space.x3, Space.gutter, MediaQuery.paddingOf(context).bottom + Space.x3),
+              padding: EdgeInsets.fromLTRB(
+                Space.gutter,
+                Space.x3,
+                Space.gutter,
+                MediaQuery.paddingOf(context).bottom + Space.x3,
+              ),
               decoration: BoxDecoration(
                 color: c.surface.withValues(alpha: 0.97),
                 border: Border(top: BorderSide(color: c.hairline)),
@@ -968,12 +979,16 @@ class _FocusBar extends StatelessWidget {
               ),
             ),
             const SizedBox(width: Space.x3),
-            Text(formatClock(left),
-                style: context.text.titleMedium?.copyWith(color: fg, fontFeatures: const [FontFeature.tabularFigures()])),
+            Text(
+              formatClock(left),
+              style: context.text.titleMedium?.copyWith(color: fg, fontFeatures: const [FontFeature.tabularFigures()]),
+            ),
             Text(' left', style: context.text.bodySmall?.copyWith(color: fg.withValues(alpha: 0.7))),
             const Spacer(),
-            Text('p. $page / $pageCount · ${((page / pageCount) * 100).round()}%',
-                style: context.text.labelMedium?.copyWith(color: fg.withValues(alpha: 0.8))),
+            Text(
+              'p. $page / $pageCount · ${((page / pageCount) * 100).round()}%',
+              style: context.text.labelMedium?.copyWith(color: fg.withValues(alpha: 0.8)),
+            ),
             const SizedBox(width: Space.x2),
             TextButton(
               onPressed: onEnd,

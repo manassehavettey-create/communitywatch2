@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../core/db/database.dart';
@@ -45,8 +46,7 @@ class BookGridTile extends StatelessWidget {
                       right: 8,
                       child: _Badge(icon: PhosphorIconsFill.heart, color: ShelfColor.rose.strong),
                     ),
-                  if (book.isIndexing)
-                    const Positioned(left: 8, bottom: 8, child: _IndexingBadge()),
+                  if (book.isIndexing) const Positioned(left: 8, bottom: 8, child: _IndexingBadge()),
                 ],
               ),
               const SizedBox(height: Space.x2),
@@ -95,8 +95,12 @@ class BookListTile extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(book.title,
-                            maxLines: 2, overflow: TextOverflow.ellipsis, style: context.text.titleMedium),
+                        child: Text(
+                          book.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.text.titleMedium,
+                        ),
                       ),
                       if (book.favorite)
                         Padding(
@@ -143,10 +147,10 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(6),
-        decoration: const BoxDecoration(color: Color(0xF2FFFDF8), shape: BoxShape.circle),
-        child: Icon(icon, size: 14, color: color),
-      );
+    padding: const EdgeInsets.all(6),
+    decoration: const BoxDecoration(color: Color(0xF2FFFDF8), shape: BoxShape.circle),
+    child: Icon(icon, size: 14, color: color),
+  );
 }
 
 class _IndexingBadge extends StatelessWidget {
@@ -154,21 +158,21 @@ class _IndexingBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(color: const Color(0xF2161514), borderRadius: Radii.pillAll),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(
-              width: 10,
-              height: 10,
-              child: CircularProgressIndicator(strokeWidth: 1.6, color: Color(0xFFD6F26B)),
-            ),
-            const SizedBox(width: 6),
-            Text('Indexing', style: context.text.labelSmall?.copyWith(color: const Color(0xFFF6F1E7))),
-          ],
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(color: const Color(0xF2161514), borderRadius: Radii.pillAll),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(
+          width: 10,
+          height: 10,
+          child: CircularProgressIndicator(strokeWidth: 1.6, color: Color(0xFFD6F26B)),
         ),
-      );
+        const SizedBox(width: 6),
+        Text('Indexing', style: context.text.labelSmall?.copyWith(color: const Color(0xFFF6F1E7))),
+      ],
+    ),
+  );
 }
 
 /// Placeholder shown while a PDF is being imported.
@@ -200,36 +204,36 @@ class ImportingListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Space.gutter, vertical: Space.x2),
-        child: Row(
-          children: [
-            const Skeleton(width: 56, height: 84, radius: Radii.sm),
-            const SizedBox(width: Space.x4),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(fileName, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.titleMedium),
-                  const SizedBox(height: 6),
-                  const Skeleton(width: 140, height: 10),
-                  const SizedBox(height: 6),
-                  Text(stage ?? 'Waiting…', style: context.text.bodySmall),
-                ],
-              ),
-            ),
-          ],
+    padding: const EdgeInsets.symmetric(horizontal: Space.gutter, vertical: Space.x2),
+    child: Row(
+      children: [
+        const Skeleton(width: 56, height: 84, radius: Radii.sm),
+        const SizedBox(width: Space.x4),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(fileName, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.titleMedium),
+              const SizedBox(height: 6),
+              const Skeleton(width: 140, height: 10),
+              const SizedBox(height: 6),
+              Text(stage ?? 'Waiting…', style: context.text.bodySmall),
+            ],
+          ),
         ),
-      );
+      ],
+    ),
+  );
 }
 
 String stageLabel(Object? stage) => switch (stage.toString().split('.').last) {
-      'checking' => 'Checking for duplicates…',
-      'copying' => 'Copying into Folio…',
-      'reading' => 'Reading pages…',
-      'cover' => 'Making the cover…',
-      'done' => 'Added',
-      _ => 'Waiting…',
-    };
+  'checking' => 'Checking for duplicates…',
+  'copying' => 'Copying into Folio…',
+  'reading' => 'Reading pages…',
+  'cover' => 'Making the cover…',
+  'done' => 'Added',
+  _ => 'Waiting…',
+};
 
 LibraryFilter parseFilter(String? s) =>
     LibraryFilter.values.firstWhere((f) => f.name == s, orElse: () => LibraryFilter.all);

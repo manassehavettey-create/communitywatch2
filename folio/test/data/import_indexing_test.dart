@@ -51,8 +51,7 @@ void main() {
     }
   }
 
-  testWidgets('imports a PDF: metadata, cover, page count, outline and search index',
-      (tester) async {
+  testWidgets('imports a PDF: metadata, cover, page count, outline and search index', (tester) async {
     await tester.runAsync(() async {
       final r = await importer.importFile('test/fixtures/sample_book.pdf', 'sample_book.pdf');
       expect(r.outcome, ImportOutcome.added, reason: r.message);
@@ -134,25 +133,32 @@ void main() {
   });
 
   final largePath = Platform.environment['FOLIO_LARGE_PDF'];
-  testWidgets('large PDF (1,200 pages, ~25 MB) imports and indexes', (tester) async {
-    await tester.runAsync(() async {
-      final sw = Stopwatch()..start();
-      final r = await importer.importFile(largePath!, 'large_book.pdf');
-      final importMs = sw.elapsedMilliseconds;
-      expect(r.outcome, ImportOutcome.added, reason: r.message);
-      await idle();
-      final indexMs = sw.elapsedMilliseconds - importMs;
-      final book = (await books.getBook(r.bookId!))!;
-      expect(book.pageCount, 1200);
-      expect(book.indexStatus, IndexStatus.done);
-      final hits = await search.searchBook(book.id, '"seven hundred seventy seven"');
-      expect(hits.single.page, 777);
-      expect((await db.outlineFor(book.id)), hasLength(40));
-      final searchSw = Stopwatch()..start();
-      await search.searchBook(book.id, 'lantern');
-      // ignore: avoid_print
-      print('large PDF: import ${importMs}ms, index ${indexMs}ms, '
-          'search ${searchSw.elapsedMilliseconds}ms');
-    });
-  }, skip: largePath == null, timeout: const Timeout(Duration(minutes: 5)));
+  testWidgets(
+    'large PDF (1,200 pages, ~25 MB) imports and indexes',
+    (tester) async {
+      await tester.runAsync(() async {
+        final sw = Stopwatch()..start();
+        final r = await importer.importFile(largePath!, 'large_book.pdf');
+        final importMs = sw.elapsedMilliseconds;
+        expect(r.outcome, ImportOutcome.added, reason: r.message);
+        await idle();
+        final indexMs = sw.elapsedMilliseconds - importMs;
+        final book = (await books.getBook(r.bookId!))!;
+        expect(book.pageCount, 1200);
+        expect(book.indexStatus, IndexStatus.done);
+        final hits = await search.searchBook(book.id, '"seven hundred seventy seven"');
+        expect(hits.single.page, 777);
+        expect((await db.outlineFor(book.id)), hasLength(40));
+        final searchSw = Stopwatch()..start();
+        await search.searchBook(book.id, 'lantern');
+        // ignore: avoid_print
+        print(
+          'large PDF: import ${importMs}ms, index ${indexMs}ms, '
+          'search ${searchSw.elapsedMilliseconds}ms',
+        );
+      });
+    },
+    skip: largePath == null,
+    timeout: const Timeout(Duration(minutes: 5)),
+  );
 }

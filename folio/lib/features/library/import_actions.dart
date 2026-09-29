@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -49,20 +50,17 @@ Future<void> pickAndImportBooks(BuildContext context, WidgetRef ref) async {
       await sink.close();
       files.add((path: tmp.path, name: f.name, temporary: true));
     } catch (e) {
-      failures.add(ImportResult(
-        ImportOutcome.failed,
-        f.name,
-        message: isOutOfSpace(e)
-            ? 'Not enough free storage to add this PDF.'
-            : 'Folio couldn’t read this file.',
-      ));
+      failures.add(
+        ImportResult(
+          ImportOutcome.failed,
+          f.name,
+          message: isOutOfSpace(e) ? 'Not enough free storage to add this PDF.' : 'Folio couldn’t read this file.',
+        ),
+      );
     }
   }
 
-  final results = [
-    ...failures,
-    ...await ref.read(importControllerProvider.notifier).importAll(files),
-  ];
+  final results = [...failures, ...await ref.read(importControllerProvider.notifier).importAll(files)];
   if (!context.mounted) return;
   await _showResults(context, results);
   ref.read(importControllerProvider.notifier).clearFinished();
@@ -73,9 +71,14 @@ Future<void> _showResults(BuildContext context, List<ImportResult> results) asyn
   final problems = results.where((r) => r.outcome != ImportOutcome.added).toList();
   if (problems.isEmpty) {
     if (added.length == 1) {
-      showFolioSnack(context, 'Added to your library', action: 'Open', onAction: () {
-        context.push('/book/${added.single.bookId}');
-      });
+      showFolioSnack(
+        context,
+        'Added to your library',
+        action: 'Open',
+        onAction: () {
+          context.push('/book/${added.single.bookId}');
+        },
+      );
     } else {
       showFolioSnack(context, 'Added ${added.length} books to your library');
     }
@@ -119,10 +122,7 @@ Future<void> _showResults(BuildContext context, List<ImportResult> results) asyn
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(r.fileName, style: ctx.text.titleSmall),
-                            Text(
-                              r.message ?? 'Added',
-                              style: ctx.text.bodySmall,
-                            ),
+                            Text(r.message ?? 'Added', style: ctx.text.bodySmall),
                           ],
                         ),
                       ),

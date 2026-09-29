@@ -165,8 +165,7 @@ class PdfReaderViewState extends State<PdfReaderView> {
     await _c.goTo(m, duration: animate ? const Duration(milliseconds: 260) : Duration.zero);
   }
 
-  Future<void> goToPage(int page, {bool animate = true}) =>
-      goToAnchor(ReaderAnchor(page: page), animate: animate);
+  Future<void> goToPage(int page, {bool animate = true}) => goToAnchor(ReaderAnchor(page: page), animate: animate);
 
   Future<void> nextPage() => goToPage((currentPage + 1).clamp(1, _c.pageCount));
   Future<void> previousPage() => goToPage((currentPage - 1).clamp(1, _c.pageCount));
@@ -176,24 +175,32 @@ class PdfReaderViewState extends State<PdfReaderView> {
     if (!_c.isReady || rects.isEmpty) return;
     var u = rects.first;
     for (final r in rects.skip(1)) {
-      u = Rect.fromLTRB(math.min(u.left, r.left), math.max(u.top, r.top), math.max(u.right, r.right),
-          math.min(u.bottom, r.bottom));
+      u = Rect.fromLTRB(
+        math.min(u.left, r.left),
+        math.max(u.top, r.top),
+        math.max(u.right, r.right),
+        math.min(u.bottom, r.bottom),
+      );
     }
     if (_pageMode) {
       await goToPage(page, animate: false);
       return;
     }
-    await _c.goToRectInsidePage(
-      pageNumber: page,
-      rect: PdfRect(u.left, u.top, u.right, u.bottom),
-      anchor: PdfPageAnchor.center,
-      duration: const Duration(milliseconds: 300),
-    );
+    // Keep the reading zoom (fit) and centre the match vertically, rather
+    // than zooming into the match rect.
+    final pr = _pageRect(page);
+    final docRect = pdfRectToPage(u, _c.pages[page - 1], pr);
+    final zoom = math.max(_c.currentZoom, _fitZoom(page));
+    final m = _c.calcMatrixFor(Offset(pr.center.dx, docRect.center.dy), zoom: zoom);
+    await _c.goTo(m, duration: const Duration(milliseconds: 300));
   }
 
   Future<void> applyFit({bool animate = false}) async {
     final a = currentAnchor();
-    await goToAnchor(ReaderAnchor(page: a.page, offset: a.offset, zoom: 1), animate: animate);
+    await goToAnchor(
+      ReaderAnchor(page: a.page, offset: a.offset, zoom: 1),
+      animate: animate,
+    );
     _reportPosition();
   }
 
@@ -305,7 +312,10 @@ class PdfReaderViewState extends State<PdfReaderView> {
     _selDebounce = Timer(const Duration(milliseconds: 250), () async {
       final ranges = await sel.getSelectedTextRanges();
       if (!mounted || token != _selectionToken) return;
-      final segs = [for (final r in ranges) if (r.end > r.start) segmentFromRange(r)];
+      final segs = [
+        for (final r in ranges)
+          if (r.end > r.start) segmentFromRange(r),
+      ];
       widget.onSelectionChanged(segs.isEmpty ? null : ReaderSelection(segs));
     });
   }

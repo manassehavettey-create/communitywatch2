@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -51,7 +52,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     const EmptyState(
                       art: Art.emptyHistory,
                       title: 'No reading history yet',
-                      message: 'Open a book and read for a minute. Your pages, time and streak '
+                      message:
+                          'Open a book and read for a minute. Your pages, time and streak '
                           'will start showing up here, stored only on this phone.',
                     )
                   else ...[
@@ -77,8 +79,11 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
                       child: Row(
                         children: [
-                          _Tile(ShelfColor.sky, formatDuration(Duration(seconds: stats.totalSeconds), short: true),
-                              'total reading time'),
+                          _Tile(
+                            ShelfColor.sky,
+                            formatDuration(Duration(seconds: stats.totalSeconds), short: true),
+                            'reading time',
+                          ),
                           const SizedBox(width: Space.x3),
                           _Tile(ShelfColor.mint, '${stats.booksFinished}', 'books finished'),
                           const SizedBox(width: Space.x3),
@@ -91,17 +96,33 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
                       child: Row(
                         children: [
-                          PillChip(label: 'Pages', dense: true, selected: _metric == _Metric.pages,
-                              onTap: () => setState(() => _metric = _Metric.pages)),
+                          PillChip(
+                            label: 'Pages',
+                            dense: true,
+                            selected: _metric == _Metric.pages,
+                            onTap: () => setState(() => _metric = _Metric.pages),
+                          ),
                           const SizedBox(width: Space.x2),
-                          PillChip(label: 'Minutes', dense: true, selected: _metric == _Metric.minutes,
-                              onTap: () => setState(() => _metric = _Metric.minutes)),
+                          PillChip(
+                            label: 'Minutes',
+                            dense: true,
+                            selected: _metric == _Metric.minutes,
+                            onTap: () => setState(() => _metric = _Metric.minutes),
+                          ),
                           const Spacer(),
-                          PillChip(label: '7 days', dense: true, selected: _range == _Range.week,
-                              onTap: () => setState(() => _range = _Range.week)),
+                          PillChip(
+                            label: '7 days',
+                            dense: true,
+                            selected: _range == _Range.week,
+                            onTap: () => setState(() => _range = _Range.week),
+                          ),
                           const SizedBox(width: Space.x2),
-                          PillChip(label: '30 days', dense: true, selected: _range == _Range.month,
-                              onTap: () => setState(() => _range = _Range.month)),
+                          PillChip(
+                            label: '30 days',
+                            dense: true,
+                            selected: _range == _Range.month,
+                            onTap: () => setState(() => _range = _Range.month),
+                          ),
                         ],
                       ),
                     ),
@@ -121,11 +142,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     const SectionHeader('Reading calendar'),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: Space.gutter),
-                      child: _Calendar(
-                        month: _month,
-                        days: stats.days,
-                        onMonth: (d) => setState(() => _month = d),
-                      ),
+                      child: _Calendar(month: _month, days: stats.days, onMonth: (d) => setState(() => _month = d)),
                     ),
                     const SizedBox(height: Space.x3),
                     Padding(
@@ -168,8 +185,8 @@ class _StreakHero extends StatelessWidget {
                   streak.current == 0
                       ? 'Start a new streak today'
                       : streak.readToday
-                          ? 'You read today. Nice.'
-                          : 'Read today to keep it going',
+                      ? 'You read today. Nice.'
+                      : 'Read today to keep it going',
                   style: context.text.titleLarge?.copyWith(color: fg),
                 ),
                 const SizedBox(height: Space.x3),
@@ -177,8 +194,10 @@ class _StreakHero extends StatelessWidget {
                   children: [
                     Icon(PhosphorIconsFill.fire, size: 16, color: c.lime),
                     const SizedBox(width: 6),
-                    Text('Longest: ${plural(streak.longest, 'day')}',
-                        style: context.text.labelLarge?.copyWith(color: fg.withValues(alpha: 0.8))),
+                    Text(
+                      'Longest: ${plural(streak.longest, 'day')}',
+                      style: context.text.labelLarge?.copyWith(color: fg.withValues(alpha: 0.8)),
+                    ),
                   ],
                 ),
               ],
@@ -215,8 +234,12 @@ class _Tile extends StatelessWidget {
               child: Text(value, style: context.text.headlineMedium?.copyWith(color: fg, height: 1)),
             ),
             const SizedBox(height: 4),
-            Text(label, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: context.text.bodySmall?.copyWith(color: fg.withValues(alpha: 0.75))),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.text.bodySmall?.copyWith(color: fg.withValues(alpha: 0.75)),
+            ),
           ],
         ),
       ),
@@ -317,7 +340,12 @@ class _BarChartState extends State<_BarChart> {
                             ],
                           ),
                         ),
-                      Positioned(left: 0, right: 0, top: plotH, child: Container(height: 1, color: c.hairline)),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        top: plotH,
+                        child: Container(height: 1, color: c.hairline),
+                      ),
                       for (var i = 0; i < n; i++)
                         Positioned(
                           left: slot * i + (slot - barW) / 2,
@@ -343,16 +371,18 @@ class _BarChartState extends State<_BarChart> {
                         ),
                       // Direct labels only on the peak day (never every bar).
                       if (maxV > 0 && _active == null)
-                        Builder(builder: (context) {
-                          final i = values.lastIndexOf(maxV);
-                          final h = plotH * maxV / niceMax;
-                          return Positioned(
-                            left: (slot * i + slot / 2 - 30).clamp(0, box.maxWidth - 60),
-                            width: 60,
-                            bottom: labelH + h + 4,
-                            child: Text('$maxV', textAlign: TextAlign.center, style: context.text.labelMedium),
-                          );
-                        }),
+                        Builder(
+                          builder: (context) {
+                            final i = values.lastIndexOf(maxV);
+                            final h = plotH * maxV / niceMax;
+                            return Positioned(
+                              left: (slot * i + slot / 2 - 30).clamp(0, box.maxWidth - 60),
+                              width: 60,
+                              bottom: labelH + h + 4,
+                              child: Text('$maxV', textAlign: TextAlign.center, style: context.text.labelMedium),
+                            );
+                          },
+                        ),
                       for (var i = 0; i < n; i++)
                         if (few || i == n - 1 || i % 7 == (n - 1) % 7)
                           Positioned(
@@ -360,7 +390,11 @@ class _BarChartState extends State<_BarChart> {
                             width: slot,
                             bottom: 0,
                             child: Text(
-                              i == n - 1 ? 'Today' : (few ? DateFormat('E').format(widget.days[i].day) : DateFormat('d/M').format(widget.days[i].day)),
+                              i == n - 1
+                                  ? 'Today'
+                                  : (few
+                                        ? DateFormat('E').format(widget.days[i].day)
+                                        : DateFormat('d/M').format(widget.days[i].day)),
                               textAlign: TextAlign.center,
                               maxLines: 1,
                               overflow: TextOverflow.clip,
@@ -386,10 +420,10 @@ class _BarChartState extends State<_BarChart> {
   }
 
   static int _nice(int v) {
-    for (final step in [5, 10, 20, 25, 50, 100, 200, 250, 500, 1000]) {
+    for (final step in [2, 4, 10, 20, 40, 100, 200, 400, 1000]) {
       if (v <= step) return step;
     }
-    return ((v / 1000).ceil()) * 1000;
+    return ((v / 2000).ceil()) * 2000;
   }
 }
 
@@ -446,7 +480,9 @@ class _Calendar extends StatelessWidget {
           Row(
             children: [
               for (final d in const ['M', 'T', 'W', 'T', 'F', 'S', 'S'])
-                Expanded(child: Center(child: Text(d, style: context.text.labelSmall))),
+                Expanded(
+                  child: Center(child: Text(d, style: context.text.labelSmall)),
+                ),
             ],
           ),
           const SizedBox(height: Space.x2),
@@ -457,33 +493,38 @@ class _Calendar extends StatelessWidget {
                 children: [
                   for (var col = 0; col < 7; col++)
                     Expanded(
-                      child: Builder(builder: (context) {
-                        final idx = r * 7 + col - lead + 1;
-                        if (idx < 1 || idx > daysInMonth) return const SizedBox(height: 36);
-                        final day = DateTime(month.year, month.month, idx);
-                        final hit = read[day];
-                        final isToday = day == today;
-                        return Semantics(
-                          label: '${DateFormat('d MMMM').format(day)}${hit != null ? ', read ${hit.pages} pages' : ''}',
-                          excludeSemantics: true,
-                          child: Container(
-                            height: 36,
-                            margin: const EdgeInsets.symmetric(horizontal: 3),
-                            decoration: BoxDecoration(
-                              color: hit != null ? c.lime : Colors.transparent,
-                              borderRadius: Radii.smAll,
-                              border: isToday ? Border.all(color: c.ink, width: 1.5) : null,
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              '$idx',
-                              style: context.text.labelMedium?.copyWith(
-                                color: hit != null ? const Color(0xFF161514) : (day.isAfter(today) ? c.hairline : c.inkMuted),
+                      child: Builder(
+                        builder: (context) {
+                          final idx = r * 7 + col - lead + 1;
+                          if (idx < 1 || idx > daysInMonth) return const SizedBox(height: 36);
+                          final day = DateTime(month.year, month.month, idx);
+                          final hit = read[day];
+                          final isToday = day == today;
+                          return Semantics(
+                            label:
+                                '${DateFormat('d MMMM').format(day)}${hit != null ? ', read ${hit.pages} pages' : ''}',
+                            excludeSemantics: true,
+                            child: Container(
+                              height: 36,
+                              margin: const EdgeInsets.symmetric(horizontal: 3),
+                              decoration: BoxDecoration(
+                                color: hit != null ? c.lime : Colors.transparent,
+                                borderRadius: Radii.smAll,
+                                border: isToday ? Border.all(color: c.ink, width: 1.5) : null,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '$idx',
+                                style: context.text.labelMedium?.copyWith(
+                                  color: hit != null
+                                      ? const Color(0xFF161514)
+                                      : (day.isAfter(today) ? c.hairline : c.inkMuted),
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }),
+                          );
+                        },
+                      ),
                     ),
                 ],
               ),

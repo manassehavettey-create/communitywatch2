@@ -26,11 +26,7 @@ class ImportResult {
 /// files are copied into app storage, read with PDFium on-device, and their
 /// text is indexed locally.
 class ImportService {
-  ImportService({
-    required this.books,
-    required this.storage,
-    required this.indexer,
-  });
+  ImportService({required this.books, required this.storage, required this.indexer});
 
   final BooksRepository books;
   final LibraryStorage storage;
@@ -48,12 +44,14 @@ class ImportService {
     try {
       final src = File(sourcePath);
       if (!await src.exists()) {
-        return ImportResult(ImportOutcome.failed, fileName,
-            message: "The file couldn't be opened. It may have been moved or deleted.");
+        return ImportResult(
+          ImportOutcome.failed,
+          fileName,
+          message: "The file couldn't be opened. It may have been moved or deleted.",
+        );
       }
       if (!await _looksLikePdf(src)) {
-        return ImportResult(ImportOutcome.failed, fileName,
-            message: "This file isn't a PDF, so Folio can't open it.");
+        return ImportResult(ImportOutcome.failed, fileName, message: "This file isn't a PDF, so Folio can't open it.");
       }
 
       onStage?.call(ImportStage.checking);
@@ -61,8 +59,12 @@ class ImportService {
       final existing = await books.findBySha(sha);
       if (existing != null) {
         if (moveSource) await src.delete();
-        return ImportResult(ImportOutcome.duplicate, fileName,
-            bookId: existing.id, message: 'Already in your library as “${existing.title}”.');
+        return ImportResult(
+          ImportOutcome.duplicate,
+          fileName,
+          bookId: existing.id,
+          message: 'Already in your library as “${existing.title}”.',
+        );
       }
 
       onStage?.call(ImportStage.copying);
@@ -89,13 +91,15 @@ class ImportService {
       } on PdfPasswordException {
         await storage.deleteFiles(filePath: dest);
         copiedPath = null;
-        return ImportResult(ImportOutcome.failed, fileName,
-            message: 'This PDF is password-protected. Remove the password and import it again.');
+        return ImportResult(
+          ImportOutcome.failed,
+          fileName,
+          message: 'This PDF is password-protected. Remove the password and import it again.',
+        );
       } catch (_) {
         await storage.deleteFiles(filePath: dest);
         copiedPath = null;
-        return ImportResult(ImportOutcome.failed, fileName,
-            message: "This PDF looks damaged and couldn't be opened.");
+        return ImportResult(ImportOutcome.failed, fileName, message: "This PDF looks damaged and couldn't be opened.");
       }
 
       int pageCount;
@@ -139,11 +143,17 @@ class ImportService {
         await storage.deleteFiles(filePath: copiedPath, coverPath: coverPath);
       }
       if (isOutOfSpace(e)) {
-        return ImportResult(ImportOutcome.failed, fileName,
-            message: 'Not enough free storage to add this PDF. Free up some space and try again.');
+        return ImportResult(
+          ImportOutcome.failed,
+          fileName,
+          message: 'Not enough free storage to add this PDF. Free up some space and try again.',
+        );
       }
-      return ImportResult(ImportOutcome.failed, fileName,
-          message: "Something went wrong while adding this PDF. (${e.runtimeType})");
+      return ImportResult(
+        ImportOutcome.failed,
+        fileName,
+        message: "Something went wrong while adding this PDF. (${e.runtimeType})",
+      );
     }
   }
 

@@ -37,8 +37,7 @@ extension BookX on Book {
 
   bool get isSearchable => indexStatus == IndexStatus.done && textPages > 0;
   bool get isScanned => indexStatus == IndexStatus.noText;
-  bool get isIndexing =>
-      indexStatus == IndexStatus.pending || indexStatus == IndexStatus.indexing;
+  bool get isIndexing => indexStatus == IndexStatus.pending || indexStatus == IndexStatus.indexing;
 }
 
 class AnnotationCounts {
@@ -52,17 +51,13 @@ class BooksRepository {
   BooksRepository(this.db);
   final AppDatabase db;
 
-  Stream<List<Book>> watchAll() =>
-      (db.select(db.books)..orderBy([(b) => OrderingTerm.desc(b.addedAt)])).watch();
+  Stream<List<Book>> watchAll() => (db.select(db.books)..orderBy([(b) => OrderingTerm.desc(b.addedAt)])).watch();
 
-  Stream<Book?> watchBook(int id) =>
-      (db.select(db.books)..where((b) => b.id.equals(id))).watchSingleOrNull();
+  Stream<Book?> watchBook(int id) => (db.select(db.books)..where((b) => b.id.equals(id))).watchSingleOrNull();
 
-  Future<Book?> getBook(int id) =>
-      (db.select(db.books)..where((b) => b.id.equals(id))).getSingleOrNull();
+  Future<Book?> getBook(int id) => (db.select(db.books)..where((b) => b.id.equals(id))).getSingleOrNull();
 
-  Future<Book?> findBySha(String sha) =>
-      (db.select(db.books)..where((b) => b.sha256.equals(sha))).getSingleOrNull();
+  Future<Book?> findBySha(String sha) => (db.select(db.books)..where((b) => b.sha256.equals(sha))).getSingleOrNull();
 
   Future<int> insertBook(BooksCompanion book) => db.into(db.books).insert(book);
 
@@ -70,15 +65,11 @@ class BooksRepository {
       (db.update(db.books)..where((b) => b.id.equals(id))).write(changes);
 
   Future<void> rename(int id, {required String title, String? author}) => updateBook(
-        id,
-        BooksCompanion(
-          title: Value(title.trim()),
-          author: Value(author?.trim().isEmpty ?? true ? null : author!.trim()),
-        ),
-      );
+    id,
+    BooksCompanion(title: Value(title.trim()), author: Value(author?.trim().isEmpty ?? true ? null : author!.trim())),
+  );
 
-  Future<void> setFavorite(int id, bool favorite) =>
-      updateBook(id, BooksCompanion(favorite: Value(favorite)));
+  Future<void> setFavorite(int id, bool favorite) => updateBook(id, BooksCompanion(favorite: Value(favorite)));
 
   Future<void> markOpened(int id, {DateTime? now}) async {
     final book = await getBook(id);
@@ -87,9 +78,7 @@ class BooksRepository {
       id,
       BooksCompanion(
         lastOpenedAt: Value(now ?? DateTime.now()),
-        status: book.status == BookStatus.unread
-            ? const Value(BookStatus.reading)
-            : const Value.absent(),
+        status: book.status == BookStatus.unread ? const Value(BookStatus.reading) : const Value.absent(),
       ),
     );
   }
@@ -100,50 +89,40 @@ class BooksRepository {
     final book = await getBook(id);
     if (book == null) return;
     final furthest = page > book.furthestPage ? page : book.furthestPage;
-    final finishedNow = book.pageCount > 0 &&
-        page >= book.pageCount &&
-        book.status != BookStatus.finished;
+    final finishedNow = book.pageCount > 0 && page >= book.pageCount && book.status != BookStatus.finished;
     await updateBook(
       id,
       BooksCompanion(
         furthestPage: Value(furthest),
         status: finishedNow
             ? const Value(BookStatus.finished)
-            : (book.status == BookStatus.unread
-                ? const Value(BookStatus.reading)
-                : const Value.absent()),
+            : (book.status == BookStatus.unread ? const Value(BookStatus.reading) : const Value.absent()),
         finishedAt: finishedNow ? Value(now ?? DateTime.now()) : const Value.absent(),
       ),
     );
   }
 
   Future<void> setStatus(int id, BookStatus status, {DateTime? now}) => updateBook(
-        id,
-        BooksCompanion(
-          status: Value(status),
-          finishedAt: Value(status == BookStatus.finished ? (now ?? DateTime.now()) : null),
-          furthestPage: status == BookStatus.unread ? const Value(0) : const Value.absent(),
-        ),
-      );
+    id,
+    BooksCompanion(
+      status: Value(status),
+      finishedAt: Value(status == BookStatus.finished ? (now ?? DateTime.now()) : null),
+      furthestPage: status == BookStatus.unread ? const Value(0) : const Value.absent(),
+    ),
+  );
 
-  Future<void> setIndexState(
-    int id,
-    IndexStatus status, {
-    int? indexedPages,
-    int? textPages,
-  }) =>
-      updateBook(
-        id,
-        BooksCompanion(
-          indexStatus: Value(status),
-          indexedPages: indexedPages == null ? const Value.absent() : Value(indexedPages),
-          textPages: textPages == null ? const Value.absent() : Value(textPages),
-        ),
-      );
+  Future<void> setIndexState(int id, IndexStatus status, {int? indexedPages, int? textPages}) => updateBook(
+    id,
+    BooksCompanion(
+      indexStatus: Value(status),
+      indexedPages: indexedPages == null ? const Value.absent() : Value(indexedPages),
+      textPages: textPages == null ? const Value.absent() : Value(textPages),
+    ),
+  );
 
-  Future<List<Book>> booksNeedingIndex() => (db.select(db.books)
-        ..where((b) => b.indexStatus.isIn([IndexStatus.pending.index, IndexStatus.indexing.index])))
-      .get();
+  Future<List<Book>> booksNeedingIndex() => (db.select(
+    db.books,
+  )..where((b) => b.indexStatus.isIn([IndexStatus.pending.index, IndexStatus.indexing.index]))).get();
 
   /// Removes the book and everything attached to it (highlights, notes,
   /// bookmarks, positions, search index) from the database. File cleanup is
@@ -168,9 +147,7 @@ class BooksRepository {
       variables: [Variable.withInt(bookId)],
       readsFrom: {db.highlights, db.notes, db.bookmarks},
     );
-    return q.watchSingle().map(
-          (r) => AnnotationCounts(r.read<int>('h'), r.read<int>('n'), r.read<int>('b')),
-        );
+    return q.watchSingle().map((r) => AnnotationCounts(r.read<int>('h'), r.read<int>('n'), r.read<int>('b')));
   }
 
   static List<Book> sortAndFilter(
@@ -207,27 +184,27 @@ class BooksRepository {
     out.sort(switch (sort) {
       LibrarySort.recentlyAdded => (a, b) => b.addedAt.compareTo(a.addedAt),
       LibrarySort.recentlyOpened => (a, b) {
-          final c = byDateDesc(a.lastOpenedAt, b.lastOpenedAt);
-          return c != 0 ? c : b.addedAt.compareTo(a.addedAt);
-        },
+        final c = byDateDesc(a.lastOpenedAt, b.lastOpenedAt);
+        return c != 0 ? c : b.addedAt.compareTo(a.addedAt);
+      },
       LibrarySort.lastRead => (a, b) {
-          final c = byDateDesc(a.lastReadAt, b.lastReadAt);
-          return c != 0 ? c : byDateDesc(a.lastOpenedAt, b.lastOpenedAt);
-        },
+        final c = byDateDesc(a.lastReadAt, b.lastReadAt);
+        return c != 0 ? c : byDateDesc(a.lastOpenedAt, b.lastOpenedAt);
+      },
       LibrarySort.title => (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
       LibrarySort.author => (a, b) {
-          final aa = a.author?.toLowerCase();
-          final bb = b.author?.toLowerCase();
-          if (aa == null && bb == null) return a.title.compareTo(b.title);
-          if (aa == null) return 1;
-          if (bb == null) return -1;
-          final c = aa.compareTo(bb);
-          return c != 0 ? c : a.title.toLowerCase().compareTo(b.title.toLowerCase());
-        },
+        final aa = a.author?.toLowerCase();
+        final bb = b.author?.toLowerCase();
+        if (aa == null && bb == null) return a.title.compareTo(b.title);
+        if (aa == null) return 1;
+        if (bb == null) return -1;
+        final c = aa.compareTo(bb);
+        return c != 0 ? c : a.title.toLowerCase().compareTo(b.title.toLowerCase());
+      },
       LibrarySort.progress => (a, b) {
-          final c = b.progress.compareTo(a.progress);
-          return c != 0 ? c : byDateDesc(a.lastOpenedAt, b.lastOpenedAt);
-        },
+        final c = b.progress.compareTo(a.progress);
+        return c != 0 ? c : byDateDesc(a.lastOpenedAt, b.lastOpenedAt);
+      },
     });
     return out;
   }

@@ -19,9 +19,7 @@ Future<String> loadOrCreateDatabaseKey({FlutterSecureStorage? storage}) async {
   final existing = await s.read(key: _keyName);
   if (existing != null && existing.length >= 32) return existing;
   final rnd = Random.secure();
-  final key = List.generate(32, (_) => rnd.nextInt(256))
-      .map((b) => b.toRadixString(16).padLeft(2, '0'))
-      .join();
+  final key = List.generate(32, (_) => rnd.nextInt(256)).map((b) => b.toRadixString(16).padLeft(2, '0')).join();
   await s.write(key: _keyName, value: key);
   return key;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -107,13 +108,19 @@ class ProfileScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Daily goal: ${s.dailyGoalMinutes} min',
-                              style: context.text.titleMedium?.copyWith(color: ShelfColor.lime.cardForeground(context.brightness))),
+                          Text(
+                            'Daily goal: ${s.dailyGoalMinutes} min',
+                            style: context.text.titleMedium?.copyWith(
+                              color: ShelfColor.lime.cardForeground(context.brightness),
+                            ),
+                          ),
                           Text(
                             s.reminderEnabled
                                 ? 'Reminder at ${TimeOfDay(hour: s.reminderMinutes ~/ 60, minute: s.reminderMinutes % 60).format(context)}'
                                 : 'No reminder set',
-                            style: context.text.bodySmall?.copyWith(color: ShelfColor.lime.cardForeground(context.brightness)),
+                            style: context.text.bodySmall?.copyWith(
+                              color: ShelfColor.lime.cardForeground(context.brightness),
+                            ),
                           ),
                         ],
                       ),

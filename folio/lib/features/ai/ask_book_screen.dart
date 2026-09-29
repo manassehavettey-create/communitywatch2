@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -45,20 +46,19 @@ class AskBookScreen extends ConsumerWidget {
             _Notice(
               color: ShelfColor.peach,
               title: 'Not available for this PDF',
-              body: 'This is a scanned PDF without a text layer, so there’s no text for answers to be '
+              body:
+                  'This is a scanned PDF without a text layer, so there’s no text for answers to be '
                   'grounded in.',
             )
           else if (!configured)
             _Notice(
               color: ShelfColor.lilac,
               title: 'AI features are off',
-              body: 'Add an AI provider in Settings → AI to ask questions about this book. '
+              body:
+                  'Add an AI provider in Settings → AI to ask questions about this book. '
                   'Folio would send your question and only the few most relevant pages it finds on '
                   'your phone, and every answer links back to those pages.',
-              action: FilledButton(
-                onPressed: () => context.push('/profile/ai'),
-                child: const Text('Open AI settings'),
-              ),
+              action: FilledButton(onPressed: () => context.push('/profile/ai'), child: const Text('Open AI settings')),
             ),
           const SizedBox(height: Space.x4),
           TextField(
@@ -88,14 +88,19 @@ class AskBookScreen extends ConsumerWidget {
                 leading: Icon(PhosphorIconsRegular.listBullets, color: ShelfColor.lilac.cardForeground(b)),
                 title: Text(c.title, maxLines: 2, overflow: TextOverflow.ellipsis),
                 subtitle: Text('Starts on page ${c.page}'),
-                onTap: () => showAssistantSheet(context, ref,
-                    bookId: bookId, page: c.page, action: AssistAction.summarize),
+                onTap: () =>
+                    showAssistantSheet(context, ref, bookId: bookId, page: c.page, action: AssistAction.summarize),
               ),
             ),
           if (chapters.isEmpty)
             OutlinedButton.icon(
-              onPressed: () => showAssistantSheet(context, ref,
-                  bookId: bookId, page: initialPage ?? 1, action: AssistAction.summarize),
+              onPressed: () => showAssistantSheet(
+                context,
+                ref,
+                bookId: bookId,
+                page: initialPage ?? 1,
+                action: AssistAction.summarize,
+              ),
               icon: const Icon(PhosphorIconsRegular.listBullets, size: 18),
               label: const Text('Summarize a page range'),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -68,12 +69,7 @@ class _CollectionFormState extends State<_CollectionForm> {
     final m = Motion.of(context);
     final editing = widget.initialName != null;
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-        Space.gutter,
-        0,
-        Space.gutter,
-        MediaQuery.viewInsetsOf(context).bottom + Space.x6,
-      ),
+      padding: EdgeInsets.fromLTRB(Space.gutter, 0, Space.gutter, MediaQuery.viewInsetsOf(context).bottom + Space.x6),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,10 +124,7 @@ class _CollectionFormState extends State<_CollectionForm> {
                       decoration: BoxDecoration(
                         color: col.strong,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: col == _color ? context.colors.ink : Colors.transparent,
-                          width: 2.5,
-                        ),
+                        border: Border.all(color: col == _color ? context.colors.ink : Colors.transparent, width: 2.5),
                       ),
                       child: col == _color
                           ? const Icon(PhosphorIconsRegular.check, size: 18, color: Color(0xFF161514))

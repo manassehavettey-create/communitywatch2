@@ -9,48 +9,43 @@ enum ReaderTheme {
   const ReaderTheme(this.label);
   final String label;
 
-  static ReaderTheme fromIndex(int i) =>
-      (i >= 0 && i < values.length) ? values[i] : ReaderTheme.paper;
+  static ReaderTheme fromIndex(int i) => (i >= 0 && i < values.length) ? values[i] : ReaderTheme.paper;
 
   /// Background around the pages.
   Color get canvas => switch (this) {
-        ReaderTheme.paper => const Color(0xFFE9E3D6),
-        ReaderTheme.sepia => const Color(0xFFE6D6B8),
-        ReaderTheme.night => const Color(0xFF0E0D0C),
-      };
+    ReaderTheme.paper => const Color(0xFFE9E3D6),
+    ReaderTheme.sepia => const Color(0xFFE6D6B8),
+    ReaderTheme.night => const Color(0xFF0E0D0C),
+  };
 
   /// Page colour used by Text view and as the "blank page" tone.
   Color get page => switch (this) {
-        ReaderTheme.paper => const Color(0xFFFFFDF8),
-        ReaderTheme.sepia => const Color(0xFFF3E7CF),
-        ReaderTheme.night => const Color(0xFF1E1C19),
-      };
+    ReaderTheme.paper => const Color(0xFFFFFDF8),
+    ReaderTheme.sepia => const Color(0xFFF3E7CF),
+    ReaderTheme.night => const Color(0xFF1E1C19),
+  };
 
   /// Text colour in Text view.
   Color get text => switch (this) {
-        ReaderTheme.paper => const Color(0xFF1F1D1A),
-        ReaderTheme.sepia => const Color(0xFF3B2E20),
-        ReaderTheme.night => const Color(0xFFD9D0BF),
-      };
+    ReaderTheme.paper => const Color(0xFF1F1D1A),
+    ReaderTheme.sepia => const Color(0xFF3B2E20),
+    ReaderTheme.night => const Color(0xFFD9D0BF),
+  };
 
   Color get mutedText => text.withValues(alpha: 0.6);
 
-  Brightness get chromeBrightness =>
-      this == ReaderTheme.night ? Brightness.dark : Brightness.light;
+  Brightness get chromeBrightness => this == ReaderTheme.night ? Brightness.dark : Brightness.light;
 
   /// Colour filter applied to rendered PDF pages, or null for none.
   ColorFilter? get pageFilter => switch (this) {
-        ReaderTheme.paper => null,
-        ReaderTheme.sepia => _linearMap(
-            black: const Color(0xFF3B2E20),
-            white: const Color(0xFFF3E7CF),
-          ),
-        ReaderTheme.night => _nightFilter(
-            // white page → warm dim, black text → warm light
-            whiteTo: const Color(0xFF1E1C19),
-            blackTo: const Color(0xFFD9D0BF),
-          ),
-      };
+    ReaderTheme.paper => null,
+    ReaderTheme.sepia => _linearMap(black: const Color(0xFF3B2E20), white: const Color(0xFFF3E7CF)),
+    ReaderTheme.night => _nightFilter(
+      // white page → warm dim, black text → warm light
+      whiteTo: const Color(0xFF1E1C19),
+      blackTo: const Color(0xFFD9D0BF),
+    ),
+  };
 
   /// Maps each channel linearly so black → [black] and white → [white].
   static ColorFilter _linearMap({required Color black, required Color white}) {
@@ -73,10 +68,7 @@ enum ReaderTheme {
       ColorFilter.matrix(nightMatrix(whiteTo: whiteTo, blackTo: blackTo));
 
   /// The 4x5 colour matrix behind the Night theme (exposed for tests).
-  static List<double> nightMatrix({
-    Color whiteTo = const Color(0xFF1E1C19),
-    Color blackTo = const Color(0xFFD9D0BF),
-  }) {
+  static List<double> nightMatrix({Color whiteTo = const Color(0xFF1E1C19), Color blackTo = const Color(0xFFD9D0BF)}) {
     const lr = 0.2126, lg = 0.7152, lb = 0.0722;
     // Inversion matrix rows (per output channel): c - 2L + 255.
     final inv = <List<double>>[

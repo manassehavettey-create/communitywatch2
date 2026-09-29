@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../app/providers.dart';
@@ -62,9 +63,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   bool get _isLast => _index == _pages.length;
 
   Future<void> _finish() async {
-    await ref.read(settingsProvider.notifier).update(
-          (s) => s.copyWith(onboardingDone: true, name: _name.text.trim()),
-        );
+    await ref.read(settingsProvider.notifier).update((s) => s.copyWith(onboardingDone: true, name: _name.text.trim()));
   }
 
   void _next() {
@@ -72,7 +71,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     if (_isLast) {
       _finish();
     } else {
-      _controller.nextPage(duration: m.slow == Duration.zero ? const Duration(milliseconds: 1) : m.slow, curve: Motion.emphasized);
+      _controller.nextPage(
+        duration: m.slow == Duration.zero ? const Duration(milliseconds: 1) : m.slow,
+        curve: Motion.emphasized,
+      );
     }
   }
 
@@ -121,10 +123,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       margin: const EdgeInsets.only(right: 6),
                       width: i == _index ? 22 : 8,
                       height: 8,
-                      decoration: BoxDecoration(
-                        color: i == _index ? c.ink : c.hairline,
-                        borderRadius: Radii.pillAll,
-                      ),
+                      decoration: BoxDecoration(color: i == _index ? c.ink : c.hairline, borderRadius: Radii.pillAll),
                     ),
                   const Spacer(),
                   FilledButton.icon(
@@ -158,9 +157,10 @@ class _IntroPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: Space.x4),
-            Center(
-              child: Illustration(page.art, width: (box.maxHeight * 0.52 * 3 / 4).clamp(200.0, box.maxWidth)),
-            ).animate().fadeIn(duration: m.slow).moveY(begin: 12, end: 0, duration: m.slow, curve: Motion.curve),
+            Center(child: Illustration(page.art, width: (box.maxHeight * 0.52 * 3 / 4).clamp(200.0, box.maxWidth)))
+                .animate()
+                .fadeIn(duration: m.slow)
+                .moveY(begin: 12, end: 0, duration: m.slow, curve: Motion.curve),
             const SizedBox(height: Space.x6),
             Text.rich(
               TextSpan(
@@ -236,10 +236,7 @@ class _PrivacyCard extends StatelessWidget {
     final fg = ShelfColor.mint.cardForeground(context.brightness);
     return Container(
       padding: const EdgeInsets.all(Space.x5),
-      decoration: BoxDecoration(
-        color: ShelfColor.mint.cardBackground(context.brightness),
-        borderRadius: Radii.lgAll,
-      ),
+      decoration: BoxDecoration(color: ShelfColor.mint.cardBackground(context.brightness), borderRadius: Radii.lgAll),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

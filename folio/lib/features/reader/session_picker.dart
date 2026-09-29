@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../core/motion/motion.dart';
@@ -53,8 +54,10 @@ Future<int?> pickSessionLength(BuildContext context) {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Icon(PhosphorIconsRegular.timer, color: colors[i].cardForeground(b)),
-                              Text('${options[i]} min',
-                                  style: ctx.text.headlineSmall?.copyWith(color: colors[i].cardForeground(b))),
+                              Text(
+                                '${options[i]} min',
+                                style: ctx.text.headlineSmall?.copyWith(color: colors[i].cardForeground(b)),
+                              ),
                             ],
                           ),
                         ),
@@ -97,18 +100,18 @@ Future<void> showSessionSummary(BuildContext context, SessionResult r) {
       final m = Motion.of(ctx);
       final b = ctx.brightness;
       Widget stat(ShelfColor color, String value, String label) => Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(Space.x4),
-              decoration: BoxDecoration(color: color.cardBackground(b), borderRadius: Radii.lgAll),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(value, style: ctx.text.headlineMedium?.copyWith(color: color.cardForeground(b))),
-                  Text(label, style: ctx.text.bodySmall?.copyWith(color: color.cardForeground(b))),
-                ],
-              ),
-            ),
-          );
+        child: Container(
+          padding: const EdgeInsets.all(Space.x4),
+          decoration: BoxDecoration(color: color.cardBackground(b), borderRadius: Radii.lgAll),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value, style: ctx.text.headlineMedium?.copyWith(color: color.cardForeground(b))),
+              Text(label, style: ctx.text.bodySmall?.copyWith(color: color.cardForeground(b))),
+            ],
+          ),
+        ),
+      );
       return SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(Space.gutter, 0, Space.gutter, Space.x6),
@@ -131,9 +134,7 @@ Future<void> showSessionSummary(BuildContext context, SessionResult r) {
               ).animate().fadeIn(delay: m.fast, duration: m.base),
               const SizedBox(height: 4),
               Text(
-                r.targetMinutes != null
-                    ? '${r.targetMinutes}-minute focus session'
-                    : 'Here’s what you read',
+                r.targetMinutes != null ? '${r.targetMinutes}-minute focus session' : 'Here’s what you read',
                 style: ctx.text.bodySmall,
               ),
               const SizedBox(height: Space.x5),

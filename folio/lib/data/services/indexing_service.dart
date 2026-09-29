@@ -94,12 +94,7 @@ class IndexingService {
           if (await books.getBook(bookId) == null) return;
           await search.savePageTexts(bookId, List.of(batch));
           batch.clear();
-          await books.setIndexState(
-            bookId,
-            IndexStatus.indexing,
-            indexedPages: i + 1,
-            textPages: textPages,
-          );
+          await books.setIndexState(bookId, IndexStatus.indexing, indexedPages: i + 1, textPages: textPages);
         }
       }
       await books.setIndexState(
@@ -130,13 +125,15 @@ class IndexingService {
         final page = n.dest?.pageNumber;
         final title = n.title.trim();
         if (page != null && page >= 1 && title.isNotEmpty) {
-          rows.add(OutlineEntriesCompanion.insert(
-            bookId: bookId,
-            position: rows.length,
-            title: title,
-            page: page,
-            level: level,
-          ));
+          rows.add(
+            OutlineEntriesCompanion.insert(
+              bookId: bookId,
+              position: rows.length,
+              title: title,
+              page: page,
+              level: level,
+            ),
+          );
         }
         walk(n.children, level + 1);
       }
@@ -153,8 +150,9 @@ class IndexingService {
 
 /// Reads the saved outline.
 extension OutlineQueries on AppDatabase {
-  Future<List<OutlineEntry>> outlineFor(int bookId) => (select(outlineEntries)
-        ..where((o) => o.bookId.equals(bookId))
-        ..orderBy([(o) => OrderingTerm.asc(o.position)]))
-      .get();
+  Future<List<OutlineEntry>> outlineFor(int bookId) =>
+      (select(outlineEntries)
+            ..where((o) => o.bookId.equals(bookId))
+            ..orderBy([(o) => OrderingTerm.asc(o.position)]))
+          .get();
 }

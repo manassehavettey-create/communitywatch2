@@ -52,26 +52,21 @@ enum ShelfColor {
   final Color tint;
   final String label;
 
-  static ShelfColor fromIndex(int i) =>
-      (i >= 0 && i < values.length) ? values[i] : ShelfColor.butter;
+  static ShelfColor fromIndex(int i) => (i >= 0 && i < values.length) ? values[i] : ShelfColor.butter;
 
   /// Colours offered for highlights (first five).
   static const List<ShelfColor> highlightColors = [butter, mint, sky, rose, lilac];
 
   /// Colours offered for collections.
-  static const List<ShelfColor> collectionColors = [
-    lavender, lime, butter, peach, mint, sky,
-  ];
+  static const List<ShelfColor> collectionColors = [lavender, lime, butter, peach, mint, sky];
 
   /// Card background in the given brightness: the pale tint in light mode,
   /// a dimmed version of the strong colour in dark mode.
-  Color cardBackground(Brightness b) => b == Brightness.light
-      ? tint
-      : Color.alphaBlend(strong.withValues(alpha: 0.22), const Color(0xFF1C1A18));
+  Color cardBackground(Brightness b) =>
+      b == Brightness.light ? tint : Color.alphaBlend(strong.withValues(alpha: 0.22), const Color(0xFF1C1A18));
 
   /// Foreground to use on [cardBackground].
-  Color cardForeground(Brightness b) =>
-      b == Brightness.light ? const Color(0xFF161514) : const Color(0xFFEDE6D8);
+  Color cardForeground(Brightness b) => b == Brightness.light ? const Color(0xFF161514) : const Color(0xFFEDE6D8);
 }
 
 /// Semantic colours exposed as a ThemeExtension so every widget reads them
@@ -132,9 +127,8 @@ class FolioColors extends ThemeExtension<FolioColors> {
     shadow: Color(0x00000000),
   );
 
-  List<BoxShadow> get floatingShadow => shadow.a == 0
-      ? const []
-      : [BoxShadow(color: shadow, blurRadius: 24, offset: const Offset(0, 8))];
+  List<BoxShadow> get floatingShadow =>
+      shadow.a == 0 ? const [] : [BoxShadow(color: shadow, blurRadius: 24, offset: const Offset(0, 8))];
 
   @override
   FolioColors copyWith() => this;

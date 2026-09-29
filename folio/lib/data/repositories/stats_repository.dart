@@ -42,12 +42,8 @@ class StatsSummary {
   List<DayTotal> lastDays(int count, DateTime now) {
     final byDay = {for (final d in days) d.day: d};
     final today = dateOnly(now);
-    return [
-      for (var i = count - 1; i >= 0; i--)
-        byDay[addDays(today, -i)] ?? DayTotal(addDays(today, -i), 0, 0),
-    ];
+    return [for (var i = count - 1; i >= 0; i--) byDay[addDays(today, -i)] ?? DayTotal(addDays(today, -i), 0, 0)];
   }
-
 }
 
 class StatsRepository {
@@ -70,8 +66,7 @@ class StatsRepository {
         'ON CONFLICT(day) DO UPDATE SET pages_read = pages_read + ?2, seconds = seconds + ?3',
         [key, pages, seconds],
       );
-      await (db.update(db.books)..where((b) => b.id.equals(bookId)))
-          .write(BooksCompanion(lastReadAt: Value(at)));
+      await (db.update(db.books)..where((b) => b.id.equals(bookId))).write(BooksCompanion(lastReadAt: Value(at)));
     });
   }
 
@@ -80,16 +75,12 @@ class StatsRepository {
   Future<void> updateSession(int id, ReadingSessionsCompanion s) =>
       (db.update(db.readingSessions)..where((r) => r.id.equals(id))).write(s);
 
-  Stream<List<DayTotal>> watchDays() => (db.select(db.dailyActivities)
-        ..orderBy([(d) => OrderingTerm.asc(d.day)]))
+  Stream<List<DayTotal>> watchDays() => (db.select(db.dailyActivities)..orderBy([(d) => OrderingTerm.asc(d.day)]))
       .watch()
-      .map((rows) => [
-            for (final r in rows) DayTotal(parseDayKey(r.day), r.pagesRead, r.seconds),
-          ]);
+      .map((rows) => [for (final r in rows) DayTotal(parseDayKey(r.day), r.pagesRead, r.seconds)]);
 
   Future<List<DayTotal>> _days() async {
-    final rows = await (db.select(db.dailyActivities)..orderBy([(d) => OrderingTerm.asc(d.day)]))
-        .get();
+    final rows = await (db.select(db.dailyActivities)..orderBy([(d) => OrderingTerm.asc(d.day)])).get();
     return [for (final r in rows) DayTotal(parseDayKey(r.day), r.pagesRead, r.seconds)];
   }
 
@@ -109,11 +100,13 @@ class StatsRepository {
       if (!d.day.isBefore(weekStart)) pagesWeek += d.pages;
       if (!d.day.isBefore(monthStart)) pagesMonth += d.pages;
     }
-    final counts = await db.customSelect(
-      'SELECT '
-      "(SELECT count(*) FROM books WHERE status = ${BookStatus.finished.index}) AS f, "
-      "(SELECT count(*) FROM books WHERE status = ${BookStatus.reading.index}) AS r",
-    ).getSingle();
+    final counts = await db
+        .customSelect(
+          'SELECT '
+          "(SELECT count(*) FROM books WHERE status = ${BookStatus.finished.index}) AS f, "
+          "(SELECT count(*) FROM books WHERE status = ${BookStatus.reading.index}) AS r",
+        )
+        .getSingle();
     final readingDays = {
       for (final d in days)
         if (qualifiesForStreak(pagesRead: d.pages, seconds: d.seconds)) d.day,
@@ -134,9 +127,7 @@ class StatsRepository {
   /// Re-computes the summary whenever reading activity or books change.
   Stream<StatsSummary> watchSummary() async* {
     yield await summary();
-    await for (final _ in db.tableUpdates(
-      TableUpdateQuery.onAllTables([db.dailyActivities, db.books]),
-    )) {
+    await for (final _ in db.tableUpdates(TableUpdateQuery.onAllTables([db.dailyActivities, db.books]))) {
       yield await summary();
     }
   }

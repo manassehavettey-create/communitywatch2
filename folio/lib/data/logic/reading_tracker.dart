@@ -12,10 +12,10 @@ class ReadingTracker {
     required DateTime now,
     this.idleTimeout = const Duration(minutes: 3),
     this.minDwell = const Duration(seconds: 5),
-  })  : _currentPage = startPage,
-        startPage = startPage,
-        _lastTick = now,
-        _lastInteraction = now;
+  }) : _currentPage = startPage,
+       startPage = startPage,
+       _lastTick = now,
+       _lastInteraction = now;
 
   final Duration idleTimeout;
   final Duration minDwell;

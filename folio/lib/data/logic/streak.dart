@@ -7,11 +7,7 @@ bool qualifiesForStreak({required int pagesRead, required int seconds}) =>
     pagesRead > 0 || seconds >= kStreakMinSeconds;
 
 class StreakResult {
-  const StreakResult({
-    required this.current,
-    required this.longest,
-    required this.readToday,
-  });
+  const StreakResult({required this.current, required this.longest, required this.readToday});
 
   /// Consecutive reading days ending today, or ending yesterday when today
   /// has no reading yet (the streak is still alive until the day is over).

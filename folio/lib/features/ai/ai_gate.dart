@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/theme/icons.dart';
 
 import '../../core/theme/tokens.dart';
@@ -72,8 +73,12 @@ class _AssistantSheet extends ConsumerWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(Space.x3),
                 decoration: BoxDecoration(color: context.colors.surfaceMuted, borderRadius: Radii.mdAll),
-                child: Text('“${passage!.trim()}”',
-                    maxLines: 4, overflow: TextOverflow.ellipsis, style: context.text.bodySmall),
+                child: Text(
+                  '“${passage!.trim()}”',
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.text.bodySmall,
+                ),
               ),
             ],
             const SizedBox(height: Space.x4),
@@ -100,8 +105,10 @@ class _AssistantSheet extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('AI features are off',
-                      style: context.text.titleMedium?.copyWith(color: ShelfColor.lilac.cardForeground(b))),
+                  Text(
+                    'AI features are off',
+                    style: context.text.titleMedium?.copyWith(color: ShelfColor.lilac.cardForeground(b)),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     'Explain, summarize, define and Ask This Book need an AI provider. '
