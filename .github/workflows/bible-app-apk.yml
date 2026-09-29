@@ -7,6 +7,9 @@ on:
       - '.github/workflows/bible-app-apk.yml'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,3 +35,14 @@ jobs:
           name: bible-app-apk
           path: bible_app/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
+      - run: cp build/app/outputs/flutter-apk/app-release.apk build/bible-app.apk
+      # Publishes the APK at a fixed download link:
+      # https://github.com/<owner>/<repo>/releases/download/bible-app-latest/bible-app.apk
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: bible-app-latest
+          name: Bible app (latest build)
+          prerelease: true
+          target_commitish: ${{ github.sha }}
+          files: bible_app/build/bible-app.apk
+          body: Latest APK built from ${{ github.sha }}. Local-only mode (no accounts).
