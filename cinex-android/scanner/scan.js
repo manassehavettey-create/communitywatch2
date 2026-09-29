@@ -7,7 +7,7 @@ const { findServers, clickPlay, isPlaying } = require('./common');
 
 const BASE = process.argv[2] || 'https://cinex.watch';
 const OUT = process.argv[3] || 'scan-log.json';
-const MAX_VIDEO_PAGES = +process.env.MAX_VIDEO_PAGES || 6;
+const MAX_VIDEO_PAGES = +process.env.MAX_VIDEO_PAGES || 4;
 const MEDIA_RE = /\.(m3u8|mpd|mp4|m4s|m4v|webm|ts)(\?|#|$)/i;
 const MEDIA_CT = /(mpegurl|dash\+xml|video\/|audio\/|mp2t)/i;
 const VIDEO_LINK_RE = /\/(movie|movies|tv|show|shows|series|watch|episode|film|anime)\b/i;
@@ -89,7 +89,7 @@ async function main() {
   await page.mouse.wheel(0, 3000); await sleep(2000);
   const links = await page.$$eval('a[href]', (as) => as.map((a) => a.href)).catch(() => []);
   const home = host(BASE).replace(/^www\./, '');
-  const videoLinks = [...new Set(links.filter((u) => host(u) && host(u).endsWith(home) && VIDEO_LINK_RE.test(new URL(u).pathname)))];
+  const videoLinks = [...new Set(links.filter((u) => host(u) && host(u).endsWith(home) && /^\/(movie|tv|watch|series|episode|anime)\/[\w-]+\/?$/i.test(new URL(u).pathname)).map((u) => { const x = new URL(u); return x.origin + x.pathname; }))];
   // Prefer a mix of movie and tv pages
   const pick = [];
   for (const re of [/movie|film/i, /tv|show|series|episode/i, /./]) for (const u of videoLinks) if (pick.length < MAX_VIDEO_PAGES && re.test(u) && !pick.includes(u) && pick.filter((x) => re.test(x)).length < Math.ceil(MAX_VIDEO_PAGES / 2)) pick.push(u);

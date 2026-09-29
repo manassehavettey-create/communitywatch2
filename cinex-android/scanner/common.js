@@ -7,24 +7,25 @@ const host = (u) => { try { return new URL(u).hostname.toLowerCase(); } catch { 
 async function findServers(page) {
   return page.evaluate((reSrc) => {
     const re = new RegExp(reSrc, 'i');
-    const sel = [
-      '[class*="server" i] a', '[class*="server" i] button', '[class*="server" i] li', '[id*="server" i] a', '[id*="server" i] button', '[id*="server" i] li',
-      '[class*="source" i] button', '[class*="source" i] li', '[class*="player" i] button', '[class*="provider" i] button', '[class*="provider" i] li',
-      '[data-server]', '[data-id][data-type]', '[data-embed]', '[data-src*="embed"]', '[data-link]', 'select[class*="server" i] option', 'select[id*="server" i] option',
-    ];
+    const PROVIDER = /(vid|embed|src|stream|cine|play|server|source|mirror|upcloud|mega|\b\d{1,2}\b)/i;
+    const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 4 && r.height > 4; };
+    const label = (el) => (el.innerText || el.getAttribute('title') || el.getAttribute('aria-label') || '').trim().replace(/\s+/g, ' ').slice(0, 40);
     const out = []; const seen = new Set();
-    for (const s of sel) {
-      document.querySelectorAll(s).forEach((el, index) => {
-        if (seen.has(el)) return;
-        const r = el.getBoundingClientRect();
-        const text = (el.innerText || el.getAttribute('title') || el.dataset.server || '').trim().slice(0, 40);
-        if ((r.width < 5 || r.height < 5) && el.tagName !== 'OPTION') return;
-        if (!text && !el.dataset.server && !el.dataset.id) return;
-        if (el.closest('nav,header,footer')) return;
-        if (!re.test(text + ' ' + el.className + ' ' + s)) return;
-        seen.add(el); out.push({ selector: s, index, label: text });
-      });
+    const add = (el) => {
+      const l = label(el); if (!l || seen.has(l) || el.closest('nav,header,footer')) return;
+      seen.add(l); out.push({ selector: `${el.tagName.toLowerCase()}:text-is(${JSON.stringify(l)})`, index: 0, label: l });
+    };
+    // 1) Groups of >=3 sibling buttons whose labels look like provider / server names.
+    const groups = new Map();
+    document.querySelectorAll('button,[role=button],li[data-id],a[data-id]').forEach((el) => {
+      if (!vis(el)) return; const p = el.parentElement; if (!groups.has(p)) groups.set(p, []); groups.get(p).push(el);
+    });
+    for (const els of groups.values()) {
+      if (els.length >= 3 && els.filter((e) => PROVIDER.test(label(e))).length >= Math.ceil(els.length / 2)) els.forEach(add);
     }
+    // 2) Anything inside a container named server/source/player/provider.
+    const sel = ['[class*="server" i]', '[id*="server" i]', '[class*="source" i]', '[class*="provider" i]', '[data-server]', '[data-embed]', '[data-link]'];
+    for (const s of sel) document.querySelectorAll(`${s} button, ${s} li, ${s} a, button${s}`).forEach((el) => { if (vis(el) && re.test(label(el) + ' ' + el.className)) add(el); });
     return out.slice(0, 15);
   }, SERVER_TEXT_RE.source).catch(() => []);
 }
