@@ -1,0 +1,84 @@
+name: Cinex Android
+on:
+  push:
+    paths: ['cinex-android/**', '.github/workflows/cinex-android.yml']
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults: { run: { working-directory: cinex-android/scanner } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm i --no-audit --no-fund && npx playwright install --with-deps chromium
+      - name: Step 1 - scan site (every server, click play, log requests + popups)
+        run: xvfb-run -a node scan.js https://cinex.watch scan-log.json
+      - name: Step 2 - build allow/block lists
+        run: cp ../app/src/main/assets/domains.json domains.json && node build-lists.js scan-log.json domains.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scan
+          path: |
+            cinex-android/scanner/scan-log.json
+            cinex-android/scanner/domains.json
+            cinex-android/scanner/*.png
+            cinex-android/scanner/*.html
+
+  build:
+    needs: scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults: { run: { working-directory: cinex-android } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: scan, path: scan }
+      - run: cp ../scan/domains.json app/src/main/assets/domains.json
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - name: Step 3 - build APK
+        run: ./gradlew --no-daemon assembleDebug
+      - uses: actions/upload-artifact@v4
+        with: { name: cinex-apk, path: cinex-android/app/build/outputs/apk/debug/app-debug.apk }
+
+  emulator-test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: scan, path: cinex-android/scanner }
+      - uses: actions/download-artifact@v4
+        with: { name: cinex-apk, path: apk }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: cd cinex-android/scanner && npm i --no-audit --no-fund
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - name: Step 4 - play every player type in the app on an emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          ram-size: 4096M
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: |
+            adb install -r apk/app-debug.apk
+            cd cinex-android/scanner && node emulator-test.js domains.json scan-log.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: emulator-results
+          path: |
+            cinex-android/scanner/emulator-results.json
+            cinex-android/scanner/domains.json
+            cinex-android/scanner/*.png

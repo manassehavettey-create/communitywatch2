@@ -1,0 +1,7 @@
+.gradle/
+build/
+local.properties
+scanner/node_modules/
+scanner/*.png
+scanner/*.html
+scanner/test-results/

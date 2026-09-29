@@ -1,0 +1,7 @@
+{
+  "source": "https://cinex.watch",
+  "ownDomain": "cinex.watch",
+  "allow": ["cinex.watch"],
+  "block": [],
+  "manualAllow": []
+}
