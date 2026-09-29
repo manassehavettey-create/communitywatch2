@@ -8,6 +8,9 @@ const Map<String, int> kIllustrationBackgrounds = {
   'collection_butter': 0xFFF4D46F,
   'collection_lavender': 0xFF9D8BEA,
   'collection_lime': 0xFFD4E972,
+  'collection_mint': 0xFFB2E1C7,
+  'collection_peach': 0xFFF5AA81,
+  'collection_sky': 0xFFA2C5ED,
   'empty_bookmarks': 0xFFD5F0E1,
   'empty_collections': 0xFFF9DFE4,
   'empty_highlights': 0xFFF6E8B7,
@@ -18,4 +21,5 @@ const Map<String, int> kIllustrationBackgrounds = {
   'onboarding_habit': 0xFFFBDAC7,
   'onboarding_highlight': 0xFFE9F4B2,
   'onboarding_library': 0xFFE5DFF9,
+  'session_complete': 0xFFEBF2C7,
 };
