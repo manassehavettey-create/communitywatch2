@@ -45,7 +45,15 @@ class ReaderSettingsSheet extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SheetHeader(title: 'Reading'),
+            SheetHeader(
+              title: 'Reading',
+              trailing: CircleIconButton(
+                icon: PhosphorIconsBold.x,
+                tooltip: 'Close',
+                size: 40,
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
             // Live sample of the current settings.
             AnimatedContainer(
               duration: Motion.of(context).base,
@@ -332,7 +340,15 @@ class TranslationSheet extends ConsumerWidget {
         shrinkWrap: true,
         padding: const EdgeInsets.fromLTRB(Space.x4, 0, Space.x4, Space.x6),
         children: [
-          const SheetHeader(title: 'Translation'),
+          SheetHeader(
+            title: 'Translation',
+            trailing: CircleIconButton(
+              icon: PhosphorIconsBold.x,
+              tooltip: 'Close',
+              size: 40,
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
           for (final t in catalog.available)
             _TranslationTile(
               abbreviation: t.abbreviation,
