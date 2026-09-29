@@ -24,8 +24,10 @@ const guardLog = () => adb('logcat -d -s CinexGuard:I').split('\n').filter((l) =
 
 async function launch(device) {
   adb(`shell am force-stop ${PKG}`);
+  await sleep(2000);
+  const next = device.waitForEvent('webview', { timeout: 90000 });
   adb(`shell am start -n ${PKG}/.MainActivity`);
-  const wv = await device.webView({ pkg: PKG });
+  const wv = await next; // fresh WebView of the new process (never the stale one)
   const page = await wv.page();
   await page.waitForLoadState('domcontentloaded').catch(() => {});
   return page;
@@ -48,12 +50,14 @@ async function main() {
   const results = [];
   const seenPlayers = new Set();
   for (const url of urls) {
+    if (page.isClosed()) { page = await launch(device); await sleep(4000); }
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 }).catch(() => {});
     await sleep(5000);
     await clickPlay(page); await sleep(2000);
     const servers = await findServers(page);
     console.log(`\n${url}: ${servers.length} servers`);
     for (const [j, s] of servers.entries()) {
+      if (page.isClosed()) { page = await launch(device); await sleep(4000); }
       let r = await tryServer(page, url, s, j);
       if (!r.playing && r.candidates.length) {
         console.log(`   -> not playing; app blocked ${r.candidates.join(', ')}; adding to allowlist and retesting`);
