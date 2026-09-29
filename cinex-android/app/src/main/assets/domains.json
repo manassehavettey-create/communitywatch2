@@ -1,7 +1,21 @@
 {
   "source": "https://cinex.watch",
+  "generatedAt": "2026-09-29T03:53:18Z",
   "ownDomain": "cinex.watch",
-  "allow": ["cinex.watch"],
-  "block": [],
+  "allow": [
+    "2embed.cc", "2vcdn.skin", "cinesrc.st", "cinex.watch", "cloudorchestranova.com",
+    "moviesapi.vip", "onlinecoursecreator.site", "vidlink.pro", "vidsrc.buzz", "vidsrc.cc",
+    "vidsrc.pm", "vidsrc.to", "vidstuck.xyz", "vsembed.ru", "workers.dev",
+    "yashmak-yonder.site", "youtube.com", "zxcprime.xyz", "zxcstream.xyz"
+  ],
+  "block": [
+    "acrpoker.eu", "adexchangerapid.com", "adjust.com", "ads-twitter.com", "adsco.re", "aliapp.org",
+    "alibaba.com", "alicdn.com", "americascardroom.eu", "chatmate.tv", "clarity.ms", "creativecdn.com",
+    "criteo.com", "criteo.net", "doubleclick.net", "dtscout.com", "effectivecpmnetwork.com",
+    "highrevenueformat.com", "histats.com", "intellipopup.com", "mrktmtrcs.net", "nectsideaments.com",
+    "nextgencloudfabric.com", "opera.com", "operacdn.com", "prdredir.com", "rtmark.net", "taobao.com",
+    "tiktokw.us", "trackdesk.com", "ucweb.com", "unfortunatelyejectinflected.com", "usrpubtrk.com",
+    "yz6q857w7ylbeb.cfd"
+  ],
   "manualAllow": []
 }

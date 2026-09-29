@@ -45,6 +45,8 @@ async function main() {
     urls = (await page.$$eval('a[href]', (as) => as.map((a) => a.href))).filter((u) => /\/(movie|tv|watch|series|episode)\b/i.test(u));
     urls = [...new Set(urls)].slice(0, 4);
   }
+  // Scan may have been challenged by Cloudflare: fall back to pages verified in the committed scan.
+  if (!urls.length) urls = ['/movie/1377237', '/movie/1248832', '/tv/95350', '/tv/615'].map((p) => `https://${cfg.ownDomain}${p}`);
   urls = urls.slice(0, +process.env.MAX_PAGES || 4);
 
   const results = [];

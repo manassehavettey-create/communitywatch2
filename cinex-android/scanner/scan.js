@@ -87,7 +87,8 @@ async function main() {
   await waitContent(page);
   console.log('DIAG home', JSON.stringify(await diag(page)).slice(0, 3000));
   await page.mouse.wheel(0, 3000); await sleep(2000);
-  const links = await page.$$eval('a[href]', (as) => as.map((a) => a.href)).catch(() => []);
+  let links = await page.$$eval('a[href]', (as) => as.map((a) => a.href)).catch(() => []);
+  if (links.length < 10) { await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => {}); await waitContent(page); links = await page.$$eval('a[href]', (as) => as.map((a) => a.href)).catch(() => []); }
   const home = host(BASE).replace(/^www\./, '');
   const videoLinks = [...new Set(links.filter((u) => host(u) && host(u).endsWith(home) && /^\/(movie|tv|watch|series|episode|anime)\/[\w-]+\/?$/i.test(new URL(u).pathname)).map((u) => { const x = new URL(u); return x.origin + x.pathname; }))];
   // Prefer a mix of movie and tv pages
