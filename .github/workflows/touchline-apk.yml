@@ -10,6 +10,11 @@ on:
       - 'football_app/**'
       - '.github/workflows/touchline-apk.yml'
   workflow_dispatch:
+    inputs:
+      api_key:
+        description: 'API-Football key (used only if the API_FOOTBALL_KEY secret is not set)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -23,6 +28,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Resolve the key without ever printing it: prefer the repository
+      # secret; otherwise read the dispatch input from the event file, mask it,
+      # and expose it to later steps.
+      - name: Resolve API key
+        env:
+          SECRET_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          KEY="$SECRET_KEY"
+          if [ -z "$KEY" ] && [ -f "$GITHUB_EVENT_PATH" ]; then
+            KEY=$(python3 -c "import json,os;print((json.load(open(os.environ['GITHUB_EVENT_PATH'])).get('inputs') or {}).get('api_key') or '')")
+          fi
+          if [ -n "$KEY" ]; then
+            echo "::add-mask::$KEY"
+            echo "API_FOOTBALL_KEY=$KEY" >> "$GITHUB_ENV"
+            echo "API key available."
+          else
+            echo "No API key — a demo-data preview APK will be built."
+          fi
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -35,8 +59,6 @@ jobs:
           cache: true
 
       - name: Check API-Football access (free-plan season coverage)
-        env:
-          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
           if [ -z "$API_FOOTBALL_KEY" ]; then echo "No API_FOOTBALL_KEY secret set — skipping check."; exit 0; fi
           call() { curl -s -H "x-apisports-key: $API_FOOTBALL_KEY" "https://v3.football.api-sports.io/$1"; }
@@ -51,8 +73,6 @@ jobs:
       - run: flutter test
 
       - name: Build APK
-        env:
-          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
           if [ -n "$API_FOOTBALL_KEY" ]; then
             flutter build apk --release --dart-define=API_FOOTBALL_KEY="$API_FOOTBALL_KEY"
