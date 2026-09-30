@@ -15,6 +15,10 @@ on:
         description: 'API-Football key (used only if the API_FOOTBALL_KEY secret is not set)'
         required: false
         default: ''
+      fd_key:
+        description: 'football-data.org key (optional current-season fallback)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -39,6 +43,9 @@ jobs:
           if [ -z "$KEY" ] && [ -f "$GITHUB_EVENT_PATH" ]; then
             KEY=$(python3 -c "import json,os;print((json.load(open(os.environ['GITHUB_EVENT_PATH'])).get('inputs') or {}).get('api_key') or '')")
           fi
+          FD=$(python3 -c "import json,os;print((json.load(open(os.environ['GITHUB_EVENT_PATH'])).get('inputs') or {}).get('fd_key') or '')" 2>/dev/null || true)
+          if [ -z "$FD" ]; then FD="${{ secrets.FOOTBALL_DATA_KEY }}"; fi
+          if [ -n "$FD" ]; then echo "::add-mask::$FD"; echo "FOOTBALL_DATA_KEY=$FD" >> "$GITHUB_ENV"; echo "football-data.org key available."; fi
           if [ -n "$KEY" ]; then
             echo "::add-mask::$KEY"
             echo "API_FOOTBALL_KEY=$KEY" >> "$GITHUB_ENV"
@@ -75,7 +82,7 @@ jobs:
       - name: Build APK
         run: |
           if [ -n "$API_FOOTBALL_KEY" ]; then
-            flutter build apk --release --dart-define=API_FOOTBALL_KEY="$API_FOOTBALL_KEY"
+            flutter build apk --release --dart-define=API_FOOTBALL_KEY="$API_FOOTBALL_KEY" --dart-define=FOOTBALL_DATA_KEY="${FOOTBALL_DATA_KEY:-}"
             echo "MODE=live data" >> "$GITHUB_ENV"
           else
             flutter build apk --release --dart-define=ALLOW_DEMO=true

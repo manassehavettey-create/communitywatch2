@@ -8,6 +8,7 @@ import '../core/network/request_budget.dart';
 import '../core/utils/format.dart';
 import '../data/api_football/api_football_repository.dart';
 import '../data/demo/demo_repository.dart';
+import '../data/football_data/football_data_repository.dart';
 import '../data/football_repository.dart';
 import '../data/models/models.dart';
 import 'env.dart';
@@ -61,10 +62,12 @@ final budgetStateProvider = NotifierProvider<BudgetNotifier, BudgetState>(Budget
 final repositoryProvider = Provider<FootballRepository>((ref) {
   final demo = ref.watch(settingsProvider.select((s) => s.useDemo));
   if (demo) return DemoRepository();
-  return ApiFootballRepository(
+  final primary = ApiFootballRepository(
     client: ApiFootballClient(apiKey: Env.apiKey, budget: ref.watch(budgetProvider)),
     store: ref.watch(cacheStoreProvider),
   );
+  if (Env.footballDataKey.isEmpty) return primary;
+  return HybridRepository(primary, FootballDataSource(apiKey: Env.footballDataKey, store: ref.watch(cacheStoreProvider)));
 });
 
 final capabilitiesProvider = Provider<ProviderCapabilities>((ref) => ref.watch(repositoryProvider).capabilities);
